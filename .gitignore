@@ -1,0 +1,41 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Databases and exports
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sql
+*.dump
+backups/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+instance/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local tools and generated artifacts
+.playwright-cli/
+output/
+outputs/
+dist/
+build/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
