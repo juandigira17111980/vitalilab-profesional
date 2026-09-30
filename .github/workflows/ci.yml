@@ -22,6 +22,8 @@ jobs:
       - run: pip install pip-audit==2.10.1
       - run: python -m ruff check app tests wsgi.py migrations/versions
       - run: python -m ruff format --check app tests wsgi.py migrations/versions
+      - name: Security static analysis
+        run: python -m bandit -q -r app wsgi.py -ll
       - run: python -m pytest
       - run: python -m pip_audit -r requirements.txt --progress-spinner off
 
@@ -55,6 +57,32 @@ jobs:
       - run: python -m flask --app wsgi:app db upgrade
       - run: python -m flask --app wsgi:app seed-habits
       - run: python -m flask --app wsgi:app db check
+      - name: Prove PostgreSQL backup and isolated restore
+        shell: bash
+        run: |
+          POSTGRES_CONTAINER="$(docker ps --filter 'ancestor=postgres:18-alpine' --format '{{.ID}}' | head -n 1)"
+          test -n "$POSTGRES_CONTAINER"
+          docker exec "$POSTGRES_CONTAINER" pg_dump \
+            --username vitalilab \
+            --dbname vitalilab_test \
+            --format custom \
+            --file /tmp/vitalilab.dump
+          docker exec "$POSTGRES_CONTAINER" createdb \
+            --username vitalilab \
+            vitalilab_restore
+          docker exec "$POSTGRES_CONTAINER" pg_restore \
+            --username vitalilab \
+            --dbname vitalilab_restore \
+            --exit-on-error \
+            /tmp/vitalilab.dump
+          SOURCE_HABITS="$(docker exec "$POSTGRES_CONTAINER" psql --username vitalilab --dbname vitalilab_test --tuples-only --no-align --command 'SELECT COUNT(*) FROM habits')"
+          RESTORED_HABITS="$(docker exec "$POSTGRES_CONTAINER" psql --username vitalilab --dbname vitalilab_restore --tuples-only --no-align --command 'SELECT COUNT(*) FROM habits')"
+          test "$SOURCE_HABITS" = "$RESTORED_HABITS"
+          test "$(docker exec "$POSTGRES_CONTAINER" psql --username vitalilab --dbname vitalilab_restore --tuples-only --no-align --command 'SELECT COUNT(*) FROM alembic_version')" = "1"
+      - name: Verify restored schema has no model drift
+        env:
+          DATABASE_URL: postgresql://vitalilab:test-only-password@localhost:5432/vitalilab_restore
+        run: python -m flask --app wsgi:app db check
 
   container-build:
     runs-on: ubuntu-latest
