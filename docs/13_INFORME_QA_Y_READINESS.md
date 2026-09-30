@@ -1,9 +1,9 @@
 # Informe técnico preproducción — VitaliLab
 
 Fecha: **30 de septiembre de 2026**  
-Versión: candidata `v0.1.0`, rama `feat/reconstruccion-profesional`  
+Versión: candidata `v0.1.0`, rama `staging`, integración `2120e31`
 Decisión preliminar: **GO para PR/CI y Staging; NO-GO para Production**  
-Preparación actual: **87/100 — Apto con observaciones**
+Preparación actual: **90/100 — Apto con observaciones**
 
 Escala: 0–40 No apto · 41–60 Riesgo alto · 61–75 Requiere correcciones · 76–90 Apto con observaciones · 91–100 Apto para producción.
 
@@ -13,7 +13,7 @@ Se usa calibración de sistema educativo con datos personales y medidas de salud
 
 La reconstrucción elimina los bloqueantes técnicos observados en el prototipo: credenciales inseguras, esquema no migrable, duplicación de progreso, acoplamiento, falta de pruebas y frontend inconsistente. No hay hallazgos críticos abiertos en el código local revisado.
 
-La salida a Production no se recomienda todavía porque faltan evidencias remotas y organizacionales: CI final, Staging, SMTP, backup/restauración y política institucional. Todos tienen plan, pero un plan no equivale a una prueba.
+La salida a Production no se recomienda todavía porque faltan evidencias remotas y organizacionales: Render Staging, SMTP, backup operativo del proveedor, accesibilidad y política institucional. Todos tienen plan, pero un plan no equivale a una prueba.
 
 ## 2. Estado por área
 
@@ -21,7 +21,7 @@ La salida a Production no se recomienda todavía porque faltan evidencias remota
 |---|---|---|
 | Documentación | ✅ | Arquitectura, DBA, backend, UX, seguridad, infra, QA y operación |
 | Arquitectura | ✅ | Monolito modular coherente con alcance |
-| Base de datos | 🟡 | Modelo/migraciones aprobados en PostgreSQL 18 CI; resta restore |
+| Base de datos | ✅/🟡 | Modelo, migraciones y restore aislado aprobados; resta política operativa del proveedor |
 | Backend | ✅ | Flujos, errores y reglas cubiertos |
 | Frontend | 🟡 | Responsive aprobado; resta auditoría WCAG especializada |
 | Seguridad | 🟡 | Controles técnicos; resta privacidad institucional y escaneo externo |
@@ -34,13 +34,12 @@ Score inicial: 100.
 | ID | Hallazgo abierto | Severidad | Plan formal | Deducción |
 |---|---|---|---:|---:|
 | OPS-01 | Staging sin evidencia final | Alto | Sí | -3 |
-| DBA-01 | Restauración PostgreSQL no ensayada | Alto | Sí | -3 |
 | PRIV-01 | Política institucional/menores no aprobada | Alto | Sí | -3 |
 | AUTH-01 | SMTP real no configurado | Medio | Sí | -2 |
 | A11Y-01 | WCAG/lector de pantalla no auditados formalmente | Medio | Sí | -2 |
-| Total | | | | **-13** |
+| Total | | | | **-10** |
 
-Resultado: **100 - 13 = 87/100**. No hay áreas sin información y no se aplican deducciones ocultas.
+Resultado: **100 - 10 = 90/100**. No hay áreas sin información y no se aplican deducciones ocultas.
 
 ## 4. Evidencia aprobada
 
@@ -52,6 +51,8 @@ Resultado: **100 - 13 = 87/100**. No hay áreas sin información y no se aplican
 - Configuración no root, health/readiness, DB privada y CI.
 - `pip-audit` sin vulnerabilidades conocidas en dependencias de producción.
 - GitHub Actions en verde: calidad, PostgreSQL 18 y construcción Docker.
+- Backup/restore aislado en PostgreSQL 18 con verificación de datos, Alembic y deriva.
+- Bandit sin hallazgos medios/altos.
 - Production no modificada.
 
 ## 5. Hallazgos abiertos y responsables
@@ -59,7 +60,7 @@ Resultado: **100 - 13 = 87/100**. No hay áreas sin información y no se aplican
 | ID | Responsable | Acción de cierre | Bloquea |
 |---|---|---|---|
 | OPS-01 | DevOps/propietario | PR, 3 jobs verdes, Blueprint y smoke test | Production |
-| DBA-01 | DBA/propietario | Backup + restauración aislada con conteos | Production |
+| DBA-OPS | DBA/propietario | Definir backup cifrado, retención y restore del proveedor | Production |
 | PRIV-01 | Institución | Aprobar finalidad, menores, retención y canal | Production |
 | AUTH-01 | Propietario | Cargar SMTP y probar correo ficticio | Recuperación compartida |
 | A11Y-01 | UX/QA | axe/lector/zoom y registro de resultado | Afirmación WCAG |
@@ -75,7 +76,7 @@ Resultado: **100 - 13 = 87/100**. No hay áreas sin información y no se aplican
 
 ## 7. Criterio para 100/100
 
-El score solo puede llegar a 100 cuando cada hallazgo se cierre con evidencia: CI verde, Staging funcional, restauración aprobada, SMTP real, privacidad institucional y accesibilidad formal. Subir el número sin esas pruebas sería una afirmación falsa.
+El score solo puede llegar a 100 cuando cada hallazgo se cierre con evidencia: Staging funcional, SMTP real, política operativa de backup, privacidad institucional y accesibilidad formal. Subir el número sin esas pruebas sería una afirmación falsa.
 
 ## Alcance de esta auditoría
 
@@ -87,4 +88,4 @@ Esta es una auditoría documental y técnica basada en lo entregado y ejecutado 
 - revisión humana línea por línea en áreas de máxima sensibilidad;
 - pruebas de carga o accesibilidad con usuarios reales.
 
-Cobertura declarada: arquitectura, esquema, migraciones, backend, UI, autenticación, autorización, controles HTTP, pruebas e infraestructura como código se revisaron a fondo; Render Staging, PostgreSQL remoto, SMTP, backup/restauración, Production, pentest, rendimiento y validación jurídica no se han verificado en vivo.
+Cobertura declarada: arquitectura, esquema, migraciones, backend, UI, autenticación, autorización, controles HTTP, pruebas, SAST, restore aislado e infraestructura como código se revisaron a fondo; Render Staging, PostgreSQL del proveedor, SMTP, backup operativo, Production, pentest, rendimiento y validación jurídica no se han verificado en vivo.

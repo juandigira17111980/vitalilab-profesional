@@ -15,6 +15,9 @@
 | 2026-09-30 | E2E | Registro, hábito, admin, comunicado y móvil | Playwright/Chromium | ✅ local |
 | 2026-09-30 | Infra | Docker, Compose, Render Blueprint y CI | archivos versionados | ✅ configurado |
 | 2026-09-30 | CI | Calidad, PostgreSQL 18 y build Docker | GitHub Actions PR #2 | ✅ |
+| 2026-09-30 | Git | Reconstrucción integrada a `staging` | PR #2, commit `2120e31` | ✅ |
+| 2026-09-30 | Seguridad | Bandit sin hallazgos medios/altos | GitHub Actions PR #3 | ✅ |
+| 2026-09-30 | DBA | Backup y restore aislado PostgreSQL 18 | GitHub Actions PR #3 | ✅ |
 
 ## 2. Defectos encontrados durante validación
 
@@ -30,8 +33,6 @@
 
 | Hito | Requerido |
 |---|---|
-| PR funcional | URL, commit y revisión |
-| CI final tras actualización menor | tres jobs verdes |
 | Render Staging | URL y deploy/commit |
 | SMTP Staging | correo ficticio recibido |
 | Backup/restauración | fecha, duración, conteos y responsable |
@@ -41,4 +42,4 @@
 
 | Versión | Rama | Staging | Production |
 |---|---|---|---|
-| `v0.1.0` candidata | `feat/reconstruccion-profesional` | Pendiente | No promovida |
+| `v0.1.0` candidata | `staging` | Pendiente Render | No promovida |

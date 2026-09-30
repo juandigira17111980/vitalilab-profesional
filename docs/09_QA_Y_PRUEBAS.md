@@ -14,6 +14,8 @@
 | Consola navegador | ✅ 0 errores/advertencias finales |
 | Docker | ✅ imagen construida en GitHub Actions |
 | PostgreSQL real | ✅ migraciones/seed/check en PostgreSQL 18 CI |
+| Backup/restauración | ✅ `pg_dump`/`pg_restore` y comparación aislada en PostgreSQL 18 CI |
+| SAST | ✅ Bandit sin hallazgos medios/altos |
 | Staging | 🟡 pendiente |
 
 ## 2. Casos automatizados
@@ -46,13 +48,13 @@ Durante esta prueba se encontraron y corrigieron dos defectos de integración: e
 
 El workflow corre en PR/push hacia ramas relevantes:
 
-- `quality`: Python 3.13, dependencias, Ruff y Pytest.
-- `postgres-migration`: PostgreSQL 18, upgrade, seed y `db check`.
+- `quality`: Python 3.13, dependencias, Ruff, Bandit, Pytest y `pip-audit`.
+- `postgres-migration`: PostgreSQL 18, upgrade, seed, `db check`, backup, restore y verificación de datos/esquema.
 - `container-build`: construcción del Dockerfile.
 
 Render solo auto-despliega `staging` cuando los checks asociados pasan.
 
-Ejecución GitHub del PR #2: **tres jobs aprobados**.
+Ejecuciones GitHub de los PR #2 y #3: **tres jobs aprobados** en cada cierre.
 
 ## 5. Matriz pendiente de Staging
 
@@ -67,7 +69,7 @@ Ejecución GitHub del PR #2: **tres jobs aprobados**.
 | STG-07 | SMTP | Correo y token funcionales |
 | STG-08 | Headers/TLS | Secure, HSTS, CSP |
 | STG-09 | Logs | Sin 5xx/secretos |
-| STG-10 | Backup/restauración | Conteos y relaciones iguales |
+| STG-10 | Backup/restauración del proveedor | Conteos, relaciones, cifrado y retención |
 
 ## 6. Severidad
 

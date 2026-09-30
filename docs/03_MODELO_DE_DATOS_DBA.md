@@ -146,6 +146,8 @@ pg_restore --clean --if-exists --no-owner --dbname=RESTORE_URL vitalilab.dump
 
 El archivo se guarda cifrado fuera de Git. Se verifican migración actual, conteos por tabla, duplicados diarios, FK y acceso de un usuario ficticio. El plan Free de Render no es aceptable para persistencia de Production; la base gratuita de Staging es temporal y expira según condiciones del proveedor.
 
+El pipeline del PR #3 ejecutó `pg_dump` sobre PostgreSQL 18, restauró el archivo en una base aislada, comparó los hábitos sembrados, confirmó la revisión Alembic y volvió a ejecutar `db check`. Esta evidencia valida el procedimiento técnico; antes de Production todavía debe ensayarse con el proveedor, cifrado, retención y responsable definidos.
+
 ## 9. Consultas de control
 
 ```sql
@@ -164,4 +166,4 @@ WHERE u.id IS NULL OR h.id IS NULL;
 
 ## 10. Estado
 
-Modelo y migraciones: ✅ validados localmente y sobre PostgreSQL 18 en CI. Backup/restauración y datos reales: 🟡/🔴 antes de Production.
+Modelo, migraciones y restauración aislada: ✅ validados sobre PostgreSQL 18 en CI. Backup operativo del proveedor y datos reales: 🟡/🔴 antes de Production.
