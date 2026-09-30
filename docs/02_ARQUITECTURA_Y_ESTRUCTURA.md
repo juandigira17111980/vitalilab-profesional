@@ -1,141 +1,87 @@
-# Arquitectura y estructura del proyecto
+# Arquitectura y estructura
 
-## 1. Objetivo
+## 1. Patrón elegido
 
-Definir cómo se organiza VitaliLab, qué responsabilidad tiene cada parte y cómo evoluciona desde el prototipo actual hacia una solución profesional que siga siendo comprensible para un equipo estudiantil.
+VitaliLab usa un **monolito modular con separación por dominio**. Las rutas coordinan HTTP, los formularios validan entradas, los servicios concentran reglas reutilizables, SQLAlchemy protege la persistencia y Jinja presenta datos preparados.
 
-## 2. Estructura actual observada
+No se implementaron microservicios: aumentarían despliegues, fallos distribuidos, observabilidad y costos sin una necesidad proporcional.
 
-La revisión del código histórico muestra una aplicación Flask con archivos Python de nivel raíz y plantillas Jinja. La lógica web, las consultas SQL y las reglas del dominio están fuertemente acopladas.
-
-```text
-vitalilab/
-├── vida_saludable.py       # aplicación activa histórica y rutas
-├── crear_db.py             # creación destructiva de tabla
-├── templates/              # vistas HTML con estilos/scripts embebidos
-├── static/                 # recursos parciales
-└── *.db                    # SQLite versionado o referenciado
-```
-
-Problemas arquitectónicos:
-
-- Un cambio en datos puede romper rutas y plantillas simultáneamente.
-- No existe una frontera clara entre autenticación, perfil y gamificación.
-- El esquema puede alterarse mediante scripts sin historial de migración.
-- La configuración depende del código y no de cada ambiente.
-- El arranque, la observabilidad y las pruebas no tienen contratos definidos.
-
-## 3. Estructura objetivo propuesta
+## 2. Estructura real
 
 ```text
-vitalilab-profesional/
-├── app/
-│   ├── __init__.py              # fábrica create_app
-│   ├── config.py                # Local/Staging/Production
-│   ├── extensions.py            # DB, migraciones, login, CSRF, limiter
-│   ├── auth/
-│   │   ├── routes.py
-│   │   ├── services.py
-│   │   ├── forms.py
-│   │   └── models.py
-│   ├── users/
-│   ├── habits/
-│   ├── content/
-│   ├── admin/
-│   ├── shared/
-│   │   ├── errors.py
-│   │   ├── validators.py
-│   │   └── security.py
-│   ├── templates/
-│   │   ├── layouts/base.html
-│   │   ├── components/
-│   │   └── pages/
-│   └── static/
-│       ├── css/
-│       ├── js/
-│       └── img/
-├── migrations/
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-├── docs/
-├── .github/workflows/
-├── .env.example
-├── requirements.txt
-├── wsgi.py
-└── README.md
+app/
+├── __init__.py          fábrica, extensiones, blueprints y cabeceras
+├── config.py            configuración y validación por ambiente
+├── extensions.py        DB, Migrate, Login, CSRF y Limiter
+├── models.py            entidades y restricciones del dominio
+├── forms.py             validación del servidor
+├── errors.py            respuestas 400/403/404/429/500
+├── commands.py          seeds y alta administrativa
+├── auth/routes.py       identidad y sesiones
+├── profile/routes.py    perfil y medidas propias
+├── habits/routes.py     catálogo y cumplimiento
+├── admin/routes.py      comunicados y auditoría
+├── main/routes.py       contenido, panel, health y readiness
+├── services/            audit.py, email.py y progress.py
+├── templates/           layout, macro y pantallas
+└── static/              CSS, JS y marca SVG
+migrations/versions/         historial de esquema
+tests/                       auth, operación, progreso y rutas
 ```
 
-Esta es una estructura de referencia. Puede ajustarse durante la implementación, pero toda variación debe documentar el motivo.
-
-## 4. Responsabilidades por capa
-
-| Capa | Puede hacer | No debe hacer |
-|---|---|---|
-| Rutas/controladores | Recibir petición, invocar servicio y responder | Ejecutar reglas complejas o SQL directo |
-| Servicios | Aplicar reglas de negocio y transacciones | Renderizar HTML o leer variables del navegador directamente |
-| Repositorios/ORM | Consultar y persistir entidades | Decidir puntos, roles o permisos de negocio |
-| Formularios/esquemas | Validar forma, tipo y formato de entrada | Autorizar al usuario |
-| Plantillas | Presentar datos ya preparados | Consultar DB o calcular reglas críticas |
-| Configuración | Elegir comportamiento por ambiente | Contener secretos reales versionados |
-
-## 5. Flujo de una operación crítica
-
-Ejemplo: completar un hábito.
+## 3. Flujo: completar un hábito
 
 ```mermaid
 sequenceDiagram
     actor U as Usuario
-    participant V as Vista
+    participant V as Vista Jinja
     participant R as Ruta Flask
-    participant S as Servicio de hábitos
-    participant D as PostgreSQL
-    U->>V: Marca hábito completado
-    V->>R: POST + CSRF
-    R->>R: Verifica sesión y valida entrada
-    R->>S: completar_habito(usuario, hábito, fecha)
-    S->>D: Transacción e inserción única
-    alt Ya existía
-        D-->>S: Conflicto de unicidad
-        S-->>R: Resultado idempotente
-    else Nuevo cumplimiento
-        D-->>S: Registro creado
-        S->>D: Recalcula puntos/racha
-        S-->>R: Progreso actualizado
+    participant S as Progress Service
+    participant D as Base de datos
+    U->>V: Marcar como cumplido
+    V->>R: POST con sesión y CSRF
+    R->>S: complete_habit(usuario, hábito)
+    S->>D: Buscar/inserción con unicidad diaria
+    alt Ya existe o carrera concurrente
+        D-->>S: Existente/IntegrityError
+        S-->>R: false; no suma
+    else Nuevo
+        S->>D: Evento de auditoría + commit
+        S-->>R: true
     end
-    R-->>V: Mensaje y estado actual
+    R-->>V: Mensaje y estado recalculado
 ```
 
-## 6. Contratos técnicos esenciales
+Puntos, racha y nivel no se almacenan como saldos mutables: se derivan de eventos verificables, reduciendo inconsistencias.
 
-- `create_app(config_name)` crea una aplicación sin efectos destructivos.
-- `GET /health` comprueba que el proceso responde; una verificación de DB puede exponerse por separado y protegerse.
-- Los formularios `POST` requieren sesión cuando corresponde, token CSRF y validación de servidor.
-- Las operaciones repetibles son idempotentes o están protegidas por restricciones.
-- Los errores se convierten en respuestas controladas y se registran con un identificador de correlación.
-- Ninguna plantilla depende de variables no declaradas en su contrato de vista.
+## 4. Fronteras
 
-## 7. Configuración por ambiente
+| Componente | Responsabilidad | Prohibido |
+|---|---|---|
+| Blueprint/ruta | Autenticación, coordinación y respuesta | SQL concatenado o reglas sensibles del cliente |
+| Formulario | Tipo, formato, longitud y rango | Autorizar roles |
+| Servicio | Regla de progreso, auditoría o correo | Renderizar HTML |
+| Modelo/ORM | Relación, constraint y persistencia | Confiar en valores calculados por el navegador |
+| Plantilla | Presentación semántica | Consultar DB |
+| Configuración | Diferencias por ambiente | Secretos versionados |
 
-| Configuración | Local | Staging | Production |
-|---|---|---|---|
-| Debug | Opcional | Desactivado | Desactivado |
-| Base de datos | Local/dedicada | PostgreSQL Staging | PostgreSQL Production |
-| Cookies seguras | Simulables | Activadas | Activadas |
-| Logs | Detallados sin secretos | Estructurados | Estructurados y retenidos |
-| Datos | Sintéticos | Sintéticos | Reales |
+## 5. Contratos de arranque
 
-## 8. Criterios de aceptación arquitectónica
+- `create_app(test_config=None)` no crea ni elimina tablas.
+- `wsgi:app` es el punto de entrada para Gunicorn.
+- `flask db upgrade` aplica el esquema.
+- `flask seed-habits` sincroniza cuatro hábitos idempotentes.
+- `GET /health` prueba el proceso.
+- `GET /ready` ejecuta `SELECT 1` y devuelve 503 si la DB no responde.
 
-- Importar la aplicación no crea ni elimina tablas.
-- Todos los módulos arrancan con una configuración de prueba.
-- Las dependencias tienen versiones controladas y son mínimas.
-- Las rutas críticas cuentan con pruebas de autorización y errores.
-- El esquema se crea desde migraciones sobre una base vacía.
-- El frontend reutiliza un layout común y no duplica navegación.
-- La aplicación puede desplegarse en Staging sin cambiar archivos de código.
+## 6. Configuración
 
-## 9. Estado
+`APP_ENV=staging|production` impide arrancar con el secreto de desarrollo o SQLite. Las cookies seguras y HSTS se activan en ambientes HTTPS. `DATABASE_URL` antiguo con `postgres://` se normaliza al driver Psycopg 3.
 
-La estructura objetivo está **🟡 propuesta**. No se debe presentar como implementada hasta que los archivos, pruebas y despliegue aparezcan en la [bitácora](11_BITACORA_DE_CAMBIOS.md).
+## 7. Escalabilidad deliberada
+
+El catálogo y los comunicados son pequeños. Los historiales se filtran e indexan por usuario/fecha. Staging usa un worker y cuatro threads para mantener coherente el rate limit en memoria. Si se escala a varios procesos/instancias, `RATELIMIT_STORAGE_URI` debe apuntar a Redis compartido.
+
+## 8. Estado
+
+La arquitectura está ✅ implementada y validada localmente. La topología de Staging está 🟡 declarada y pendiente de evidencia remota.

@@ -1,249 +1,167 @@
 # Modelo de datos y guía DBA
 
-## 1. Diagnóstico del estado actual
+## 1. Decisión
 
-La versión activa revisada utiliza SQLite y concentra en `usuarios` datos de acceso, identidad, medidas de salud y gamificación. También se encontró un script de creación que puede eliminar la tabla y cuyo esquema no coincide completamente con el consumido por la aplicación.
+PostgreSQL 18 es el motor de Staging/Production. SQLite se reserva para desarrollo y pruebas. El esquema se gobierna con SQLAlchemy y Alembic; la aplicación nunca crea, elimina ni modifica tablas al arrancar.
 
-Hallazgos principales:
-
-- 🔴 Contraseñas tratadas en texto legible.
-- 🔴 Script con `DROP TABLE IF EXISTS`, peligroso fuera de una base desechable.
-- 🔴 Falta de migraciones versionadas.
-- 🔴 Falta de restricciones que impidan sumar varias veces el mismo reto diario.
-- 🔴 SQLite no es una base adecuada para una aplicación compartida en Render si el almacenamiento es efímero o hay concurrencia.
-- 🟡 Archivo histórico inspeccionado sin filas de usuarios; no confirma el contenido real del entorno de producción.
-
-## 2. Principios del nuevo modelo
-
-1. Separar credenciales, perfil, medidas y progreso.
-2. Aplicar integridad con claves foráneas, restricciones únicas y validaciones.
-3. Mantener historial cuando el dato cambia en el tiempo.
-4. Minimizar datos personales y sensibles.
-5. Ejecutar todo cambio mediante migraciones.
-6. Permitir respaldo y restauración probada.
-
-## 3. Modelo lógico propuesto
+## 2. Diagrama vigente
 
 ```mermaid
 erDiagram
-    USERS ||--|| USER_PROFILES : has
+    USERS ||--|| USER_PROFILES : owns
     USERS ||--o{ HEALTH_MEASUREMENTS : records
     USERS ||--o{ HABIT_ENTRIES : completes
     HABITS ||--o{ HABIT_ENTRIES : receives
-    USERS ||--o{ DAILY_CHECKINS : accumulates
-    USERS ||--o{ AUDIT_EVENTS : produces
     USERS ||--o{ ANNOUNCEMENTS : authors
+    USERS ||--o{ AUDIT_EVENTS : acts
 
     USERS {
-        uuid id PK
-        string email UK
-        string password_hash
-        string role
-        string status
-        datetime created_at
-        datetime updated_at
+        int id PK
+        varchar email UK
+        varchar password_hash
+        varchar role
+        varchar status
+        int failed_login_count
+        datetime locked_until
         datetime last_login_at
     }
     USER_PROFILES {
-        uuid user_id PK,FK
-        string display_name
+        int user_id PK,FK
+        varchar display_name
         date birth_date
-        string gender_optional
-        string timezone
-        boolean privacy_accepted
+        varchar grade
+        varchar timezone
+        varchar privacy_version
         datetime privacy_accepted_at
     }
     HEALTH_MEASUREMENTS {
-        uuid id PK
-        uuid user_id FK
-        decimal weight_kg
-        decimal height_cm
-        decimal bmi_snapshot
+        int id PK
+        int user_id FK
+        numeric weight_kg
+        numeric height_cm
+        numeric bmi_snapshot
         date measured_on
-        datetime created_at
     }
     HABITS {
-        uuid id PK
-        string code UK
-        string name
-        string category
+        int id PK
+        varchar code UK
+        varchar name
+        varchar category
         int points
         boolean active
     }
     HABIT_ENTRIES {
-        uuid id PK
-        uuid user_id FK
-        uuid habit_id FK
+        int id PK
+        int user_id FK
+        int habit_id FK
         date completed_on
-        datetime created_at
-    }
-    DAILY_CHECKINS {
-        uuid id PK
-        uuid user_id FK
-        date checkin_date
-        int earned_points
-        int streak_days
-        datetime calculated_at
     }
     ANNOUNCEMENTS {
-        uuid id PK
-        uuid author_user_id FK
-        string title
+        int id PK
+        int author_user_id FK
+        varchar title
         text body
-        string status
+        varchar status
         datetime published_at
     }
     AUDIT_EVENTS {
-        uuid id PK
-        uuid actor_user_id FK
-        string action
-        string entity_type
-        string entity_id
+        int id PK
+        int actor_user_id FK
+        varchar action
+        varchar entity_type
+        varchar entity_id
         json metadata_redacted
         datetime created_at
     }
 ```
 
-> El modelo es **🟡 propuesto**. Antes de crear la primera migración se debe validar el alcance funcional y la necesidad real de cada atributo.
+No existe una tabla de saldos ni `daily_checkins`: puntos, nivel y racha se derivan de `habit_entries`. Es una decisión de consistencia, no una omisión.
 
-## 4. Diccionario de entidades
+## 3. Diccionario y retención
 
-### `users`
+| Tabla | Finalidad | Datos clave | Eliminación FK |
+|---|---|---|---|
+| `users` | Identidad y control de acceso | correo, hash, rol, bloqueo | Raíz |
+| `user_profiles` | Presentación y consentimiento | nombre, fecha/grado opcional | CASCADE con usuario |
+| `health_measurements` | Historial opcional | peso, altura, IMC, fecha | CASCADE con usuario |
+| `habits` | Catálogo controlado | código, puntos, estado | RESTRICT desde entradas |
+| `habit_entries` | Evidencia diaria | usuario, hábito, fecha | usuario CASCADE; hábito RESTRICT |
+| `announcements` | Comunicación administrativa | autor, contenido, estado | autor RESTRICT |
+| `audit_events` | Trazabilidad operativa | actor, acción, entidad | actor SET NULL |
 
-Cuenta y control de acceso. El correo se almacena normalizado. `password_hash` usa un algoritmo mantenido por una biblioteca reconocida. `role` inicia con `student`/`admin` o nombres de negocio acordados; `status` permite desactivar sin borrar.
+La retención legal/educativa debe aprobarse antes de Production. Técnicamente, la eliminación de una cuenta elimina perfil, medidas y cumplimientos; conserva auditoría sin identificar al actor.
 
-Restricciones recomendadas:
+## 4. Integridad
 
-- `email` único y no nulo.
-- `password_hash` no nulo.
-- `role` y `status` con valores controlados.
-- Índice por `status` solo si los planes de ejecución lo justifican.
+- `users.email`: único, normalizado y no nulo.
+- `users.role`: `user|admin`; `status`: `active|inactive`.
+- `habit_entries`: `UNIQUE(user_id, habit_id, completed_on)`.
+- Peso: 20–500 kg; altura: 80–250 cm; IMC snapshot: 5–100.
+- Puntos de hábito: 1–100.
+- Estado de comunicado: `draft|published|archived`.
+- Todas las FK tienen conducta de borrado explícita.
 
-### `user_profiles`
+## 5. Índices
 
-Información de presentación y preferencias, relación uno a uno. No contiene contraseña ni saldos de puntos. `birth_date` solo se conserva si existe una necesidad funcional y una política válida.
+- Correo y código de hábito únicos.
+- Historial por `habit_entries(user_id, completed_on)`.
+- Búsqueda de hábito por FK.
+- Medidas por `health_measurements(user_id, measured_on)`.
+- Comunicados por autor y `(status, published_at)`.
+- Auditoría por actor, acción y fecha.
 
-### `health_measurements`
+Los índices responden a rutas existentes; en Production se revisarán con `EXPLAIN ANALYZE` antes de agregar otros.
 
-Histórico de peso, altura e IMC calculado. Si el proyecto no necesita histórico, se debe justificar y simplificar. Validaciones sugeridas: valores positivos y rangos razonables sin convertir la aplicación en diagnóstico médico.
+## 6. Migraciones
 
-### `habits`
-
-Catálogo administrable de hábitos. `code` es estable para pruebas y datos iniciales. Los puntos se definen en servidor.
-
-### `habit_entries`
-
-Cumplimiento de hábitos. Restricción obligatoria:
-
-```text
-UNIQUE (user_id, habit_id, completed_on)
-```
-
-Evita duplicados incluso ante doble clic, reintento de red o solicitud manipulada.
-
-### `daily_checkins`
-
-Resumen diario calculado del progreso. Restricción:
-
-```text
-UNIQUE (user_id, checkin_date)
-```
-
-Puede reconstruirse a partir de eventos si el diseño definitivo lo decide. Los puntos y la racha se calculan en una transacción.
-
-### `announcements`
-
-Contenido administrativo. Solo roles autorizados pueden crear o publicar. Conviene separar borrador/publicado/archivado.
-
-### `audit_events`
-
-Eventos de seguridad y administración. No almacena contraseñas, tokens, peso u otros datos sensibles en `metadata_redacted`.
-
-## 5. Estrategia de migración
-
-1. Tomar backup verificable de la fuente y calcular hash del archivo/exportación.
-2. Analizar columnas y calidad de datos sin exponer registros en logs.
-3. Crear PostgreSQL de Staging vacío.
-4. Aplicar migraciones desde cero.
-5. Transformar usuarios: normalizar correos y tratar las contraseñas inseguras.
-6. Si no es posible convertir contraseñas de forma segura, exigir restablecimiento; nunca reinsertarlas como texto legible.
-7. Separar perfil, medidas y progreso.
-8. Comparar conteos y reglas de integridad.
-9. Ejecutar pruebas funcionales y de rollback en Staging.
-10. Preparar ventana y plan de reversión antes de Production.
-
-No se migrarán datos reales a Staging salvo que estén anonimizados y exista autorización.
-
-## 6. Migraciones y datos iniciales
-
-- Herramienta sugerida: Alembic mediante Flask-Migrate.
-- Una migración por cambio coherente; no editar migraciones ya aplicadas en ambientes compartidos.
-- Cada migración destructiva debe indicar respaldo, impacto y alternativa de reversión.
-- Los hábitos base se cargan mediante un comando idempotente o seed versionado.
-- La aplicación nunca ejecuta `DROP TABLE` al arrancar.
-
-## 7. Índices iniciales
-
-Crear solo índices relacionados con consultas reales:
-
-- Único en `users(email)`.
-- Único en `habits(code)`.
-- Único compuesto en `habit_entries(user_id, habit_id, completed_on)`.
-- Índice para historial en `habit_entries(user_id, completed_on DESC)`.
-- Único compuesto en `daily_checkins(user_id, checkin_date)`.
-- Índice de publicación en `announcements(status, published_at DESC)`.
-
-Después se revisan consultas lentas con `EXPLAIN ANALYZE`; no se agregan índices por intuición sin medir.
-
-## 8. Transacciones y concurrencia
-
-Completar un hábito, asignar puntos y actualizar la racha debe ser una sola unidad lógica. Si una parte falla, toda la operación revierte. Las restricciones únicas son la última defensa contra solicitudes concurrentes.
-
-## 9. Backup y recuperación
-
-| Control | Staging | Production |
+| Revisión | Objetivo | Estado local |
 |---|---|---|
-| Backup automático | Recomendado | Obligatorio |
-| Retención | Según capacidad, mínimo para pruebas | Definida por riesgo y política |
-| Prueba de restauración | Antes de promoción | Periódica y registrada |
-| Responsable | Equipo técnico | Administrador designado |
-| Evidencia | Fecha, duración, resultado y hash/conteos | Igual, sin publicar datos |
+| `0380d5595f5e` | Esquema profesional inicial | ✅ aplicada |
+| `208469fd48ef` | Índices de FK y rutas de consulta | ✅ aplicada |
 
-Un backup no se considera válido hasta restaurarlo en un entorno aislado y comprobar conteos, relaciones y acceso.
+`flask db check` no detectó deriva. El downgrade existe, pero una reversión destructiva en Production nunca se ejecuta sin backup, análisis de compatibilidad y aprobación.
 
-## 10. Consultas de verificación
+## 7. Migración desde el prototipo
 
-La migración deberá incluir comprobaciones equivalentes a:
+No se ha copiado la base SQLite histórica. El proceso seguro sería:
+
+1. Congelar escritura y tomar exportación con hash.
+2. Inventariar filas, correos duplicados y calidad sin registrar datos personales.
+3. Aplicar migraciones a PostgreSQL aislado.
+4. Normalizar identidades; nunca trasladar contraseñas legibles como hash falso.
+5. Forzar restablecimiento de acceso si el origen no tiene hashes verificables.
+6. Transformar perfil, medidas y eventos.
+7. Comparar conteos y huérfanos.
+8. Ejecutar pruebas y aprobación antes de cambiar tráfico.
+
+## 8. Backup y restauración
+
+Para una base PostgreSQL con credenciales inyectadas:
+
+```text
+pg_dump --format=custom --no-owner --file=vitalilab.dump DATABASE_URL
+createdb vitalilab_restore_test
+pg_restore --clean --if-exists --no-owner --dbname=RESTORE_URL vitalilab.dump
+```
+
+El archivo se guarda cifrado fuera de Git. Se verifican migración actual, conteos por tabla, duplicados diarios, FK y acceso de un usuario ficticio. El plan Free de Render no es aceptable para persistencia de Production; la base gratuita de Staging es temporal y expira según condiciones del proveedor.
+
+## 9. Consultas de control
 
 ```sql
--- Correos duplicados tras normalización
 SELECT lower(trim(email)), count(*)
-FROM users
-GROUP BY lower(trim(email))
-HAVING count(*) > 1;
+FROM users GROUP BY lower(trim(email)) HAVING count(*) > 1;
 
--- Cumplimientos diarios duplicados
 SELECT user_id, habit_id, completed_on, count(*)
 FROM habit_entries
-GROUP BY user_id, habit_id, completed_on
-HAVING count(*) > 1;
+GROUP BY user_id, habit_id, completed_on HAVING count(*) > 1;
+
+SELECT he.id FROM habit_entries he
+LEFT JOIN users u ON u.id = he.user_id
+LEFT JOIN habits h ON h.id = he.habit_id
+WHERE u.id IS NULL OR h.id IS NULL;
 ```
 
-## 11. Criterios de aceptación DBA
+## 10. Estado
 
-- El esquema se reconstruye sobre una base vacía usando solo migraciones.
-- No existen contraseñas legibles ni secretos.
-- Las claves foráneas están activas y no hay registros huérfanos.
-- El doble registro de un hábito no duplica puntos.
-- El backup de prueba se restaura con éxito.
-- Los datos sensibles no aparecen en logs ni datos de prueba compartidos.
-- El diagrama y diccionario coinciden con el esquema real.
-
-## 12. Evidencia pendiente
-
-- ⚪ Motor y persistencia exactos usados actualmente por el servicio Render en ejecución.
-- ⚪ Conteos y calidad de datos reales de Production.
-- ⚪ Política formal de retención y eliminación.
-- ⚪ Resultado de la primera restauración.
-
-Estas comprobaciones requieren acceso seguro al entorno; nunca deben copiarse credenciales o datos personales al repositorio.
+Modelo y migraciones: ✅ validados localmente. PostgreSQL CI, backup/restauración y datos reales: 🟡/🔴 antes de Production.

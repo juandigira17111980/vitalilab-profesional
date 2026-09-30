@@ -1,29 +1,26 @@
-## Objetivo
+## Problema y objetivo
 
-Describe qué cambia y por qué.
+<!-- Qué resuelve y por qué. -->
 
-## Tipo de cambio
+## Alcance
 
-- [ ] Seguridad
-- [ ] Base de datos
-- [ ] Backend
-- [ ] Frontend / UX
-- [ ] Infraestructura
-- [ ] Pruebas
-- [ ] Documentación
+- Incluye:
+- No incluye:
 
-## Validaciones
+## Riesgo y datos
 
 - [ ] No contiene secretos ni datos personales.
-- [ ] Las pruebas relevantes pasan.
-- [ ] Se verificaron estados de éxito, error, vacío y carga.
-- [ ] Se documentó cualquier migración y rollback.
-- [ ] Se validó en Staging cuando aplica.
+- [ ] Documenté migración, backup y rollback si cambia datos.
+- [ ] Documenté variables nuevas solo por nombre.
 
-## Riesgo y rollback
+## Verificación
 
-Explica el impacto posible y cómo revertir el cambio.
+- [ ] Ruff aprobado.
+- [ ] Pytest aprobado y cobertura >= 85 %.
+- [ ] Migraciones y `db check` aprobados.
+- [ ] Evidencia visual/responsive si cambia UI.
+- [ ] Documentación y bitácora actualizadas.
 
-## Evidencia visual
+## Staging y rollback
 
-Agregar capturas para cambios de interfaz.
+<!-- URL/commit/resultado sin credenciales; versión a restaurar. -->

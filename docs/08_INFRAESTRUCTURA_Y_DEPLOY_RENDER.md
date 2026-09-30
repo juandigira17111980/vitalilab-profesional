@@ -3,152 +3,91 @@
 ## 1. Topología
 
 ```mermaid
-flowchart TB
-    DEV[Local en Codex<br/>Datos sintéticos] -->|Git + PR| STG[Render / VitaliLab / Staging<br/>Servicio y DB exclusivos]
-    STG -->|QA + aprobación| PRD[Render / VitaliLab / Production<br/>Servicio vitalilab + DB exclusiva]
+flowchart LR
+    L[Local / datos sintéticos] -->|PR + CI| S[Render Staging]
+    S --> SW[Web vitalilab-staging]
+    S --> SD[(PostgreSQL Staging)]
+    S -->|aprobación| P[Render Production]
+    P --> PW[Servicio vitalilab]
+    P --> PD[(PostgreSQL Production dedicada)]
 ```
 
-La promoción mueve una versión de código verificada. No comparte bases de datos, secretos ni discos entre ambientes.
+No se comparte DB, secreto ni dominio entre ambientes.
 
-## 2. Estado observado al corte
+## 2. Configuración versionada
 
-| Elemento | Estado |
-|---|---|
-| Proyecto Render | ✅ `VitaliLab` |
-| Ambiente `Production` | ✅ Contiene el servicio existente `vitalilab` |
-| Ambiente `Staging` | ✅ Creado, actualmente vacío |
-| Servicio Production | ✅ Conserva nombre y dominio observados |
-| Protección avanzada del ambiente | ⚪ No disponible en el plan mostrado; opción Pro |
-| Último estado observado | Servicio marcado Live en commit anterior y un despliegue posterior fallido |
-| Causa exacta del fallo | ⚪ Pendiente de revisar logs de Render |
+- `.python-version`: Python 3.13.
+- `Dockerfile`: usuario no root, Gunicorn y health check `/ready`.
+- `compose.yaml`: web + PostgreSQL 18, DB no publicada y health checks.
+- `render.yaml`: proyecto `VitaliLab`, ambiente `Staging`, web `vitalilab-staging`, DB exclusiva y auto-deploy después de checks.
+- `.github/workflows/ci.yml`: calidad, migración PostgreSQL y build Docker.
 
-Producción no se modifica durante la auditoría sin aprobación explícita.
+## 3. Render Staging
 
-## 3. Local
+El Blueprint usa rama `staging`, plan web Free y PostgreSQL Free como ambiente temporal. La base queda sin acceso público (`ipAllowList: []`). `SECRET_KEY` se genera y las credenciales SMTP requieren carga manual en el panel.
 
-Objetivos:
-
-- Ejecutar el proyecto sin depender de Production.
-- Usar datos sintéticos y configuración de desarrollo.
-- Ejecutar pruebas y migraciones sobre una base desechable.
-
-Entregables pendientes: instrucciones reproducibles, versión de Python, dependencias mínimas, `.env.example`, y comandos de arranque, prueba, migración y seed.
-
-## 4. Staging
-
-Staging debe crearse desde la rama `staging` del repositorio privado y usar recursos propios:
-
-- Servicio web distinto, por ejemplo `vitalilab-staging`.
-- PostgreSQL de Staging.
-- Variables y secretos exclusivos.
-- URL temporal de Render antes de un dominio propio.
-- Datos ficticios.
-- `debug` desactivado y health check configurado.
-
-No se mueve el servicio de Production a Staging. Se crea uno nuevo cuando exista un baseline seguro y reproducible.
-
-## 5. Production
-
-- Mantener servicio, dominio y variables actuales mientras se audita.
-- No conectar Production a ramas de desarrollo.
-- Promover solo una versión validada en Staging.
-- Tomar backup y comprobar rollback antes de migraciones.
-- Mantener secretos separados.
-- Registrar quién aprueba y cuándo se despliega.
-
-## 6. Variables de entorno
-
-Inventario por nombre, nunca por valor:
-
-| Variable | Propósito | Local | Staging | Production |
-|---|---|---:|---:|---:|
-| `APP_ENV` | Selección de configuración | ✅ | ✅ | ✅ |
-| `SECRET_KEY` | Firma de sesión | propia | propia | propia |
-| `DATABASE_URL` | Conexión de datos | propia | propia | propia |
-| `LOG_LEVEL` | Nivel de registro | ✅ | ✅ | ✅ |
-| `SESSION_COOKIE_SECURE` | Cookie solo HTTPS | Según local | `true` | `true` |
-
-Cualquier integración futura añade solo nombre, propietario y política de rotación.
-
-## 7. Construcción y arranque propuestos
-
-La configuración final dependerá del backend refactorizado. El objetivo es contar con comandos equivalentes y reproducibles:
+Inicio de Staging:
 
 ```text
-Build: instalar dependencias controladas y ejecutar validaciones necesarias
-Start: gunicorn "wsgi:app"
-Health check: /health
+flask db upgrade && flask seed-habits && gunicorn ...
 ```
 
-Las migraciones se ejecutan en un paso controlado, con backup y registro; no de forma insegura en cada proceso web.
+La migración se ejecuta en el arranque porque el pre-deploy command no está disponible en web Free. En una instancia pagada debe moverse a `preDeployCommand` para separar cambio de esquema y proceso web.
 
-## 8. Pipeline de entrega
+## 4. Advertencia de persistencia
 
-```mermaid
-flowchart LR
-    P[Pull request] --> C[Formato + análisis + secretos]
-    C --> T[Pruebas]
-    T --> B[Build]
-    B --> S[Deploy Staging]
-    S --> E[Smoke/E2E + revisión visual]
-    E --> A{Aprobado}
-    A -- No --> P
-    A -- Sí --> R[Release Production]
-    R --> M[Monitoreo]
-```
+El filesystem del servicio Render es efímero; no se usa SQLite compartido. PostgreSQL Free sirve para demostración temporal y puede expirar a los 30 días según el plan vigente. Production debe usar una base persistente pagada con backups y retención definidos.
 
-## 9. Health checks y smoke tests
+## 5. Variables
 
-Después de cada despliegue:
+| Variable | Staging | Production |
+|---|---|---|
+| `APP_ENV` | `staging` | `production` |
+| `APP_VERSION` | versión/commit | release |
+| `SECRET_KEY` | generada, exclusiva | generada, exclusiva |
+| `DATABASE_URL` | DB Staging privada | DB Production privada |
+| `SESSION_COOKIE_SECURE` | `true` | `true` |
+| `RATELIMIT_STORAGE_URI` | memoria, un worker | Redis si escala |
+| `MAIL_*` | secretos Staging | secretos Production |
+| `LOG_LEVEL` | `INFO` | `INFO`/política |
 
-1. `/health` responde correctamente.
-2. Inicio carga por HTTPS.
-3. Registro o login de prueba funciona.
-4. Dashboard autorizado carga.
-5. Un hábito se completa una vez y el reintento no duplica puntos.
-6. Logout invalida la sesión.
-7. Logs no muestran excepciones ni datos sensibles.
+## 6. Procedimiento de Staging
 
-## 10. Logs, métricas y alertas
+1. Fusionar el PR a `staging` solo con CI verde.
+2. En Render, crear Blueprint desde el repositorio privado y `render.yaml`.
+3. Confirmar que se crean recursos dentro de `VitaliLab / Staging`, no Production.
+4. Completar variables SMTP si se probará recuperación real.
+5. Esperar build, migración, seed y health check.
+6. Ejecutar `/health`, `/ready` y recorrido de aceptación.
+7. Registrar URL, commit, hora y resultado en la bitácora.
 
-- Logs estructurados con fecha, nivel, ambiente, ruta, duración e ID de correlación.
-- Sin credenciales, tokens ni medidas de salud.
-- Seguimiento de respuestas 5xx, latencia, reinicios y fallos de conexión.
-- Alerta por despliegue fallido y errores sostenidos.
-- Registro de migración aplicada y versión desplegada.
+## 7. Rollback
 
-## 11. Rollback
+Staging: seleccionar el último deploy saludable o desplegar el commit anterior. Si la migración no es compatible, restaurar una copia aislada y analizar antes de cambiar datos.
 
-Antes de una release se registra el commit estable anterior, compatibilidad de migración, backup, responsable y criterio de reversión.
+Production: backup verificado, etiqueta de release y commit anterior antes de iniciar. El rollback de código solo es seguro si el esquema conserva compatibilidad hacia atrás.
 
-Pasos conceptuales:
+## 8. Smoke tests
 
-1. Detener promociones.
-2. Revertir a la versión estable si el esquema es compatible.
-3. Restaurar datos solo si el análisis lo requiere.
-4. Verificar health y recorrido crítico.
-5. Documentar incidente y corrección.
+- `/health` 200 y versión correcta.
+- `/ready` 200 y DB accesible.
+- Inicio HTTPS y cabeceras.
+- Registro ficticio, login, perfil, hábito, no duplicación y logout.
+- Admin crea/publica comunicado.
+- Recuperación real si SMTP está configurado.
+- Logs sin 5xx ni datos sensibles.
 
-## 12. Dominio y TLS
+## 9. Production
 
-- Conservar `www.vitalilab.space` en Production mientras se audita.
-- No apuntar el dominio a Staging.
-- Verificar HTTPS y renovación automática.
-- Documentar DNS sin publicar credenciales.
+Production conserva servicio, dominio, base y variables históricas. Este trabajo no la modifica. La migración desde SQLite/datos originales requiere ventana, inventario, restablecimiento de contraseñas si aplica, backup, ensayo y aprobación.
 
-## 13. Checklist de promoción
+## 10. Referencias operativas
 
-- [ ] PR aprobado y commit identificado.
-- [ ] CI en verde.
-- [ ] Migración probada.
-- [ ] Backup y rollback listos.
-- [ ] Variables completas y separadas.
-- [ ] Staging aprobado funcional y visualmente.
-- [ ] Seguridad sin bloqueantes.
-- [ ] Responsable definido.
-- [ ] Smoke tests ejecutados.
-- [ ] Bitácora actualizada.
+- [Render: Flask](https://render.com/docs/deploy-flask)
+- [Render: health checks](https://render.com/docs/health-checks)
+- [Render: Blueprints](https://render.com/docs/blueprint-spec)
+- [Render: PostgreSQL](https://render.com/docs/postgresql)
 
-## 14. Estado
+## 11. Estado
 
-La separación organizativa Production/Staging está **✅ creada**. El servicio, la base y el pipeline de Staging están **🟡 pendientes**. Production no ha sido modificado por esta documentación.
+Infraestructura como código: ✅. Ejecución CI/Render y backup: 🟡. Production: 🔴 congelada.
