@@ -1,0 +1,1 @@
+"""Public and dashboard routes."""

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123c35">
+  <meta name="description" content="VitaliLab: hábitos saludables, progreso consciente y bienestar educativo.">
+  <title>{% block title %}VitaliLab{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/brand-mark.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header" data-header>
+    <div class="shell header-inner">
+      <a class="brand" href="{{ url_for('main.home') }}" aria-label="VitaliLab, inicio">
+        <img src="{{ url_for('static', filename='img/brand-mark.svg') }}" alt="" width="42" height="42">
+        <span>Vitali<span>Lab</span></span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-nav-toggle>
+        <span class="sr-only">Abrir menú</span>
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="primary-nav" aria-label="Navegación principal" data-nav>
+        <a href="{{ url_for('main.home') }}">Inicio</a>
+        <a href="{{ url_for('main.content', slug='bienestar') }}">Bienestar</a>
+        <a href="{{ url_for('main.content', slug='imc') }}">IMC</a>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('main.dashboard') }}">Mi panel</a>
+          <a href="{{ url_for('habits.index') }}">Hábitos</a>
+          <a href="{{ url_for('profile.edit') }}">Perfil</a>
+          {% if current_user.is_admin %}<a href="{{ url_for('admin.dashboard') }}">Administración</a>{% endif %}
+          <form action="{{ url_for('auth.logout') }}" method="post" class="nav-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="nav-logout" type="submit">Salir</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}">Ingresar</a>
+          <a class="button button--small" href="{{ url_for('auth.register') }}">Crear cuenta</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <div class="flash-region shell" aria-live="polite" aria-atomic="true">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash--{{ category }}" role="status">
+          <span>{{ message }}</span>
+          <button type="button" aria-label="Cerrar mensaje" data-dismiss-flash>×</button>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+  <main id="contenido">{% block content %}{% endblock %}</main>
+
+  <footer class="site-footer">
+    <div class="shell footer-grid">
+      <div>
+        <a class="brand brand--footer" href="{{ url_for('main.home') }}">
+          <img src="{{ url_for('static', filename='img/brand-mark.svg') }}" alt="" width="38" height="38">
+          <span>Vitali<span>Lab</span></span>
+        </a>
+        <p>Hábitos comprensibles, progreso consciente.</p>
+      </div>
+      <div>
+        <h2>Explora</h2>
+        <a href="{{ url_for('main.content', slug='fundamentos') }}">Cómo funciona</a>
+        <a href="{{ url_for('main.privacy') }}">Privacidad</a>
+        <a href="{{ url_for('main.health') }}">Estado técnico</a>
+      </div>
+      <p class="footer-note">© {{ current_year }} VitaliLab. Proyecto educativo; no sustituye orientación médica.</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% from "macros/forms.html" import field, submit_button %}
+{% block title %}Ingresar · VitaliLab{% endblock %}
+{% block content %}
+<section class="auth-section"><div class="shell auth-grid">
+  <div class="auth-intro"><p class="eyebrow eyebrow--light">Bienvenido de nuevo</p><h1>Retoma tu camino justo donde lo dejaste.</h1><p>Tu progreso está organizado para que la siguiente acción siempre sea clara.</p><div class="auth-quote">“Lo sostenible vence a lo perfecto.”</div></div>
+  <div class="auth-card"><p class="eyebrow">Acceso seguro</p><h2>Ingresa a tu cuenta</h2><p>Usa el correo con el que te registraste.</p>
+    <form method="post" novalidate>{{ form.hidden_tag() }}{{ field(form.email, autocomplete="email", placeholder="nombre@ejemplo.com") }}{{ field(form.password, autocomplete="current-password", placeholder="Tu contraseña") }}
+      <div class="form-options"><label class="check-row">{{ form.remember() }} <span>{{ form.remember.label.text }}</span></label><a href="{{ url_for('auth.forgot_password') }}">Olvidé mi contraseña</a></div>{{ submit_button(form.submit) }}
+    </form><p class="auth-switch">¿Aún no tienes cuenta? <a href="{{ url_for('auth.register') }}">Créala aquí</a></p>
+  </div>
+</div></section>
+{% endblock %}

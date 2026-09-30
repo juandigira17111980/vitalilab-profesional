@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Mi panel · VitaliLab{% endblock %}
+{% block content %}
+<section class="dashboard-head"><div class="shell"><div><p class="eyebrow">Tu espacio personal</p><h1>Hola, {{ current_user.profile.display_name }}</h1><p>Una mirada clara a lo que ya hiciste y a tu siguiente paso.</p></div><a class="button button--light" href="{{ url_for('habits.index') }}">Registrar hábito →</a></div></section>
+<section class="section shell dashboard-layout">
+  <div class="dashboard-main">
+    <div class="metric-grid">
+      <article class="metric-card"><span>Puntos</span><strong>{{ summary.points }}</strong><small>XP acumulados</small></article>
+      <article class="metric-card metric-card--dark"><span>Racha actual</span><strong>{{ summary.streak }}</strong><small>días consecutivos</small></article>
+      <article class="metric-card"><span>Nivel</span><strong class="metric-card__name">{{ summary.level }}</strong><small>cada paso suma</small></article>
+    </div>
+    <article class="panel-card">
+      <div class="panel-card__head"><div><p class="eyebrow">Últimos siete días</p><h2>Tu ritmo, sin presión</h2></div><span class="pill">{{ summary.completed_today }}/{{ summary.total_habits }} hoy</span></div>
+      <div class="week-chart" aria-label="Hábitos completados durante los últimos siete días">
+        {% for item in summary.week %}<div class="week-bar"><div class="week-bar__track"><span data-bar-value="{{ item.count }}"></span></div><b>{{ item.label }}</b><small>{{ item.count }}</small></div>{% endfor %}
+      </div>
+    </article>
+    <article class="panel-card">
+      <div class="panel-card__head"><div><p class="eyebrow">Hoy</p><h2>Hábitos disponibles</h2></div><a class="text-link" href="{{ url_for('habits.index') }}">Ver todos →</a></div>
+      <div class="compact-habits">
+        {% for habit in habits %}<div class="compact-habit{% if habit.id in completed_ids %} compact-habit--done{% endif %}"><span>{{ habit.icon }}</span><div><b>{{ habit.name }}</b><small>{{ habit.points }} XP</small></div><span class="compact-habit__state">{{ 'Listo' if habit.id in completed_ids else 'Pendiente' }}</span></div>{% endfor %}
+      </div>
+    </article>
+  </div>
+  <aside class="dashboard-side">
+    <article class="quote-card"><span aria-hidden="true">“</span><p>La constancia no exige hacerlo perfecto; exige volver a intentarlo.</p></article>
+    {% if announcement %}<article class="side-card"><p class="eyebrow">Comunicado</p><h2>{{ announcement.title }}</h2><p>{{ announcement.body }}</p></article>{% endif %}
+    <article class="side-card"><p class="eyebrow">Tu información</p><h2>Completa tu perfil</h2><p>Registra medidas solo si te resultan útiles. Son opcionales y se tratan como información sensible.</p><a class="text-link" href="{{ url_for('profile.edit') }}">Revisar perfil →</a></article>
+  </aside>
+</section>
+{% endblock %}
