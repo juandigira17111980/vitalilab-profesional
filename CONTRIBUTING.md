@@ -1,26 +1,29 @@
-# Cómo contribuir a VitaliLab
+# Contribuir a VitaliLab
 
-## Flujo obligatorio
+## Flujo
 
-1. Partir de `staging` actualizado.
-2. Crear una rama `feat/*`, `fix/*`, `refactor/*`, `test/*` o `docs/*`.
-3. Mantener commits pequeños con formato `tipo(alcance): descripción`.
-4. Abrir Pull Request hacia `staging`.
-5. Exigir pruebas, revisión y validación de seguridad antes de integrar.
-6. Promover de `staging` a `main` únicamente después de aprobación funcional.
+1. Cree una rama `feat/*`, `fix/*`, `docs/*` o `chore/*` desde `staging`.
+2. Mantenga un alcance coherente y no incluya secretos, datos personales ni bases.
+3. Ejecute Ruff, Pytest y `flask db check` cuando aplique.
+4. Actualice pruebas, documentación y bitácora en el mismo cambio.
+5. Abra PR hacia `staging`; Production se promueve desde `staging` a `main` con aprobación.
 
-## Reglas de seguridad
+## Estándar de cambio
 
-- Nunca subir `.env`, tokens, claves, bases SQLite, respaldos o datos personales.
-- No registrar contraseñas, cookies, tokens ni información de salud en logs.
-- Toda modificación de esquema debe usar una migración versionada y tener plan de rollback.
-- No realizar despliegues manuales a producción desde ramas de trabajo.
+- Rutas: solo coordinación HTTP.
+- Reglas reutilizables: servicios.
+- Datos: ORM y migración versionada.
+- Acciones mutantes: sesión/rol, CSRF y validación del servidor.
+- UI: semántica, foco, responsive y estados de error.
+- Migraciones aplicadas en ambientes compartidos no se reescriben.
 
-## Checklist de Pull Request
+## Puerta local
 
-- [ ] El cambio tiene alcance claro.
-- [ ] No contiene secretos ni datos personales.
-- [ ] Incluye pruebas proporcionales al riesgo.
-- [ ] Las migraciones fueron revisadas y son reversibles o tienen recuperación documentada.
-- [ ] La documentación fue actualizada.
-- [ ] Fue validado en Staging.
+```text
+ruff check app tests wsgi.py migrations/versions
+ruff format --check app tests wsgi.py migrations/versions
+pytest
+flask --app wsgi:app db check
+```
+
+Use commits `tipo(alcance): descripción`. El PR debe explicar prueba, riesgo, migración, rollback y variables nuevas solo por nombre.

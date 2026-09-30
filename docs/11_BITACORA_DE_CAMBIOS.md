@@ -1,52 +1,44 @@
 # Bitácora verificable de cambios
 
-## 1. Regla
+## 1. Evidencia de la reconstrucción
 
-Esta bitácora responde “qué se mejoró realmente”. Un elemento solo figura como implementado si existe evidencia verificable. Los diseños y recomendaciones no cuentan como mejoras funcionales terminadas.
-
-## 2. Estado al 30 de septiembre de 2026
-
-### Implementado y verificado
-
-| Fecha | Área | Cambio | Evidencia | Impacto |
+| Fecha | Área | Cambio | Evidencia | Estado |
 |---|---|---|---|---|
-| 2026-09-30 | Infraestructura | Proyecto Render organizado como `VitaliLab`; servicio existente ubicado en `Production` | Capturas de Render del propietario | Reduce confusión sin alterar servicio |
-| 2026-09-30 | Infraestructura | Ambiente `Staging` creado y vacío | Captura de Render | Prepara pruebas; no afecta Production |
-| 2026-09-30 | Git | Repositorio privado `juandigira17111980/vitalilab-profesional` creado | Repositorio y permisos verificados | Espacio controlado |
-| 2026-09-30 | Git | Ramas `main`, `staging` y `docs/auditoria-profunda` creadas | Historial remoto | Base de promoción |
-| 2026-09-30 | Auditoría | Diagnóstico de datos, backend, frontend, seguridad e infraestructura | Documento de auditoría | Prioriza riesgos y roadmap |
-| 2026-09-30 | Documentación | Documento Maestro y guías especializadas creadas | Pull request y carpeta `docs/` | Base de estudio y sustentación |
+| 2026-09-30 | Git | Repositorio privado y ramas `main`/`staging` | Historial remoto | ✅ |
+| 2026-09-30 | Documentación | Auditoría inicial integrada | PR #1, commit `182f96d` | ✅ |
+| 2026-09-30 | Arquitectura | Fábrica Flask y módulos por dominio | `app/` | ✅ |
+| 2026-09-30 | DBA | 7 tablas, constraints e índices | migraciones `0380d5595f5e`, `208469fd48ef` | ✅ local |
+| 2026-09-30 | Backend | Auth, perfil, hábitos, progreso, admin y errores | rutas/servicios | ✅ local |
+| 2026-09-30 | Seguridad | scrypt, CSRF, RBAC, rate limits, cookies y headers | pruebas/código | ✅ local |
+| 2026-09-30 | Frontend | Sistema visual, responsive y componentes | CSS/Jinja/JS + capturas | ✅ local |
+| 2026-09-30 | QA | 24 pruebas, cobertura 90,41 %, Ruff limpio | salida reproducible | ✅ |
+| 2026-09-30 | E2E | Registro, hábito, admin, comunicado y móvil | Playwright/Chromium | ✅ local |
+| 2026-09-30 | Infra | Docker, Compose, Render Blueprint y CI | archivos versionados | ✅ configurado |
+| 2026-09-30 | CI | Calidad, PostgreSQL 18 y build Docker | GitHub Actions PR #2 | ✅ |
 
-### No implementado todavía
+## 2. Defectos encontrados durante validación
 
-| Área | Trabajo pendiente | Por qué no se marca como realizado |
-|---|---|---|
-| Base de datos | PostgreSQL, modelo, migraciones y backup | No hay esquema aplicado ni restauración probada |
-| Backend | Modularización, ORM, reglas, health y pruebas | No hay código funcional nuevo validado |
-| Frontend | Sistema visual, responsive y accesibilidad | No hay pantallas nuevas en Staging |
-| Seguridad | Hash, CSRF, cookies, límites, cabeceras y privacidad | Controles documentados, no verificados |
-| QA | Suites y reportes | Estrategia creada; no hay resultados |
-| Infraestructura | Servicio/DB Staging, CI/CD, monitoreo y rollback | Staging vacío y Production intacto |
+| ID | Hallazgo | Corrección | Regresión |
+|---|---|---|---|
+| DEF-001 | Espacios/caso del correo fallaban antes de normalizar | Filtro previo de formulario | Registro con correo espaciado |
+| DEF-002 | `timedelta` CSRF incompatible con librería actual | TTL de 7200 segundos | POST real con CSRF activo |
+| DEF-003 | Perfil aceptaba peso sin altura por corto circuito de `Optional` | Validación cruzada en ambos campos | Caso inválido |
+| DEF-004 | CLI admin permitía correo reservado/clave débil | email-validator + política común | Tres casos CLI |
+| DEF-005 | Alerta móvil ocultaba contenido/menú | Alerta en flujo y z-index del menú | Captura 390 px |
 
-## 3. Plantilla para próximas entradas
+## 3. Evidencia remota pendiente
 
-| Fecha | Área | Requisito/hallazgo | Rama/PR | Commit | Pruebas | Staging | Aprobación | Estado |
-|---|---|---|---|---|---|---|---|---|
-| AAAA-MM-DD | DBA/backend/frontend/etc. | Problema resuelto | enlace/ID | SHA | reporte/casos | resultado | responsable | Implementado/Revertido |
-
-Cambios de datos añaden migración, conteos, backup/restauración y rollback. Cambios visuales añaden capturas comparables, resoluciones y accesibilidad.
+| Hito | Requerido |
+|---|---|
+| PR funcional | URL, commit y revisión |
+| CI final tras actualización menor | tres jobs verdes |
+| Render Staging | URL y deploy/commit |
+| SMTP Staging | correo ficticio recibido |
+| Backup/restauración | fecha, duración, conteos y responsable |
+| Production | aprobación explícita; no ejecutada |
 
 ## 4. Historial de releases
 
-| Versión | Fecha | Commit | Staging | Production | Resultado |
-|---|---|---|---|---|---|
-| Pendiente | — | — | — | No modificado por este proceso | Aún no existe release profesional |
-
-## 5. Decisiones pendientes
-
-- Baseline exacto desde el cual reconstruir.
-- Alcance definitivo para estudiantes y administradores.
-- PostgreSQL y plan operativo.
-- Identidad visual y contenidos.
-- Política de privacidad, edad mínima y medidas de salud.
-- Momento autorizado para crear Staging y luego promover Production.
+| Versión | Rama | Staging | Production |
+|---|---|---|---|
+| `v0.1.0` candidata | `feat/reconstruccion-profesional` | Pendiente | No promovida |

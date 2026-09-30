@@ -2,163 +2,83 @@
 
 ## 1. Alcance
 
-Este documento cubre controles técnicos y de proceso para proteger cuentas, datos personales, información relacionada con salud y la operación en Render. No constituye concepto jurídico; las obligaciones concretas deben validarse según usuarios, institución y jurisdicción.
+Este documento registra controles técnicos. No sustituye la revisión jurídica/institucional exigible para datos personales, salud o menores.
 
-## 2. Hallazgos críticos observados
+## 2. Controles implementados
 
-- 🔴 Secreto de sesión incluido en código.
-- 🔴 Contraseñas almacenadas/comparadas sin hash seguro en la versión activa revisada.
-- 🔴 Formularios mutantes sin una protección CSRF verificable.
-- 🔴 Reglas de puntos y rachas manipulables mediante solicitudes repetidas.
-- 🔴 Scripts de base de datos con acciones destructivas.
-- 🟡 No se verificó política de privacidad, recuperación de cuenta, retención ni respuesta a incidentes.
-- 🟡 La aplicación maneja medidas corporales; pueden constituir datos sensibles según contexto y uso.
-
-Estas condiciones impiden considerar la versión auditada lista para una promoción profesional sin correcciones.
-
-## 3. Modelo de amenazas simplificado
-
-| Activo | Amenaza | Control principal |
+| Dominio | Control | Evidencia |
 |---|---|---|
-| Cuentas | Robo/reutilización de contraseña | Hash robusto, rate limiting, recuperación segura |
-| Sesión | Secuestro o fijación | Secreto fuerte, cookie segura, rotación y expiración |
-| Perfil/medidas | Acceso de otro usuario | Autorización por propiedad y mínimo privilegio |
-| Puntos/racha | Manipulación o repetición | Cálculo en servidor, unicidad y transacción |
-| Base de datos | Pérdida o exposición | PostgreSQL privado, backup, cifrado en tránsito y acceso restringido |
-| Despliegue | Cambio no autorizado | Ramas protegidas por proceso, PR, secretos en Render y rollback |
-| Logs | Filtración de datos | Redacción y política de retención |
+| Contraseñas | scrypt con sal mediante Werkzeug | Hash distinto al texto y pruebas |
+| Enumeración | Mensajes genéricos y hash ficticio | Pruebas de cuenta inexistente |
+| Fuerza bruta | 5/min y 20/h por endpoint + bloqueo de cuenta tras 5 fallos | Configuración y prueba |
+| Registro/recuperación | Límites 8/h y 5/h | Decoradores Limiter |
+| Recuperación | Token firmado, una hora e invalidación por cambio de hash | Pruebas |
+| Sesiones | Cookies HttpOnly, SameSite Lax, Secure en HTTPS y vida de 8 h | Configuración |
+| CSRF | Global para formularios; logout también usa POST | Prueba con CSRF activo |
+| Autorización | `login_required` y `admin_required` del lado servidor | Prueba usuario/admin |
+| Inyección | ORM y expresiones parametrizadas | Revisión de código |
+| XSS | Autoescape Jinja y CSP sin inline scripts | Plantillas/cabecera |
+| Clickjacking | `frame-ancestors 'none'` y `X-Frame-Options: DENY` | Prueba de headers |
+| MIME/referrer/permisos | `nosniff`, referrer estricto y cámara/mic/geoloc deshabilitados | Middleware |
+| Transporte | HSTS cuando `SESSION_COOKIE_SECURE=true` | Configuración |
+| Cache | `no-store` en panel, perfil, hábitos y admin | Middleware |
+| Auditoría | Eventos de cuenta/sesión/hábito/comunicado, sin datos sensibles | Tabla y panel |
+| Secretos | Variables externas; `.env`, DB y backups ignorados | `.gitignore`/`.env.example` |
 
-## 4. Autenticación y contraseñas
+## 3. Datos tratados
 
-- Usar funciones de hash de contraseña provistas por Werkzeug u otra biblioteca mantenida; Argon2id puede evaluarse según compatibilidad.
-- Nunca cifrar de forma reversible ni registrar contraseñas.
-- Definir longitud mínima y permitir frases largas, pegado y gestores.
-- Mensajes de acceso/recuperación no revelan si una cuenta existe.
-- Limitar intentos y registrar señales de abuso sin almacenar datos excesivos.
-- Recuperación mediante token aleatorio, de un solo uso, con expiración y almacenamiento seguro.
-- Invalidar sesiones relevantes después de un cambio de contraseña.
+| Categoría | Obligatorio | Finalidad |
+|---|---:|---|
+| Correo | Sí | Identidad y recuperación |
+| Nombre/apodo | Sí | Presentación |
+| Fecha de nacimiento/grado | No | Contexto educativo |
+| Peso/altura/IMC | No | Seguimiento educativo opcional |
+| Cumplimientos | Sí para la función | Progreso, puntos y racha |
+| Auditoría | Operativo | Seguridad y trazabilidad |
 
-Si existen cuentas con contraseña en texto legible, el plan debe incluir migración controlada o restablecimiento obligatorio y comunicación responsable.
+No se registran contraseñas, hashes, tokens, cookies ni medidas en logs/auditoría. `metadata_redacted` contiene solo fecha u otro metadato no sensible aprobado.
 
-## 5. Sesiones y cookies
+## 4. Privacidad por diseño
 
-Configuración esperada en Staging/Production:
+- Aceptación de privacidad versionada al crear la cuenta.
+- Medidas opcionales y acceso limitado al propietario.
+- No se copian datos reales a pruebas o Staging.
+- Mensaje permanente de alcance educativo/no diagnóstico.
+- Eventos administrativos visibles sin abrir perfiles de salud.
 
-```text
-SESSION_COOKIE_SECURE=true
-SESSION_COOKIE_HTTPONLY=true
-SESSION_COOKIE_SAMESITE=Lax (o más estricto si el flujo lo permite)
-```
+Antes de Production deben aprobarse responsable del tratamiento, contacto, finalidad, base jurídica, edad mínima/consentimiento, retención, corrección, eliminación e incidentes.
 
-- `SECRET_KEY` aleatoria, externa al repositorio y distinta por ambiente.
-- Regenerar la sesión al autenticar.
-- Expiración razonable y cierre de sesión efectivo.
-- No guardar datos sensibles innecesarios en la cookie de sesión.
+## 5. Límites conocidos
 
-## 6. Autorización
+- Rate limiting usa memoria y un worker. Escalar horizontalmente exige Redis compartido.
+- SMTP real no ha sido conectado; la lógica se prueba con doble.
+- `pip-audit 2.10.1` no encontró vulnerabilidades conocidas en las dependencias de producción. No sustituye SAST, pentest ni escaneo de secretos; si el plan lo permite, se recomienda Dependabot/CodeQL.
+- La CSP permite estilos propios por archivo; agregar analítica o CDN exige revisar la política.
+- No existe MFA; no es requisito del primer alcance, pero se recomienda para administradores en una fase posterior.
 
-Cada solicitud valida:
+## 6. Respuesta a incidentes
 
-1. Que existe una sesión válida.
-2. Que el rol permite la acción.
-3. Que el recurso pertenece al usuario cuando aplica.
-4. Que el estado del recurso permite la transición.
+1. Contener acceso o despliegue sin borrar evidencia.
+2. Preservar versión, hora, logs y alcance.
+3. Rotar secretos y corregir causa.
+4. Restaurar versión/datos validados.
+5. Verificar health, acceso y ausencia de recurrencia.
+6. Comunicar según responsable y obligación.
+7. Registrar postmortem y control preventivo.
 
-Ocultar un botón no es una medida de seguridad. El servidor debe rechazar solicitudes directas no autorizadas.
+## 7. Gate de Production
 
-## 7. Entradas, CSRF y contenido
+- [x] Hash, CSRF, autorización, validación, cabeceras y errores.
+- [x] Secretos fuera de Git y configuración separada.
+- [x] Pruebas críticas locales.
+- [ ] CI final en verde.
+- [ ] SMTP y recuperación real en Staging.
+- [x] Auditoría local de dependencias sin vulnerabilidades conocidas.
+- [ ] Escaneo de secretos/SAST del commit final.
+- [ ] Backup/restauración PostgreSQL.
+- [ ] Política de privacidad aprobada.
+- [ ] Aprobación de release.
 
-- Proteger formularios y peticiones mutantes con CSRF.
-- Validar en servidor longitud, formato, tipo y rango.
-- Usar consultas parametrizadas/ORM; nunca concatenar SQL.
-- Mantener autoescape de Jinja y revisar cualquier uso de contenido marcado como seguro.
-- Restringir subidas por tipo, tamaño y almacenamiento si se incorporan en el futuro.
-- Aplicar límites de frecuencia a login, registro, recuperación y acciones abusables.
+## 8. Estado
 
-## 8. Cabeceras y transporte
-
-- HTTPS obligatorio.
-- HSTS tras confirmar dominio y subdominios.
-- `Content-Security-Policy` adaptada a los recursos reales.
-- `X-Content-Type-Options: nosniff`.
-- `Referrer-Policy` restrictiva.
-- Política de `frame-ancestors` para evitar clickjacking.
-- Evitar scripts y estilos inline para facilitar una CSP fuerte.
-
-## 9. Secretos
-
-- Secretos solo en el gestor de variables de Render y en almacenamiento local ignorado por Git.
-- Valores diferentes para Local, Staging y Production.
-- `.env.example` solo contiene nombres y ejemplos no sensibles.
-- Nunca pegar secretos en issues, PR, documentación, capturas o logs.
-- Rotar de inmediato cualquier secreto que haya sido publicado.
-- Mantener inventario de propietario, propósito, ambiente, fecha de rotación y dependencias, sin registrar el valor.
-
-## 10. Privacidad y datos de salud
-
-Aplicar minimización: pedir solo lo necesario y explicar finalidad. Peso, altura, fecha de nacimiento u otros indicadores pueden requerir controles reforzados.
-
-Antes de Production se debe definir:
-
-- Responsable del tratamiento y canal de contacto.
-- Finalidades y base de tratamiento.
-- Datos obligatorios y opcionales.
-- Tiempo de retención y procedimiento de eliminación/corrección.
-- Acceso restringido y registro de operaciones administrativas.
-- Política para usuarios menores de edad, si pueden registrarse.
-- Texto que aclare que la plataforma es educativa y no sustituye consejo médico.
-
-Referencias iniciales para validación institucional/jurídica:
-
-- [Ley 1581 de 2012 sobre protección de datos personales en Colombia — Función Pública](https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981).
-- [Orientación de la Superintendencia de Industria y Comercio sobre datos sensibles relativos a la salud](https://sedeelectronica.sic.gov.co/publicaciones/boletin-juridico/concepto/tratamiento-de-datos-sensibles-relativos-la-salud).
-
-## 11. Logs y auditoría
-
-Registrar:
-
-- Inicio/cierre de sesión y fallos agregados.
-- Cambios administrativos.
-- Errores con ID de correlación.
-- Despliegues y migraciones.
-
-No registrar:
-
-- Contraseñas, hashes, tokens o cookies.
-- Valores completos de salud.
-- Cuerpos de formularios personales.
-- URLs con tokens de recuperación.
-
-## 12. Dependencias y cadena de suministro
-
-- Mantener un archivo de dependencias mínimo y versionado.
-- Ejecutar análisis de vulnerabilidades y actualización controlada.
-- Revisar licencias cuando se incorporen recursos de terceros.
-- CI debe instalar desde fuente reproducible, ejecutar pruebas y fallar ante secretos detectados.
-- Las acciones de CI se fijan a versiones confiables y con permisos mínimos.
-
-## 13. Respuesta a incidentes
-
-1. Contener: desactivar credencial/ruta afectada sin destruir evidencia.
-2. Preservar: registrar hora, versión, logs y alcance con acceso restringido.
-3. Erradicar: corregir causa y rotar secretos.
-4. Recuperar: desplegar versión validada y vigilar recurrencia.
-5. Comunicar: responsables y usuarios según impacto y obligación aplicable.
-6. Aprender: documentar causa, control faltante y acción preventiva.
-
-## 14. Checklist antes de Production
-
-- [ ] No hay secretos en Git ni historial relevante sin tratar.
-- [ ] Todas las contraseñas usan hash seguro.
-- [ ] CSRF, autorización y límites se prueban.
-- [ ] Cookies y HTTPS están configurados.
-- [ ] CSP y cabeceras se verifican en Staging.
-- [ ] Logs no contienen datos sensibles.
-- [ ] Backup y restauración funcionan.
-- [ ] Dependencias no tienen hallazgos críticos sin aceptar formalmente.
-- [ ] Existe política de privacidad revisada.
-- [ ] Existe rollback y responsable de incidente.
-
-## 15. Estado
-
-La política y los controles están **🟡 documentados como objetivo**. Los hallazgos críticos pertenecen a la versión revisada y aún deben corregirse mediante código, migraciones y pruebas antes de afirmar cumplimiento.
+Controles de aplicación: ✅. Controles organizacionales y verificación remota: 🟡; bloquean Production donde se indica.

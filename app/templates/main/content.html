@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} · VitaliLab{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="shell shell--narrow"><p class="eyebrow">{{ article.eyebrow }}</p><h1>{{ article.title }}</h1><p>{{ article.lead }}</p></div></section>
+<section class="section shell shell--narrow">
+  <div class="article-stack">
+    {% for title, text in article.sections %}<article><span>0{{ loop.index }}</span><div><h2>{{ title }}</h2><p>{{ text }}</p></div></article>{% endfor %}
+  </div>
+  <div class="notice"><strong>Importante</strong><p>Este contenido es educativo y general. Si necesitas una evaluación individual, consulta a un profesional calificado.</p></div>
+</section>
+{% endblock %}

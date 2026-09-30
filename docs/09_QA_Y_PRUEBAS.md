@@ -1,139 +1,83 @@
-# Estrategia de QA y pruebas
+# Estrategia y ejecución de QA
 
-## 1. Objetivo
+## 1. Resultado local
 
-Demostrar de manera repetible que VitaliLab funciona, protege los datos y puede desplegarse sin degradar Production. Las pruebas son evidencia técnica, no una actividad final opcional.
-
-## 2. Pirámide de pruebas
-
-```mermaid
-flowchart TB
-    E2E[E2E: pocos recorridos críticos]
-    INT[Integración: rutas + DB + permisos]
-    UNIT[Unitarias: muchas reglas rápidas]
-    UNIT --> INT --> E2E
-```
-
-También se realizan pruebas visuales, accesibilidad, seguridad, migración, rendimiento básico y recuperación.
-
-## 3. Ambientes y datos
-
-- Unitarias: sin servicios externos y con datos fabricados.
-- Integración: base temporal creada por migraciones.
-- E2E: Staging con usuarios ficticios y reiniciables.
-- Production: solo smoke tests no destructivos y aprobados.
-
-Nunca se usan credenciales reales en fixtures ni se copia información personal a reportes.
-
-## 4. Matriz funcional inicial
-
-| ID | Escenario | Resultado esperado | Tipo | Prioridad |
-|---|---|---|---|---|
-| AUTH-01 | Registro válido | Cuenta y perfil mínimo creados | Integración | Crítica |
-| AUTH-02 | Correo repetido | Rechazo controlado, sin duplicado | Integración | Alta |
-| AUTH-03 | Contraseña incorrecta | No inicia sesión, mensaje genérico | Integración | Crítica |
-| AUTH-04 | Logout | Sesión deja de servir | E2E | Alta |
-| SEC-01 | POST sin CSRF | Solicitud rechazada | Integración | Crítica |
-| SEC-02 | Editar perfil ajeno | Respuesta 403, sin cambios | Integración | Crítica |
-| HAB-01 | Completar hábito | Crea cumplimiento y puntos correctos | Integración | Crítica |
-| HAB-02 | Repetir mismo día | No duplica cumplimiento ni puntos | Integración/concurrencia | Crítica |
-| HAB-03 | Días consecutivos | Racha aumenta según regla | Unitaria | Alta |
-| HAB-04 | Día omitido | Racha se reinicia según regla | Unitaria | Alta |
-| UX-01 | Flujo a 360 px | Sin corte ni desplazamiento horizontal | Visual | Alta |
-| A11Y-01 | Registro por teclado | Orden, foco y errores accesibles | Manual/automatizada | Alta |
-| DBA-01 | Migración en DB vacía | Esquema completo y consistente | Integración | Crítica |
-| DBA-02 | Restauración | Conteos y relaciones coinciden | Operativa | Crítica |
-| OPS-01 | Health check | Respuesta saludable | Smoke | Crítica |
-| OPS-02 | Rollback ensayado | Vuelve a versión estable | Operativa | Crítica |
-
-## 5. Compatibilidad backend/frontend
-
-Para evitar la divergencia observada entre rutas y plantillas:
-
-- Toda llamada a `url_for` resuelve en una prueba de renderizado.
-- Cada plantilla declara las variables que espera.
-- Las rutas se recorren como anónimo, usuario y administrador.
-- Se prueban estados con datos, vacío, validación fallida y permiso denegado.
-
-## 6. Pruebas de base de datos
-
-- Migraciones desde cero y desde el baseline elegido.
-- Restricciones únicas y claves foráneas.
-- Transacción atómica de hábito/puntos/racha.
-- Consultas principales con plan razonable.
-- Backup y restauración aislada.
-- Ausencia de contraseñas legibles y registros huérfanos.
-
-## 7. Seguridad
-
-- Autenticación y autorización horizontal/vertical.
-- CSRF, XSS e inyección.
-- Rate limiting en endpoints sensibles.
-- Cookies y cabeceras.
-- Escaneo de secretos y dependencias.
-- Manejo de errores sin trazas públicas.
-
-Una herramienta automática no reemplaza el análisis de reglas de negocio.
-
-## 8. UX, responsive y accesibilidad
-
-Registrar navegador, sistema, resolución, fecha y resultado para:
-
-- Inicio → registro.
-- Login → dashboard.
-- Completar hábito → observar progreso.
-- Editar perfil con errores y éxito.
-- Administración con y sin permiso.
-
-Verificar teclado, lector de pantalla en flujos críticos, contraste, zoom 200 %, orientación y mensajes.
-
-## 9. Rendimiento básico
-
-Medir en Staging con volumen documentado:
-
-- Respuesta de inicio, login y dashboard.
-- Consultas por pantalla y consultas lentas.
-- LCP, CLS e INP.
-- Solicitudes concurrentes de cumplimiento.
-- Tiempo de arranque y consumo del servicio.
-
-No se prometen números sin línea base; los presupuestos se acuerdan tras medir.
-
-## 10. Gestión de defectos
-
-| Severidad | Definición | Salida |
-|---|---|---|
-| Bloqueante | Pérdida de datos, acceso indebido o app no inicia | Impide promoción |
-| Alta | Flujo principal incorrecto o riesgo significativo | Corregir antes de release |
-| Media | Alternativa disponible, impacto acotado | Planificar con responsable |
-| Baja | Mejora visual/documental menor | Puede quedar en backlog |
-
-Todo defecto registra pasos, resultado esperado/real, ambiente, versión y evidencia sin datos sensibles.
-
-## 11. Reporte de ejecución
-
-| Campo | Valor a registrar |
+| Puerta | Resultado |
 |---|---|
-| Versión/commit | Identificador exacto |
-| Ambiente | Local o Staging |
-| Fecha y responsable | Trazabilidad |
-| Pruebas ejecutadas | IDs o suite |
-| Aprobadas/fallidas/omitidas | Conteos |
-| Defectos abiertos | Severidad y enlace |
-| Evidencia | Log redactado, captura o reporte |
-| Decisión | Aprobado/rechazado con motivo |
+| Ruff check/format | ✅ sin hallazgos |
+| Pytest | ✅ 24/24 |
+| Cobertura | ✅ 90,41 %; umbral 85 % |
+| Dependencias | ✅ `pip-audit`: sin vulnerabilidades conocidas |
+| Migración base vacía | ✅ |
+| Deriva Alembic | ✅ ninguna |
+| Navegador escritorio/móvil | ✅ |
+| Consola navegador | ✅ 0 errores/advertencias finales |
+| Docker | ✅ imagen construida en GitHub Actions |
+| PostgreSQL real | ✅ migraciones/seed/check en PostgreSQL 18 CI |
+| Staging | 🟡 pendiente |
 
-## 12. Criterio de salida a Production
+## 2. Casos automatizados
 
-- Cero defectos bloqueantes o críticos abiertos.
-- Pruebas críticas aprobadas.
-- Seguridad revisada.
-- Migración y restauración ensayadas.
-- Recorrido visual y accesible aprobado.
-- Rollback disponible.
-- Documentación y bitácora al día.
-- Aprobación explícita del responsable.
+| Grupo | Casos principales |
+|---|---|
+| Auth | alta, normalización, hash, duplicado, login/logout, bloqueo, token, reset, redirección segura, CSRF |
+| Progreso | IMC, niveles, evento único, puntos, racha y ruta idempotente |
+| Perfil | medida válida, validación cruzada, no duplicar medición idéntica |
+| Roles/admin | 403, borrador, publicar y archivar |
+| Operación | health/readiness, DB caída, seed, SMTP y CLI admin |
+| Público | contenidos, privacidad implícita, 404 y cabeceras |
 
-## 13. Estado
+## 3. Recorrido visual real
 
-La estrategia está **✅ documentada**, pero las suites y resultados están **🟡 pendientes** porque la implementación funcional aún no se ha iniciado.
+Playwright controló Chromium y verificó:
+
+1. Inicio y estructura semántica.
+2. Registro con privacidad y CSRF activo.
+3. Dashboard recién creado.
+4. Vista móvil 390 × 844.
+5. Menú, etiqueta accesible y cierre con Escape.
+6. Cumplimiento de hábito y cambio a 1/4.
+7. Logout, login admin y acceso por rol.
+8. Creación/publicación de comunicado y visualización en inicio.
+
+Durante esta prueba se encontraron y corrigieron dos defectos de integración: expiración CSRF incompatible y validación insuficiente del comando administrativo.
+
+## 4. CI
+
+El workflow corre en PR/push hacia ramas relevantes:
+
+- `quality`: Python 3.13, dependencias, Ruff y Pytest.
+- `postgres-migration`: PostgreSQL 18, upgrade, seed y `db check`.
+- `container-build`: construcción del Dockerfile.
+
+Render solo auto-despliega `staging` cuando los checks asociados pasan.
+
+Ejecución GitHub del PR #2: **tres jobs aprobados**.
+
+## 5. Matriz pendiente de Staging
+
+| ID | Prueba | Salida requerida |
+|---|---|---|
+| STG-01 | Build y arranque | Deploy Live |
+| STG-02 | `/health` y `/ready` | 200/200 |
+| STG-03 | Alta/login/logout | Flujo completo |
+| STG-04 | Hábito doble | Un evento y mismos puntos |
+| STG-05 | Perfil/IMC | Valor, contexto y persistencia |
+| STG-06 | Rol admin | Usuario 403; admin permitido |
+| STG-07 | SMTP | Correo y token funcionales |
+| STG-08 | Headers/TLS | Secure, HSTS, CSP |
+| STG-09 | Logs | Sin 5xx/secretos |
+| STG-10 | Backup/restauración | Conteos y relaciones iguales |
+
+## 6. Severidad
+
+- Bloqueante: pérdida/exposición de datos, auth rota, app no inicia.
+- Alta: flujo principal o integridad incorrectos.
+- Media: impacto acotado con alternativa.
+- Baja: detalle visual/documental.
+
+No hay defectos bloqueantes abiertos en la ejecución local. La falta de evidencia remota es una condición de release, no un fallo oculto.
+
+## 7. Gate de salida
+
+Staging puede desplegarse cuando el PR esté en CI verde. Production solo con cero bloqueantes, Staging aprobado, SMTP si es requisito, restauración, privacidad, rollback y autorización.

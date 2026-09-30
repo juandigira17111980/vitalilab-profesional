@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [staging, main]
+  push:
+    branches: [staging, main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: pip install pip-audit==2.10.1
+      - run: python -m ruff check app tests wsgi.py migrations/versions
+      - run: python -m ruff format --check app tests wsgi.py migrations/versions
+      - run: python -m pytest
+      - run: python -m pip_audit -r requirements.txt --progress-spinner off
+
+  postgres-migration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: vitalilab_test
+          POSTGRES_USER: vitalilab
+          POSTGRES_PASSWORD: test-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vitalilab -d vitalilab_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      APP_ENV: development
+      SECRET_KEY: ci-only-secret
+      DATABASE_URL: postgresql://vitalilab:test-only-password@localhost:5432/vitalilab_test
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m flask --app wsgi:app db upgrade
+      - run: python -m flask --app wsgi:app seed-habits
+      - run: python -m flask --app wsgi:app db check
+
+  container-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build production container
+        run: docker build --tag vitalilab:${{ github.sha }} .
