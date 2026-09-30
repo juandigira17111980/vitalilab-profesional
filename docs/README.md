@@ -35,9 +35,9 @@ Fecha de corte: **30 de septiembre de 2026**.
 - ✅ Modelo relacional de siete tablas y dos migraciones.
 - ✅ Controles de autenticación, autorización, CSRF, cabeceras y auditoría.
 - ✅ Diseño responsive probado en navegador real a 390 px y 1280 px.
-- ✅ 24 pruebas, 90,41 % de cobertura y análisis estático limpio.
-- ✅ Configuración Docker, Render Blueprint y CI versionados.
-- 🟡 PR funcional, ejecución CI y despliegue de Staging pendientes del cierre remoto.
+- ✅ 24 pruebas, 90,41 % de cobertura, análisis estático y dependencias limpios.
+- ✅ CI verde: calidad, PostgreSQL 18 y construcción Docker.
+- 🟡 PR funcional abierto y despliegue de Staging pendiente.
 - 🔴 Production permanece congelada hasta aprobación, backup y validación final.
 
 ## Regla de evidencia

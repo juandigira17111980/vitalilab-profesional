@@ -164,4 +164,4 @@ WHERE u.id IS NULL OR h.id IS NULL;
 
 ## 10. Estado
 
-Modelo y migraciones: ✅ validados localmente. PostgreSQL CI, backup/restauración y datos reales: 🟡/🔴 antes de Production.
+Modelo y migraciones: ✅ validados localmente y sobre PostgreSQL 18 en CI. Backup/restauración y datos reales: 🟡/🔴 antes de Production.

@@ -91,12 +91,12 @@ El servicio histórico de Production no comparte base, variables ni dominio con 
 - Navegador: registro, login/logout, dashboard, hábito, menú móvil, administración y comunicados aprobados.
 - Consola del navegador: 0 errores y 0 advertencias en el flujo final.
 - Hallazgos detectados y corregidos durante E2E: incompatibilidad de expiración CSRF y validación débil del CLI administrativo.
+- GitHub Actions: calidad, migración PostgreSQL 18 y construcción de contenedor aprobadas.
 
 ## 8. Riesgos y límites restantes
 
 | Riesgo | Estado | Control requerido |
 |---|---|---|
-| CI aún no ejecutado sobre el commit final | 🟡 | Abrir PR y exigir tres jobs verdes |
 | Staging aún sin URL funcional | 🟡 | Crear Blueprint, completar variables y smoke tests |
 | PostgreSQL no validado localmente por falta de Docker | 🟡 | Job `postgres-migration` en CI |
 | SMTP no configurado | 🟡 | Registrar proveedor/secretos en Staging |

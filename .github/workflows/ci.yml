@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [staging, main]
   push:
-    branches: [staging, main, "feat/**", "fix/**"]
+    branches: [staging, main]
 
 permissions:
   contents: read
@@ -13,8 +13,8 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
           cache: pip
@@ -46,8 +46,8 @@ jobs:
       SECRET_KEY: ci-only-secret
       DATABASE_URL: postgresql://vitalilab:test-only-password@localhost:5432/vitalilab_test
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
           cache: pip
@@ -59,6 +59,6 @@ jobs:
   container-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build production container
         run: docker build --tag vitalilab:${{ github.sha }} .

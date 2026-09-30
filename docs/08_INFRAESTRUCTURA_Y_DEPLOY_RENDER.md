@@ -90,4 +90,4 @@ Production conserva servicio, dominio, base y variables históricas. Este trabaj
 
 ## 11. Estado
 
-Infraestructura como código: ✅. Ejecución CI/Render y backup: 🟡. Production: 🔴 congelada.
+Infraestructura como código y CI (PostgreSQL/Docker): ✅. Render Staging y backup: 🟡. Production: 🔴 congelada.

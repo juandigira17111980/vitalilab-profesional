@@ -12,8 +12,8 @@
 | Deriva Alembic | ✅ ninguna |
 | Navegador escritorio/móvil | ✅ |
 | Consola navegador | ✅ 0 errores/advertencias finales |
-| Docker local | ⚪ no disponible; job CI preparado |
-| PostgreSQL real | 🟡 job CI preparado |
+| Docker | ✅ imagen construida en GitHub Actions |
+| PostgreSQL real | ✅ migraciones/seed/check en PostgreSQL 18 CI |
 | Staging | 🟡 pendiente |
 
 ## 2. Casos automatizados
@@ -51,6 +51,8 @@ El workflow corre en PR/push hacia ramas relevantes:
 - `container-build`: construcción del Dockerfile.
 
 Render solo auto-despliega `staging` cuando los checks asociados pasan.
+
+Ejecución GitHub del PR #2: **tres jobs aprobados**.
 
 ## 5. Matriz pendiente de Staging
 

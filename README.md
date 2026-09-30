@@ -10,7 +10,7 @@ VitaliLab es una aplicación web educativa para registrar hábitos saludables, c
 | Modelo de datos | 7 tablas, 2 migraciones Alembic, integridad e índices |
 | Seguridad | Hash scrypt, CSRF, autorización, bloqueo temporal, rate limits y cabeceras |
 | Frontend | Responsive, navegación móvil, formularios accesibles y estados controlados |
-| Calidad local | 24 pruebas aprobadas, 90,41 % de cobertura, Ruff sin hallazgos |
+| Calidad | 24 pruebas, 90,41 %, Ruff y `pip-audit`; CI/PostgreSQL/Docker aprobados |
 | Base vacía | `flask db upgrade` y `flask db check` aprobados |
 | Staging | Configuración declarativa lista; despliegue remoto pendiente de ejecutar/aprobar |
 | Production | Congelada; no se ha modificado |

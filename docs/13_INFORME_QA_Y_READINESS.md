@@ -21,11 +21,11 @@ La salida a Production no se recomienda todavía porque faltan evidencias remota
 |---|---|---|
 | Documentación | ✅ | Arquitectura, DBA, backend, UX, seguridad, infra, QA y operación |
 | Arquitectura | ✅ | Monolito modular coherente con alcance |
-| Base de datos | 🟡 | Modelo/migraciones aprobados local; resta PostgreSQL remoto y restore |
+| Base de datos | 🟡 | Modelo/migraciones aprobados en PostgreSQL 18 CI; resta restore |
 | Backend | ✅ | Flujos, errores y reglas cubiertos |
 | Frontend | 🟡 | Responsive aprobado; resta auditoría WCAG especializada |
 | Seguridad | 🟡 | Controles técnicos; resta privacidad institucional y escaneo externo |
-| Infraestructura | 🟡 | IaC lista; CI/Render no ejecutados aún |
+| Infraestructura | 🟡 | CI y Docker aprobados; Render Staging no ejecutado aún |
 
 ## 3. Cálculo reproducible
 
@@ -33,7 +33,7 @@ Score inicial: 100.
 
 | ID | Hallazgo abierto | Severidad | Plan formal | Deducción |
 |---|---|---|---:|---:|
-| OPS-01 | CI y Staging sin evidencia final | Alto | Sí | -3 |
+| OPS-01 | Staging sin evidencia final | Alto | Sí | -3 |
 | DBA-01 | Restauración PostgreSQL no ensayada | Alto | Sí | -3 |
 | PRIV-01 | Política institucional/menores no aprobada | Alto | Sí | -3 |
 | AUTH-01 | SMTP real no configurado | Medio | Sí | -2 |
@@ -51,6 +51,7 @@ Resultado: **100 - 13 = 87/100**. No hay áreas sin información y no se aplican
 - Navegador 390 px y 1280 px sin error de consola.
 - Configuración no root, health/readiness, DB privada y CI.
 - `pip-audit` sin vulnerabilidades conocidas en dependencias de producción.
+- GitHub Actions en verde: calidad, PostgreSQL 18 y construcción Docker.
 - Production no modificada.
 
 ## 5. Hallazgos abiertos y responsables

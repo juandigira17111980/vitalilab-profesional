@@ -14,6 +14,7 @@
 | 2026-09-30 | QA | 24 pruebas, cobertura 90,41 %, Ruff limpio | salida reproducible | ✅ |
 | 2026-09-30 | E2E | Registro, hábito, admin, comunicado y móvil | Playwright/Chromium | ✅ local |
 | 2026-09-30 | Infra | Docker, Compose, Render Blueprint y CI | archivos versionados | ✅ configurado |
+| 2026-09-30 | CI | Calidad, PostgreSQL 18 y build Docker | GitHub Actions PR #2 | ✅ |
 
 ## 2. Defectos encontrados durante validación
 
@@ -30,7 +31,7 @@
 | Hito | Requerido |
 |---|---|
 | PR funcional | URL, commit y revisión |
-| CI | tres jobs verdes |
+| CI final tras actualización menor | tres jobs verdes |
 | Render Staging | URL y deploy/commit |
 | SMTP Staging | correo ficticio recibido |
 | Backup/restauración | fecha, duración, conteos y responsable |
