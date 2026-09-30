@@ -27,11 +27,20 @@ docs/*                auditoría y documentación
 5. QA, observabilidad y despliegue en Staging.
 6. Aprobación explícita antes de producción.
 
-## Documento principal
+## Documentación técnica
 
-Ver [Auditoría profunda y plan de mejora](docs/AUDITORIA_PROFUNDA_Y_PLAN_DE_MEJORA.md).
+La documentación académica y operativa completa está centralizada en [docs/README.md](docs/README.md). Incluye:
+
+- Documento Maestro Técnico.
+- Auditoría profunda y roadmap.
+- Arquitectura y estructura.
+- Modelo de datos y DBA.
+- Backend, frontend, seguridad y privacidad.
+- Git, infraestructura, despliegue y QA.
+- Guía de sustentación y bitácora verificable.
+
+La documentación diferencia expresamente entre cambios implementados y propuestas pendientes.
 
 ## Regla de seguridad
 
 Nunca se deben versionar archivos `.env`, bases SQLite, respaldos, tokens, claves o datos personales. Usar `.env.example` únicamente como plantilla sin valores reales.
-Repositorio profesional para auditoria y evolucion segura de VitaliLab
