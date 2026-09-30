@@ -1,0 +1,55 @@
+projects:
+  - name: VitaliLab
+    environments:
+      - name: Staging
+        services:
+          - type: web
+            name: vitalilab-staging
+            runtime: python
+            plan: free
+            branch: staging
+            autoDeployTrigger: checksPass
+            buildCommand: pip install -r requirements.txt
+            startCommand: >-
+              flask --app wsgi:app db upgrade &&
+              flask --app wsgi:app seed-habits &&
+              gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 60
+            healthCheckPath: /ready
+            envVars:
+              - key: APP_ENV
+                value: staging
+              - key: APP_VERSION
+                value: 0.1.0-staging
+              - key: PYTHON_VERSION
+                value: 3.13
+              - key: SECRET_KEY
+                generateValue: true
+              - key: DATABASE_URL
+                fromDatabase:
+                  name: vitalilab-staging-db
+                  property: connectionString
+              - key: SESSION_COOKIE_SECURE
+                value: "true"
+              - key: SESSION_COOKIE_SAMESITE
+                value: Lax
+              - key: MAIL_HOST
+                sync: false
+              - key: MAIL_PORT
+                value: "587"
+              - key: MAIL_USERNAME
+                sync: false
+              - key: MAIL_PASSWORD
+                sync: false
+              - key: MAIL_FROM
+                sync: false
+              - key: MAIL_USE_TLS
+                value: "true"
+              - key: PASSWORD_RESET_MAX_AGE
+                value: "3600"
+        databases:
+          - name: vitalilab-staging-db
+            plan: free
+            postgresMajorVersion: "18"
+            databaseName: vitalilab_staging
+            user: vitalilab
+            ipAllowList: []

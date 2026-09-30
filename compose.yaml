@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vitalilab_dev
+      POSTGRES_USER: vitalilab
+      POSTGRES_PASSWORD: local-only-change-me
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vitalilab -d vitalilab_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - vitalilab_pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    restart: unless-stopped
+    environment:
+      APP_ENV: development
+      SECRET_KEY: local-compose-secret-change-me
+      DATABASE_URL: postgresql://vitalilab:local-only-change-me@db:5432/vitalilab_dev
+      SESSION_COOKIE_SECURE: "false"
+    command: >-
+      sh -c "flask --app wsgi:app db upgrade &&
+      flask --app wsgi:app seed-habits &&
+      gunicorn wsgi:app --bind 0.0.0.0:10000 --workers 1 --threads 4 --timeout 60"
+    ports:
+      - "127.0.0.1:5000:10000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:10000/ready', timeout=3)",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  vitalilab_pgdata:
