@@ -27,6 +27,7 @@ Fecha de corte: **30 de septiembre de 2026**.
 12. [Bitácora verificable](11_BITACORA_DE_CAMBIOS.md)
 13. [Manual de operación](12_MANUAL_DE_OPERACION.md)
 14. [Informe QA y readiness](13_INFORME_QA_Y_READINESS.md)
+15. [Matriz de trazabilidad](14_MATRIZ_TRAZABILIDAD.md)
 
 ## Resultado actual
 
@@ -36,8 +37,9 @@ Fecha de corte: **30 de septiembre de 2026**.
 - ✅ Controles de autenticación, autorización, CSRF, cabeceras y auditoría.
 - ✅ Diseño responsive probado en navegador real a 390 px y 1280 px.
 - ✅ 24 pruebas, 90,41 % de cobertura, análisis estático y dependencias limpios.
-- ✅ CI verde: calidad, PostgreSQL 18 y construcción Docker.
-- 🟡 PR funcional abierto y despliegue de Staging pendiente.
+- ✅ PR #2 fusionado a `staging`; CI verde en la integración.
+- ✅ CI de cierre: calidad, SAST, PostgreSQL 18, backup/restore y construcción Docker.
+- 🟡 Despliegue de Render Staging pendiente de acceso al panel privado.
 - 🔴 Production permanece congelada hasta aprobación, backup y validación final.
 
 ## Regla de evidencia

@@ -77,7 +77,7 @@ La aplicación es un monolito modular porque el alcance académico no justifica 
 | Ambiente | Rama | Base | Datos | Estado |
 |---|---|---|---|---|
 | Local | feature/fix | SQLite o PostgreSQL local | Sintéticos | ✅ verificado |
-| Staging | `staging` | PostgreSQL exclusivo | Sintéticos | 🟡 definición lista, despliegue pendiente |
+| Staging | `staging` | PostgreSQL exclusivo | Sintéticos | 🟡 código integrado; despliegue Render pendiente |
 | Production | `main`/release aprobada | PostgreSQL exclusivo antes de migrar | Reales | 🔴 no modificar todavía |
 
 El servicio histórico de Production no comparte base, variables ni dominio con Staging.

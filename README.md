@@ -6,16 +6,16 @@ VitaliLab es una aplicación web educativa para registrar hábitos saludables, c
 
 | Componente | Resultado |
 |---|---|
-| Aplicación y backend | Implementados en `feat/reconstruccion-profesional` |
+| Aplicación y backend | Integrados en `staging` mediante PR #2 |
 | Modelo de datos | 7 tablas, 2 migraciones Alembic, integridad e índices |
 | Seguridad | Hash scrypt, CSRF, autorización, bloqueo temporal, rate limits y cabeceras |
 | Frontend | Responsive, navegación móvil, formularios accesibles y estados controlados |
-| Calidad | 24 pruebas, 90,41 %, Ruff y `pip-audit`; CI/PostgreSQL/Docker aprobados |
-| Base vacía | `flask db upgrade` y `flask db check` aprobados |
+| Calidad | 24 pruebas, 90,41 %, Ruff, Bandit y `pip-audit`; CI/PostgreSQL/Docker aprobados |
+| Base de datos | Migración, deriva, backup y restauración aislada aprobados en PostgreSQL 18 CI |
 | Staging | Configuración declarativa lista; despliegue remoto pendiente de ejecutar/aprobar |
 | Production | Congelada; no se ha modificado |
 
-La calificación final no se declara como 100/100 hasta validar CI, PostgreSQL, Staging, backup/restauración y aceptación del propietario. Consulte [Informe QA y readiness](docs/13_INFORME_QA_Y_READINESS.md).
+La calificación final no se declara como 100/100 hasta validar Render Staging, SMTP, accesibilidad y las decisiones institucionales de privacidad. Consulte [Informe QA y readiness](docs/13_INFORME_QA_Y_READINESS.md).
 
 ## Funciones
 
@@ -89,7 +89,7 @@ ruff format --check app tests wsgi.py migrations/versions
 pytest
 ```
 
-El CI repite estas comprobaciones, ejecuta las migraciones contra PostgreSQL 18 y construye la imagen de producción.
+El CI repite estas comprobaciones, ejecuta análisis estático de seguridad, migra PostgreSQL 18, prueba un backup/restore aislado y construye la imagen de producción.
 
 ## Ambientes y ramas
 

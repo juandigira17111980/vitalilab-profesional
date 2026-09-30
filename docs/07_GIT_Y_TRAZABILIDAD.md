@@ -53,10 +53,11 @@ Contenido obligatorio: problema, alcance, decisión, riesgos, migraciones, varia
 | Hito | Evidencia |
 |---|---|
 | Auditoría documental | PR #1 fusionado a `staging`, commit `182f96d` |
-| Reconstrucción | Rama `feat/reconstruccion-profesional` |
+| Reconstrucción | PR #2 fusionado a `staging`, commit `2120e31` |
 | Calidad local | 24 pruebas, 90,41 %, Ruff limpio |
 | Migraciones | `0380d5595f5e` y `208469fd48ef` |
-| PR funcional | 🟡 se completa al cerrar esta entrega |
+| PR funcional | PR #2 fusionado; tres jobs verdes en `staging` |
+| Cierre QA/DBA | PR #3; SAST y restore PostgreSQL 18 aprobados |
 | Release Production | 🔴 no autorizada |
 
 ## 7. Versionado

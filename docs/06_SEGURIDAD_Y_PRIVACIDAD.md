@@ -52,7 +52,7 @@ Antes de Production deben aprobarse responsable del tratamiento, contacto, final
 
 - Rate limiting usa memoria y un worker. Escalar horizontalmente exige Redis compartido.
 - SMTP real no ha sido conectado; la lógica se prueba con doble.
-- `pip-audit 2.10.1` no encontró vulnerabilidades conocidas en las dependencias de producción. No sustituye SAST, pentest ni escaneo de secretos; si el plan lo permite, se recomienda Dependabot/CodeQL.
+- `pip-audit 2.10.1` no encontró vulnerabilidades conocidas en dependencias y Bandit no encontró hallazgos medios/altos. No sustituyen pentest ni escaneo especializado de secretos; si el plan lo permite, se recomienda Dependabot/CodeQL.
 - La CSP permite estilos propios por archivo; agregar analítica o CDN exige revisar la política.
 - No existe MFA; no es requisito del primer alcance, pero se recomienda para administradores en una fase posterior.
 
@@ -71,11 +71,12 @@ Antes de Production deben aprobarse responsable del tratamiento, contacto, final
 - [x] Hash, CSRF, autorización, validación, cabeceras y errores.
 - [x] Secretos fuera de Git y configuración separada.
 - [x] Pruebas críticas locales.
-- [ ] CI final en verde.
+- [x] CI final en verde.
 - [ ] SMTP y recuperación real en Staging.
 - [x] Auditoría local de dependencias sin vulnerabilidades conocidas.
-- [ ] Escaneo de secretos/SAST del commit final.
-- [ ] Backup/restauración PostgreSQL.
+- [x] SAST del código Python con Bandit.
+- [ ] Escaneo especializado de secretos del commit final.
+- [x] Backup/restauración aislada en PostgreSQL 18 CI.
 - [ ] Política de privacidad aprobada.
 - [ ] Aprobación de release.
 
