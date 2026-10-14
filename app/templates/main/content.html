@@ -3,6 +3,9 @@
 {% block content %}
 <section class="page-hero"><div class="shell shell--narrow"><p class="eyebrow">{{ article.eyebrow }}</p><h1>{{ article.title }}</h1><p>{{ article.lead }}</p></div></section>
 <section class="section shell shell--narrow">
+  {% if request.view_args.slug == 'imc' %}
+  <form class="calculator-card" data-bmi-form><h2>Calculadora educativa</h2><div class="field-row"><div class="field"><label for="bmi-weight">Peso en kg</label><input id="bmi-weight" name="weight" type="number" min="20" max="500" step="0.1" required placeholder="Ej. 62"></div><div class="field"><label for="bmi-height">Altura en cm</label><input id="bmi-height" name="height" type="number" min="80" max="250" step="0.1" required placeholder="Ej. 168"></div></div><button class="button button--primary button--full" type="submit">Calcular indicador</button><div class="calculator-result" aria-live="polite" data-bmi-result>Ingresa tus datos para ver una referencia.</div></form>
+  {% endif %}
   <div class="article-stack">
     {% for title, text in article.sections %}<article><span>0{{ loop.index }}</span><div><h2>{{ title }}</h2><p>{{ text }}</p></div></article>{% endfor %}
   </div>

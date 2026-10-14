@@ -4,13 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#123c35">
-  <meta name="description" content="VitaliLab: hábitos saludables, progreso consciente y bienestar educativo.">
+  <meta name="description" content="Un plan que cabe en tu día: hábitos, metas personales, rutinas guiadas y progreso en un solo espacio. Descubre VitaliLab.">
   <title>{% block title %}VitaliLab{% endblock %}</title>
   <link rel="icon" href="{{ url_for('static', filename='img/brand-mark.svg') }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css', v=config.APP_VERSION) }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/premium.css', v=config.APP_VERSION) }}">
+  <script src="{{ url_for('static', filename='js/app.js', v=config.APP_VERSION) }}" defer></script>
+  <script src="{{ url_for('static', filename='js/wellness.js', v=config.APP_VERSION) }}" defer></script>
 </head>
-<body>
+<body{% if current_user.is_authenticated %} class="has-mobile-nav"{% endif %}>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
   {% if config.APP_ENV == 'staging' %}
   <div class="lab-banner" role="note">Laboratorio académico · utiliza datos ficticios. No es el sitio de producción.</div>
@@ -18,7 +20,7 @@
   <header class="site-header" data-header>
     <div class="shell header-inner">
       <a class="brand" href="{{ url_for('main.home') }}" aria-label="VitaliLab, inicio">
-        <img src="{{ url_for('static', filename='img/brand-mark.svg') }}" alt="" width="42" height="42">
+        <img src="{{ url_for('static', filename='img/brand-mark.svg', v=config.APP_VERSION) }}" alt="" width="42" height="42">
         <span>Vitali<span>Lab</span></span>
       </a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-nav-toggle>
@@ -26,19 +28,22 @@
         <span></span><span></span><span></span>
       </button>
       <nav id="primary-nav" class="primary-nav" aria-label="Navegación principal" data-nav>
-        <a href="{{ url_for('main.home') }}">Inicio</a>
-        <a href="{{ url_for('main.content', slug='bienestar') }}">Bienestar</a>
-        <a href="{{ url_for('main.content', slug='imc') }}">IMC</a>
         {% if current_user.is_authenticated %}
-          <a href="{{ url_for('main.dashboard') }}">Mi panel</a>
-          <a href="{{ url_for('habits.index') }}">Hábitos</a>
-          <a href="{{ url_for('profile.edit') }}">Perfil</a>
+          {% for endpoint, label in [('main.dashboard', 'Hoy'), ('habits.index', 'Hábitos'), ('wellness.goals', 'Metas'), ('wellness.progress', 'Progreso'), ('wellness.library', 'Rutinas')] %}
+          <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}>{{ label }}</a>
+          {% endfor %}
+          <details class="account-menu"><summary>Mi cuenta</summary><div class="account-menu__content">
+          <a href="{{ url_for('profile.edit') }}">Mi perfil</a>
+          <a href="{{ url_for('wellness.checkin') }}">Mi bitácora</a>
           {% if current_user.is_admin %}<a href="{{ url_for('admin.dashboard') }}">Administración</a>{% endif %}
           <form action="{{ url_for('auth.logout') }}" method="post" class="nav-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button class="nav-logout" type="submit">Salir</button>
-          </form>
+          </form></div></details>
         {% else %}
+          <a href="{{ url_for('main.home') }}#herramientas">El producto</a>
+          <a href="{{ url_for('wellness.library') }}"{% if request.endpoint == 'wellness.library' %} aria-current="page"{% endif %}>Rutinas</a>
+          <a href="{{ url_for('main.home') }}#como-funciona">Cómo funciona</a>
           <a href="{{ url_for('auth.login') }}">Ingresar</a>
           <a class="button button--small" href="{{ url_for('auth.register') }}">Crear cuenta</a>
         {% endif %}
@@ -66,16 +71,25 @@
           <img src="{{ url_for('static', filename='img/brand-mark.svg') }}" alt="" width="38" height="38">
           <span>Vitali<span>Lab</span></span>
         </a>
-        <p>Hábitos comprensibles, progreso consciente.</p>
+        <p>Haz espacio para lo que te hace bien.</p>
       </div>
       <div>
         <h2>Explora</h2>
+        <a href="{{ url_for('wellness.library') }}">Rutinas guiadas</a>
+        <a href="{{ url_for('main.content', slug='imc') }}">Indicadores educativos</a>
         <a href="{{ url_for('main.content', slug='fundamentos') }}">Cómo funciona</a>
         <a href="{{ url_for('main.privacy') }}">Privacidad</a>
-        <a href="{{ url_for('main.health') }}">Estado técnico</a>
       </div>
       <p class="footer-note">© {{ current_year }} VitaliLab. Proyecto educativo; no sustituye orientación médica.</p>
     </div>
   </footer>
+  {% if current_user.is_authenticated %}
+  {% from 'macros/icons.html' import icon %}
+  <nav class="mobile-dock" aria-label="Accesos rápidos">
+    {% for endpoint, label, symbol in [('main.dashboard','Hoy','grid'),('habits.index','Hábitos','check'),('wellness.goals','Metas','focus'),('wellness.progress','Progreso','chart')] %}
+    <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}>{{ icon(symbol) }}<span>{{ label }}</span></a>
+    {% endfor %}
+  </nav>
+  {% endif %}
 </body>
 </html>

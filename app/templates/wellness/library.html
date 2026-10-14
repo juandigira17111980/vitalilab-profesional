@@ -1,0 +1,12 @@
+{% extends 'base.html' %}{% from 'macros/icons.html' import icon %}
+{% block title %}Rutinas guiadas · VitaliLab{% endblock %}
+{% block content %}
+<section class="page-hero page-hero--compact"><div class="shell"><p class="eyebrow">Una pausa, una posibilidad</p><h1>Encuentra tu próxima rutina.</h1><p>De uno a cinco minutos para empezar. Elige según tu momento, sin necesidad de crear una cuenta.</p></div></section>
+<section class="section shell workspace-section">
+  <form class="library-search" method="get" role="search"><div class="field"><label for="routine-search">Buscar una rutina</label><input id="routine-search" name="q" type="search" maxlength="80" value="{{ query }}" placeholder="Prueba: pantalla, pausa, calma…"></div>{% if category %}<input type="hidden" name="categoria" value="{{ category }}">{% endif %}<button class="button button--primary" type="submit">Buscar</button></form>
+  <nav class="filter-tabs" aria-label="Categorías de rutinas"><a href="{{ url_for('wellness.library', q=query) }}"{% if not category %} aria-current="page"{% endif %}>Todas</a>{% for item in categories %}<a href="{{ url_for('wellness.library', categoria=item, q=query) }}"{% if category == item %} aria-current="page"{% endif %}>{{ item }}</a>{% endfor %}</nav>
+  <p class="results-label">{{ routines|length }} {{ 'rutina disponible' if routines|length == 1 else 'rutinas disponibles' }}</p>
+  <div class="routine-grid">{% for routine in routines %}<article class="routine-card"><div class="routine-card__top"><span class="capability-icon">{{ icon(routine.icon) }}</span><span class="pill">{{ routine.seconds // 60 }}{{ '½' if routine.seconds % 60 else '' }} min</span></div><p class="eyebrow">{{ routine.category }}</p><h2>{{ routine.name }}</h2><p>{{ routine.description }}</p><a class="button button--ghost" href="{{ url_for('wellness.routine', slug=routine.slug) }}">Empezar rutina {{ icon('arrow') }}</a></article>{% else %}<div class="empty-panel"><h2>No encontramos una rutina con ese filtro.</h2><p>Prueba una palabra más corta o vuelve a todas las categorías.</p><a class="button button--primary" href="{{ url_for('wellness.library') }}">Ver todas las rutinas</a></div>{% endfor %}</div>
+  <p class="context-note">Adapta las actividades a tus posibilidades. Si algo te incomoda, detente. No son tratamientos ni indicaciones clínicas.</p>
+</section>
+{% endblock %}

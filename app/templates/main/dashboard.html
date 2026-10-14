@@ -1,31 +1,33 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% from 'macros/icons.html' import icon %}
 {% block title %}Mi panel · VitaliLab{% endblock %}
 {% block content %}
-<section class="dashboard-head"><div class="shell"><div><p class="eyebrow">Tu espacio personal</p><h1>Hola, {{ current_user.profile.display_name }}</h1><p>Una mirada clara a lo que ya hiciste y a tu siguiente paso.</p></div><a class="button button--light" href="{{ url_for('habits.index') }}">Registrar hábito →</a></div></section>
-<section class="section shell dashboard-layout">
+<section class="dashboard-head"><div class="shell"><div><p class="eyebrow">Hoy es un buen lugar para empezar</p><h1>Hola, {{ current_user.profile.display_name }}</h1><p>Elige un paso posible. El resto puede esperar.</p></div><a class="button button--light" href="{{ url_for('wellness.checkin') }}">Mi bitácora {{ icon('journal') }}</a></div></section>
+<section class="section shell dashboard-layout workspace-section">
   <div class="dashboard-main">
     <div class="metric-grid">
       <article class="metric-card"><span>Puntos</span><strong>{{ summary.points }}</strong><small>XP acumulados</small></article>
       <article class="metric-card metric-card--dark"><span>Racha actual</span><strong>{{ summary.streak }}</strong><small>días consecutivos</small></article>
       <article class="metric-card"><span>Nivel</span><strong class="metric-card__name">{{ summary.level }}</strong><small>cada paso suma</small></article>
     </div>
+    <div class="quick-link-grid"><a class="quick-link" href="{{ url_for('wellness.goals') }}"><span class="capability-icon">{{ icon('focus') }}</span><span><strong>{{ 'Ajustar mis metas' if goals else 'Elegir mi primera meta' }}</strong><small>Un hábito, una frecuencia posible</small></span></a><a class="quick-link" href="{{ url_for('wellness.library') }}"><span class="capability-icon">{{ icon('calm') }}</span><span><strong>Encontrar una pausa</strong><small>De uno a cinco minutos para ti</small></span></a></div>
     <article class="panel-card">
       <div class="panel-card__head"><div><p class="eyebrow">Últimos siete días</p><h2>Tu ritmo, sin presión</h2></div><span class="pill">{{ summary.completed_today }}/{{ summary.total_habits }} hoy</span></div>
-      <div class="week-chart" aria-label="Hábitos completados durante los últimos siete días">
+      <div class="week-chart" data-bar-max="{{ summary.total_habits }}" aria-label="Hábitos completados durante los últimos siete días">
         {% for item in summary.week %}<div class="week-bar"><div class="week-bar__track"><span data-bar-value="{{ item.count }}"></span></div><b>{{ item.label }}</b><small>{{ item.count }}</small></div>{% endfor %}
       </div>
     </article>
     <article class="panel-card">
       <div class="panel-card__head"><div><p class="eyebrow">Hoy</p><h2>Hábitos disponibles</h2></div><a class="text-link" href="{{ url_for('habits.index') }}">Ver todos →</a></div>
       <div class="compact-habits">
-        {% for habit in habits %}<div class="compact-habit{% if habit.id in completed_ids %} compact-habit--done{% endif %}"><span>{{ habit.icon }}</span><div><b>{{ habit.name }}</b><small>{{ habit.points }} XP</small></div><span class="compact-habit__state">{{ 'Listo' if habit.id in completed_ids else 'Pendiente' }}</span></div>{% endfor %}
+        {% for habit in habits %}<div class="compact-habit{% if habit.id in completed_ids %} compact-habit--done{% endif %}"><span>{{ habit.icon }}</span><div><b>{{ habit.name }}</b><small>{{ habit.points }} XP</small></div>{% if habit.id in completed_ids %}<span class="compact-habit__state">Listo ✓</span>{% else %}<form action="{{ url_for('habits.complete', habit_id=habit.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="return_to" value="panel"><button class="text-button" type="submit">Registrar<span class="sr-only"> {{ habit.name }}</span></button></form>{% endif %}</div>{% endfor %}
       </div>
     </article>
   </div>
   <aside class="dashboard-side">
-    <article class="quote-card"><span aria-hidden="true">“</span><p>La constancia no exige hacerlo perfecto; exige volver a intentarlo.</p></article>
+    <article class="side-card"><p class="eyebrow">Lo que quieres priorizar</p><h2>Tus metas de siete días</h2>{% for item in goals %}<div class="insight-goal"><strong>{{ item.goal.habit.name }}</strong><span>{{ item.days_done }} días registrados · meta {{ item.goal.target_days }}</span><progress value="{{ item.days_done }}" max="{{ item.goal.target_days }}" aria-label="Avance de {{ item.goal.habit.name }}"></progress></div>{% else %}<p>Empieza con un hábito que tenga sentido para ti. No necesitas completar todas las opciones.</p>{% endfor %}<a class="text-link" href="{{ url_for('wellness.goals') }}">Ver mis metas →</a></article>
+    <article class="quote-card"><p>Un día sin registros no borra lo que ya construiste.</p><a class="text-link" href="{{ url_for('wellness.progress') }}">Ver mi perspectiva de 28 días →</a></article>
     {% if announcement %}<article class="side-card"><p class="eyebrow">Comunicado</p><h2>{{ announcement.title }}</h2><p>{{ announcement.body }}</p></article>{% endif %}
-    <article class="side-card"><p class="eyebrow">Tu información</p><h2>Completa tu perfil</h2><p>Registra medidas solo si te resultan útiles. Son opcionales y se tratan como información sensible.</p><a class="text-link" href="{{ url_for('profile.edit') }}">Revisar perfil →</a></article>
+    <article class="side-card"><p class="eyebrow">A tu manera</p><h2>Tu espacio personal</h2><p>Actualiza cómo quieres que te llamemos y tu grupo. Las medidas corporales son opcionales.</p><a class="text-link" href="{{ url_for('profile.edit') }}">Revisar perfil →</a></article>
   </aside>
 </section>
 {% endblock %}

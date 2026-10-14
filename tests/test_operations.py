@@ -8,7 +8,7 @@ from app.services.email import send_password_reset
 
 def test_seed_habits_is_idempotent(app):
     assert seed_habits() == 0
-    assert db.session.scalar(db.select(db.func.count(Habit.id))) == 4
+    assert db.session.scalar(db.select(db.func.count(Habit.id))) == 8
 
 
 def test_email_service_without_configuration_returns_false(app):

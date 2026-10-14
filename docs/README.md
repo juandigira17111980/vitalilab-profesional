@@ -55,6 +55,13 @@ La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md
 - ⚪ Web Render Staging no creada y Vercel preparado como alternativa no utilizada.
 - 🔴 Production permanece congelada hasta aprobación, backup y validación final.
 
+## Evolución premium
+
+20. [Diseño de producto y auditoría UX](19_EVOLUCION_DE_PRODUCTO_Y_AUDITORIA_UX.md)
+21. [Guía de funciones y QA premium](20_GUIA_DE_FUNCIONES_Y_QA_PREMIUM.md)
+
+Este corte amplía la base original de siete entidades con metas y bitácora: nueve tablas de negocio, tres revisiones, ocho hábitos, seis rutinas y 42 pruebas locales con 91,75 % de cobertura. Los resultados de siete entidades y 28 pruebas anteriores se conservan como evidencia histórica. La guía nueva explica la extensión; la publicación requiere CI y comprobación remota del commit.
+
 ## Regla de evidencia
 
 Un cambio no se presenta como desplegado si solo existe localmente. Cada promoción debe registrar rama, commit, CI, URL de Staging, smoke tests, responsable y resultado. Nunca se adjuntan secretos ni datos personales.

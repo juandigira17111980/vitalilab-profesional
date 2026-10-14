@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title id="title">Símbolo VitaliLab</title>
-  <rect width="64" height="64" rx="19" fill="#dff46a"/>
-  <path d="M18 35c8-1 9-13 18-16-1 7 4 9 10 10-4 12-12 18-23 16-5-1-8-5-5-10Z" fill="#123c35"/>
-  <path d="M25 42c3-8 9-13 18-16" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <title id="title">VitaliLab, crecimiento a tu ritmo</title>
+  <rect width="64" height="64" rx="20" fill="#163f36"/>
+  <path d="m17 24 13 24 16-30" fill="none" stroke="#dff46a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M30 28C28 17 17 16 16 16c0 9 6 15 14 12Z" fill="#dff46a"/>
+  <circle cx="48" cy="17" r="4" fill="#f8f8f2"/>
 </svg>

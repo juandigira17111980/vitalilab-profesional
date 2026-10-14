@@ -66,6 +66,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m flask --app wsgi:app db upgrade
       - run: python -m flask --app wsgi:app seed-habits
+      - run: python -m scripts.verify_postgres_release
       - run: python -m flask --app wsgi:app db check
       - name: Prove PostgreSQL backup and isolated restore
         shell: bash
@@ -88,6 +89,10 @@ jobs:
           SOURCE_HABITS="$(docker exec "$POSTGRES_CONTAINER" psql --username vitalilab --dbname vitalilab_test --tuples-only --no-align --command 'SELECT COUNT(*) FROM habits')"
           RESTORED_HABITS="$(docker exec "$POSTGRES_CONTAINER" psql --username vitalilab --dbname vitalilab_restore --tuples-only --no-align --command 'SELECT COUNT(*) FROM habits')"
           test "$SOURCE_HABITS" = "$RESTORED_HABITS"
+          QUERY="SELECT 'users', count(*) FROM users UNION ALL SELECT 'user_profiles', count(*) FROM user_profiles UNION ALL SELECT 'health_measurements', count(*) FROM health_measurements UNION ALL SELECT 'habits', count(*) FROM habits UNION ALL SELECT 'habit_entries', count(*) FROM habit_entries UNION ALL SELECT 'announcements', count(*) FROM announcements UNION ALL SELECT 'audit_events', count(*) FROM audit_events UNION ALL SELECT 'user_goals', count(*) FROM user_goals UNION ALL SELECT 'daily_checkins', count(*) FROM daily_checkins"
+          SOURCE_COUNTS="$(docker exec "$POSTGRES_CONTAINER" psql --username vitalilab --dbname vitalilab_test --tuples-only --no-align --command "$QUERY")"
+          RESTORED_COUNTS="$(docker exec "$POSTGRES_CONTAINER" psql --username vitalilab --dbname vitalilab_restore --tuples-only --no-align --command "$QUERY")"
+          test "$SOURCE_COUNTS" = "$RESTORED_COUNTS"
           test "$(docker exec "$POSTGRES_CONTAINER" psql --username vitalilab --dbname vitalilab_restore --tuples-only --no-align --command 'SELECT COUNT(*) FROM alembic_version')" = "1"
       - name: Verify restored schema has no model drift
         env:

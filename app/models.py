@@ -220,6 +220,37 @@ class AuditEvent(db.Model):
     actor: Mapped[User | None] = relationship()
 
 
+class UserGoal(TimestampMixin, db.Model):
+    __tablename__ = "user_goals"
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "habit_id", name="uq_user_goal_habit"),
+        CheckConstraint("target_days BETWEEN 1 AND 7", name="valid_target_days"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    habit_id: Mapped[int] = mapped_column(
+        ForeignKey("habits.id", ondelete="RESTRICT"), nullable=False
+    )
+    target_days: Mapped[int] = mapped_column(nullable=False)
+    habit: Mapped[Habit] = relationship()
+
+
+class DailyCheckIn(TimestampMixin, db.Model):
+    __tablename__ = "daily_checkins"
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "checked_on", name="uq_user_daily_checkin"),
+        CheckConstraint("energy BETWEEN 1 AND 5", name="valid_energy"),
+        CheckConstraint("focus BETWEEN 1 AND 5", name="valid_focus"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    checked_on: Mapped[date] = mapped_column(Date, nullable=False)
+    energy: Mapped[int] = mapped_column(nullable=False)
+    focus: Mapped[int] = mapped_column(nullable=False)
+
+
 @login_manager.user_loader
 def load_user(user_id: str) -> User | None:
     return db.session.get(User, int(user_id)) if user_id.isdigit() else None

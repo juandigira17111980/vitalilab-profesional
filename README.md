@@ -7,10 +7,10 @@ VitaliLab es una aplicación web educativa para registrar hábitos saludables, c
 | Componente | Resultado |
 |---|---|
 | Aplicación y backend | Integrados en `staging` mediante PR #2 |
-| Modelo de datos | 7 tablas, 2 migraciones Alembic, integridad e índices |
+| Modelo de datos | 9 tablas de negocio, 3 migraciones Alembic, integridad e índices |
 | Seguridad | Hash scrypt, CSRF, autorización, bloqueo temporal, rate limits y cabeceras |
 | Frontend | Responsive, navegación móvil, formularios accesibles y estados controlados |
-| Calidad | 28 pruebas y 90,67 % local; CI PostgreSQL, seguridad y Docker aprobado |
+| Calidad | 42 pruebas y 91,75 % local; PostgreSQL, seguridad y Docker son gates de CI |
 | Base de datos | Migración, deriva, backup y restauración aislada aprobados en PostgreSQL 18 CI |
 | Staging | Copia académica en NexoStack; evidencia en docs/18 |
 | Production | Congelada; no se ha modificado |
@@ -18,6 +18,11 @@ VitaliLab es una aplicación web educativa para registrar hábitos saludables, c
 La copia es un laboratorio, no un reemplazo productivo de Render. SMTP real, accesibilidad formal, alertas personales, operación offsite y privacidad institucional siguen requiriendo validación. No se declara una calificación 100/100 por publicar contenedores. Consulte [Informe QA y readiness](docs/13_INFORME_QA_Y_READINESS.md) y [evidencia NexoStack](docs/18_NEXOSTACK_OPERACION_Y_ACCESOS.md).
 
 ## Funciones
+
+- Evolución de producto: ocho hábitos, metas personales, bitácora diaria, actividad de 28 días y seis rutinas públicas con temporizador.
+- Logo SVG propio, portada de producto, navegación compacta y móvil con accesos rápidos.
+- La calculadora IMC continúa en Indicadores educativos; privacidad y consentimiento permanecen activos.
+- [Diseño y auditoría UX](docs/19_EVOLUCION_DE_PRODUCTO_Y_AUDITORIA_UX.md) y [guía de funciones, datos y QA](docs/20_GUIA_DE_FUNCIONES_Y_QA_PREMIUM.md).
 
 - Registro, login, logout, bloqueo temporal y recuperación de contraseña.
 - Perfil propio y medidas opcionales con IMC educativo.

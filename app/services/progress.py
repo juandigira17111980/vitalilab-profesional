@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from app.extensions import db
 from app.models import Habit, HabitEntry, User
 from app.services.audit import record_event
+from app.services.clock import local_day
 
 LEVELS = (
     (500, "Leyenda vital"),
@@ -45,7 +46,7 @@ def bmi_label(value: float) -> str:
 
 
 def complete_habit(user: User, habit: Habit, completed_on: date | None = None) -> bool:
-    day = completed_on or date.today()
+    day = completed_on or local_day(user)
     existing = db.session.scalar(
         db.select(HabitEntry).where(
             HabitEntry.user_id == user.id,
@@ -66,7 +67,7 @@ def complete_habit(user: User, habit: Habit, completed_on: date | None = None) -
 
 
 def progress_for(user: User, today: date | None = None) -> ProgressSummary:
-    day = today or date.today()
+    day = today or local_day(user)
     points = db.session.scalar(
         db.select(func.coalesce(func.sum(Habit.points), 0))
         .select_from(HabitEntry)
