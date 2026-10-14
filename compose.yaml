@@ -12,7 +12,7 @@ services:
       timeout: 3s
       retries: 10
     volumes:
-      - vitalilab_pgdata:/var/lib/postgresql/data
+      - vitalilab_pgdata:/var/lib/postgresql
 
   web:
     build: .

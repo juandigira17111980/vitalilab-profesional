@@ -1,0 +1,115 @@
+name: vitalilab-lab
+
+x-app: &app
+  image: vitalilab-lab:${RELEASE_SHA:?Set the verified release commit}
+  build:
+    context: ../..
+    dockerfile: Dockerfile
+  read_only: true
+  tmpfs:
+    - /tmp:size=32m,mode=1777
+    - /app/instance:size=8m,uid=10001,gid=10001,mode=0700
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  mem_limit: 384m
+  cpus: 0.75
+  pids_limit: 128
+  volumes:
+    - /opt/labs/vitalilab/secrets/postgres-ca.crt:/run/secrets/postgres-ca.crt:ro
+  logging:
+    driver: json-file
+    options: {max-size: "5m", max-file: "3"}
+
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: vitalilab-db-lab
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vitalilab_staging
+      POSTGRES_USER: vitalilab_owner
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?Set a generated secret}
+      VITALILAB_APP_PASSWORD: ${POSTGRES_APP_PASSWORD:?Set a generated secret}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    command:
+      - postgres
+      - -c
+      - shared_buffers=64MB
+      - -c
+      - max_connections=25
+      - -c
+      - ssl=on
+      - -c
+      - ssl_cert_file=/run/secrets/postgres-server.crt
+      - -c
+      - ssl_key_file=/run/secrets/postgres-server.key
+    mem_limit: 256m
+    cpus: 0.50
+    pids_limit: 128
+    shm_size: 128m
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./init-database.sh:/docker-entrypoint-initdb.d/10-vitalilab.sh:ro
+      - /opt/labs/vitalilab/secrets/postgres-server.crt:/run/secrets/postgres-server.crt:ro
+      - /opt/labs/vitalilab/secrets/postgres-server.key:/run/secrets/postgres-server.key:ro
+    networks: [data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U vitalilab_owner -d vitalilab_staging"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "3"}
+
+  migrate:
+    <<: *app
+    profiles: [tools]
+    environment:
+      APP_ENV: staging
+      SECRET_KEY: ${SECRET_KEY:?Set a generated secret}
+      DATABASE_URL: postgresql://vitalilab_owner:${POSTGRES_ADMIN_PASSWORD}@db:5432/vitalilab_staging?sslmode=verify-full&sslrootcert=/run/secrets/postgres-ca.crt
+    command: [sh, -c, "flask --app wsgi:app db upgrade && flask --app wsgi:app seed-habits && flask --app wsgi:app db check"]
+    networks: [data]
+    depends_on:
+      db: {condition: service_healthy}
+
+  web:
+    <<: *app
+    container_name: vitalilab-web-lab
+    restart: unless-stopped
+    environment:
+      APP_ENV: staging
+      APP_VERSION: ${RELEASE_SHA}
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: postgresql://vitalilab_app:${POSTGRES_APP_PASSWORD}@db:5432/vitalilab_staging?sslmode=verify-full&sslrootcert=/run/secrets/postgres-ca.crt
+      SESSION_COOKIE_SECURE: "true"
+      SESSION_COOKIE_SAMESITE: Lax
+      TZ: America/Bogota
+    networks: [data, edge]
+    depends_on:
+      db: {condition: service_healthy}
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: coolify
+      traefik.http.routers.vitalilab-lab-http.rule: Host(`vitalilab.lab.nexostack.app`)
+      traefik.http.routers.vitalilab-lab-http.entrypoints: http
+      traefik.http.routers.vitalilab-lab-http.middlewares: vitalilab-lab-https
+      traefik.http.middlewares.vitalilab-lab-https.redirectscheme.scheme: https
+      traefik.http.routers.vitalilab-lab-https.rule: Host(`vitalilab.lab.nexostack.app`)
+      traefik.http.routers.vitalilab-lab-https.entrypoints: https
+      traefik.http.routers.vitalilab-lab-https.tls: "true"
+      traefik.http.routers.vitalilab-lab-https.tls.certresolver: letsencrypt
+      traefik.http.services.vitalilab-lab.loadbalancer.server.port: "10000"
+
+networks:
+  data:
+    internal: true
+  edge:
+    name: coolify
+    external: true
+
+volumes:
+  pgdata:
+    name: vitalilab-lab-pgdata
