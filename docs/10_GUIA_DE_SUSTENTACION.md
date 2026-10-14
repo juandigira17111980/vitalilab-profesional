@@ -1,5 +1,7 @@
 # Guía de sustentación académica
 
+Antes de memorizar respuestas, siga [el manual desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) y complete sus ocho laboratorios. Allí se explican los términos, el montaje local, los archivos reales y un guion de treinta minutos con evidencias. El docente dispone además de [resultados y criterios de acompañamiento](17_GUIA_DEL_DOCENTE_Y_EVIDENCIAS.md).
+
 ## 1. Tesis
 
 VitaliLab demuestra un proceso completo de ingeniería: se auditó un prototipo con riesgos reales, se preservó Production, se reconstruyó la solución por capas, se protegió la integridad de los datos y cada afirmación se respalda con código, migración o prueba.
@@ -31,7 +33,7 @@ VitaliLab demuestra un proceso completo de ingeniería: se auditó un prototipo 
 
 ## 4. Demo reproducible
 
-En Staging y con datos ficticios:
+En local o en un Staging ya publicado, con datos ficticios. Indique expresamente cuál utiliza; actualmente la URL nueva sigue pendiente:
 
 1. Mostrar `/health`, `/ready` y commit desplegado.
 2. Registrar una cuenta y explicar el hash/consentimiento sin mostrar secretos.

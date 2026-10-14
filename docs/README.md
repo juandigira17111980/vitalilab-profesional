@@ -2,7 +2,13 @@
 
 Fuente de verdad técnica y académica del proyecto. Los documentos separan cuatro estados: implementado localmente, verificado por pruebas, validado en Staging y promovido a Production.
 
-Fecha de corte: **30 de septiembre de 2026**.
+Fecha de actualización documental: **13 de octubre de 2026**. Las pruebas y auditorías históricas conservan su fecha de ejecución.
+
+## Empieza aquí si eres estudiante
+
+Lee [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) antes de los documentos por especialidad. Está escrito para primeros fundamentos de programación: cada concepto se relaciona con un archivo, una práctica y una explicación de sustentación.
+
+La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md) detalla Vercel y el estado real de Render. La [guía del docente](17_GUIA_DEL_DOCENTE_Y_EVIDENCIAS.md) contiene el orden de sesiones, resultados y criterios para acompañar el aprendizaje.
 
 | Marca | Significado |
 |---|---|
@@ -28,6 +34,9 @@ Fecha de corte: **30 de septiembre de 2026**.
 13. [Manual de operación](12_MANUAL_DE_OPERACION.md)
 14. [Informe QA y readiness](13_INFORME_QA_Y_READINESS.md)
 15. [Matriz de trazabilidad](14_MATRIZ_TRAZABILIDAD.md)
+16. [Manual de aprendizaje desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md)
+17. [Publicación de la copia de práctica](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md)
+18. [Guía del docente y evidencias](17_GUIA_DEL_DOCENTE_Y_EVIDENCIAS.md)
 
 ## Resultado actual
 
@@ -39,7 +48,9 @@ Fecha de corte: **30 de septiembre de 2026**.
 - ✅ 24 pruebas, 90,41 % de cobertura, análisis estático y dependencias limpios.
 - ✅ PR #2 fusionado a `staging`; CI verde en la integración.
 - ✅ CI de cierre: calidad, SAST, PostgreSQL 18, backup/restore y construcción Docker.
-- 🟡 Despliegue de Render Staging pendiente de acceso al panel privado.
+- ✅ CLI Render autorizado y PostgreSQL de práctica disponible, confirmado el 13 de octubre.
+- 🟡 Web Render Staging pendiente de resolver acceso Git al repositorio privado.
+- 🟡 Copia Vercel preparada en código; publicación y PostgreSQL externa pendientes.
 - 🔴 Production permanece congelada hasta aprobación, backup y validación final.
 
 ## Regla de evidencia

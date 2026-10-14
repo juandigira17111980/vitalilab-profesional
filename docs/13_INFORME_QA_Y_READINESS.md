@@ -5,6 +5,8 @@ Versión: candidata `v0.1.0`, rama `staging`, integración `2120e31`
 Decisión preliminar: **GO para PR/CI y Staging; NO-GO para Production**  
 Preparación actual: **90/100 — Apto con observaciones**
 
+Esta cifra corresponde a la rúbrica interna del corte original; no es una nota académica ni una certificación de seguridad. La edición formativa del 13 de octubre agrega 26 pruebas y 90,43 % local, preparación Vercel y guías para estudiantes. Una nueva publicación debe cerrar acceso, PostgreSQL del proveedor, controles compartidos, recorrido remoto y recuperación antes de valorar su preparación operativa.
+
 Escala: 0–40 No apto · 41–60 Riesgo alto · 61–75 Requiere correcciones · 76–90 Apto con observaciones · 91–100 Apto para producción.
 
 Se usa calibración de sistema educativo con datos personales y medidas de salud: alto rigor, aunque el producto no es clínico.

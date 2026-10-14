@@ -4,15 +4,19 @@
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements-dev.txt
-Copy-Item .env.example .env
-flask --app wsgi:app db upgrade
-flask --app wsgi:app seed-habits
-flask --app wsgi:app run
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+$env:APP_ENV = "development"
+$env:DATABASE_URL = "sqlite:///vitalilab-aprendizaje.db"
+$env:SECRET_KEY = (.\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_hex(32))")
+$env:SESSION_COOKIE_SECURE = "false"
+.\.venv\Scripts\python.exe -m flask --app wsgi:app db upgrade
+.\.venv\Scripts\python.exe -m flask --app wsgi:app seed-habits
+.\.venv\Scripts\python.exe -m flask --app wsgi:app run
 ```
 
 Use una DB desechable y un `SECRET_KEY` local. No comparta `.env`.
+
+Las variables anteriores se configuran en la misma terminal. Copiar `.env.example` no garantiza cargar `.env`; `python-dotenv` no se declara. Para Vercel se usa PostgreSQL externa y el [procedimiento dedicado](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md).
 
 ## 2. Pruebas y diagnóstico
 

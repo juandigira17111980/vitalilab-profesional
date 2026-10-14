@@ -1,5 +1,7 @@
 # Estrategia y ejecución de QA
 
+Revalidación formativa del 13 de octubre de 2026: **26 pruebas aprobadas y 90,43 % de cobertura local**. Se agregan los casos de carpeta temporal Vercel y preparación de estáticos. Se comprobó además un flujo con migraciones reales sobre SQLite desechable, CSRF activo, seed repetido, hábito duplicado y rechazo de admin. La tabla histórica siguiente conserva los resultados del 30 de septiembre.
+
 ## 1. Resultado local
 
 | Puerta | Resultado |
