@@ -2,6 +2,8 @@
 
 Manual de aprendizaje, instalación, programación y sustentación. Edición del 13 de octubre de 2026.
 
+Edición de producto ampliada: nueve entidades, tres migraciones, ocho hábitos y seis rutinas. El núcleo de siete entidades sigue explicado en el capítulo 6; la extensión está en 6.11. La [guía de funciones y QA](20_GUIA_DE_FUNCIONES_Y_QA_PREMIUM.md) desarrolla metas, bitácora, contratos y pruebas.
+
 Vas a aprender cómo funciona VitaliLab siguiendo el viaje de una acción sencilla: una persona entra, crea su cuenta y registra un hábito. Ese recorrido conecta la pantalla, el código del servidor y la base de datos. Al final podrás instalar la aplicación, explicar su estructura, hacer un cambio pequeño, comprobarlo y demostrar qué sucede con los datos.
 
 Este material empieza con fundamentos y llega a decisiones de diseño y operación. La experiencia se construye con las prácticas: leer un documento no convierte a alguien en experto. Tu objetivo inicial es comprender, ejecutar y explicar el proyecto con tus propias palabras.
@@ -16,7 +18,7 @@ Estudia en este orden. No necesitas aprender todas las herramientas el primer d�
 |---|---|---|
 | Fundamentos | Archivos, Python, navegador y servidor | Explicar el viaje de una petición |
 | Montaje local | Descargar, instalar y arrancar | Abrir la página en tu equipo |
-| Datos | Tablas, relaciones e integridad | Dibujar las siete entidades |
+| Datos | Tablas, relaciones e integridad | Dibujar el núcleo y las dos entidades añadidas |
 | Backend | Rutas, formularios y servicios | Seguir un registro de hábito en el código |
 | Frontend | HTML, Jinja, CSS y JavaScript | Cambiar un texto y mostrar el resultado |
 | Calidad | Pruebas, errores y control de versiones | Ejecutar una prueba y explicar su resultado |
@@ -213,7 +215,7 @@ El archivo SQLite quedará dentro de la carpeta `instance`. Es una base exclusiv
 .\.venv\Scripts\python.exe -m flask --app wsgi:app db current
 ```
 
-La primera orden aplica las migraciones pendientes. La segunda crea o sincroniza cuatro hábitos. La tercera muestra la revisión actual, `208469fd48ef`. El resultado del seed informa cuántos hábitos nuevos se crearon. Ejecutarlo nuevamente debe crear cero adicionales; actualiza el catálogo por su código único.
+La primera orden aplica las migraciones pendientes. La segunda crea o sincroniza ocho hábitos. La tercera muestra la revisión actual, `54e1c8bb7901`. El resultado del seed informa cuántos hábitos nuevos se crearon. Ejecutarlo nuevamente debe crear cero adicionales; actualiza el catálogo por su código único.
 
 Si aparecen tablas inexistentes, revisa que aplicaste las migraciones a la misma `DATABASE_URL` con la que arrancarás. Si aparece rechazo de conexión a PostgreSQL, probablemente no estás usando la configuración SQLite de esta primera práctica.
 
@@ -354,7 +356,7 @@ Separamos identidad, perfil, medidas, catálogo, cumplimientos, comunicados y ev
 
 `user_profiles` utiliza `user_id` como clave primaria y foránea a la vez. Eso impide crear dos perfiles para el mismo usuario. Contiene `display_name`, `birth_date`, `grade`, `timezone`, `privacy_version`, `privacy_accepted_at` y las fechas de creación y modificación. La fecha de nacimiento y el grado son opcionales.
 
-El campo `timezone` prepara un dato de contexto, pero el cumplimiento diario actual usa `date.today()` del servidor. No afirmes que todas las fechas ya se calculan en la zona individual del perfil. Un próximo cambio podría utilizar esa zona de forma coherente en rutas y servicios.
+El campo `timezone` se utiliza mediante `app/services/clock.py`. El día de hábitos, metas, bitácora y nuevas mediciones se calcula en la zona del perfil, con retorno a America/Bogota si no se encuentra. No se reescriben fechas históricas. Una prueba compara el mismo instante UTC en Bogotá y Tokio para explicar por qué «hoy» puede ser diferente.
 
 ### 6.4 Medidas y catálogo
 
@@ -406,6 +408,7 @@ El modelo describe el estado que queremos. La migración registra cómo pasar de
 |---|---|
 | 0380d5595f5e | Crea las siete tablas con relaciones y restricciones |
 | 208469fd48ef | Añade índices para claves foráneas y consultas |
+| 54e1c8bb7901 | Añade metas personales y bitácora diaria sin alterar las siete tablas originales |
 
 `db upgrade` aplica cambios pendientes. `db check` compara modelo y esquema para detectar deriva. `db migrate` genera una propuesta: alguien debe leerla y revisarla antes de aplicarla. No editamos una migración que ya se ejecutó en un ambiente compartido.
 
@@ -431,9 +434,19 @@ db.session.scalar(db.select(db.func.count(HabitEntry.id)))
 exit()
 ```
 
-Debe haber cuatro hábitos después del seed. Los otros conteos dependen de tu práctica. Este ejercicio usa SELECT; no borra ni cambia registros. `db.select` construye una consulta; `scalar` devuelve un valor; `count` cuenta filas.
+Debe haber ocho hábitos después del seed. Los otros conteos dependen de tu práctica. Este ejercicio usa SELECT; no borra ni cambia registros. `db.select` construye una consulta; `scalar` devuelve un valor; `count` cuenta filas.
 
 **Para sustentar.** Dibuja dos usuarios, un hábito y tres cumplimientos de fechas distintas. Identifica cuál sería el cuarto registro inválido. Explica qué protege UNIQUE y qué protege la sesión del usuario.
+
+### 6.11 Cómo se amplía el modelo sin romper el núcleo
+
+`user_goals` conecta una persona con un hábito y una frecuencia de uno a siete días. Su combinación usuario/hábito es única: ajustar tres días a dos modifica una meta, no crea dos tarjetas. La meta no guarda otra copia del progreso; el servicio cuenta sus HabitEntry en los últimos siete días.
+
+`daily_checkins` guarda fecha, energía y enfoque percibidos en escala uno a cinco. Su combinación usuario/fecha es única: repetir el formulario hoy actualiza el registro. Ambas entidades tienen creación/actualización, claves foráneas y CHECK; no se añade texto libre sensible ni se cambia la identidad de las tablas anteriores.
+
+Retirar una meta conserva el hábito registrado porque son responsabilidades distintas. La migración aditiva permite volver al código anterior sin borrar las nuevas tablas. Un downgrade no es un rollback seguro sobre datos compartidos.
+
+El diccionario y los contratos están en la guía 20. Dibuja users → user_goals → habits y users → daily_checkins. Predice qué inserción duplicada será rechazada y compruébalo con las pruebas wellness.
 
 ## 7 Backend explicado con recorridos de código
 
@@ -496,7 +509,7 @@ Idempotencia significa que repetir esta misma acción del día deja el mismo res
 
 ### 7.5 Cómo se calculan los puntos y la racha
 
-La aplicación suma los puntos del catálogo asociados a cumplimientos del usuario. Los cuatro hábitos sembrados valen 15, 15, 15 y 10; cumplir uno de cada uno produce 55 puntos. No hay una columna de saldo acumulado enviada por el navegador.
+La aplicación suma los puntos del catálogo asociados a cumplimientos del usuario. Los cuatro hábitos originales valen 15, 15, 15 y 10; los cuatro nuevos valen 10, 10, 10 y 15. Cumplir una vez cada uno de los ocho produce 100 puntos. No hay una columna de saldo acumulado enviada por el navegador.
 
 El diseño facilita comprobar la suma a partir de eventos, pero tiene una consecuencia: cambiar los puntos del catálogo puede recalcular el valor de registros antiguos. El seed también sincroniza esos valores. Mantén estable el catálogo de la práctica; si el producto necesita precios históricos por hábito, deberá añadirse una política o un valor snapshot por evento mediante migración.
 
@@ -715,7 +728,7 @@ La carpeta `/opt/labs/vitalilab/releases` guarda versiones por commit. `current`
 
 ### 11.4 Roles y conexiones de la base
 
-`DATABASE_URL` reúne servidor, usuario, contraseña y nombre de base. Es un secreto. `vitalilab_owner` administra únicamente la PostgreSQL independiente de este laboratorio y ejecuta migraciones. La web utiliza `vitalilab_app`, que puede consultar y modificar las siete tablas de negocio, pero no crear bases, roles o tablas.
+`DATABASE_URL` reúne servidor, usuario, contraseña y nombre de base. Es un secreto. `vitalilab_owner` administra únicamente la PostgreSQL independiente de este laboratorio y ejecuta migraciones. La web utiliza `vitalilab_app`, que puede consultar y modificar las nueve tablas de negocio, pero no crear bases, roles o tablas.
 
 La conexión de la aplicación verifica el certificado y el nombre `db` con `sslmode=verify-full`. La comprobación real registró TLS 1.3. HTTPS del navegador y TLS de base son conexiones distintas: un candado en la página no prueba cómo se conectó PostgreSQL.
 
@@ -751,7 +764,7 @@ bash deploy/nexostack/deploy.sh SHA_COMPLETO_VERIFICADO
 
 `SHA_COMPLETO_VERIFICADO` representa los 40 caracteres del commit que pasó CI. No se copia literalmente esa palabra. El procedimiento se ejecuta como infraestructura confiable en la versión cargada del VPS, no en la terminal de un estudiante.
 
-El script valida Compose, construye la imagen, inicia su base, aplica las dos migraciones, sincroniza cuatro hábitos y comprueba deriva. Después concede los permisos de negocio a la web y activa solo su contenedor. Las migraciones no se ejecutan al visitar una pantalla.
+El script valida Compose, construye la imagen, inicia su base, aplica las tres migraciones, sincroniza ocho hábitos y comprueba deriva. Después concede los permisos de negocio a la web y activa solo su contenedor. Las migraciones no se ejecutan al visitar una pantalla.
 
 La tarea de migración usa `--no-deps` después de verificar la base, para no recrear una dependencia saludable como efecto de la tarea puntual. Un bloqueo evita dos despliegues de VitaliLab simultáneos. Si hay una versión anterior, se respalda antes de la actualización.
 
@@ -784,7 +797,7 @@ La [guía de operación y accesos](18_NEXOSTACK_OPERACION_Y_ACCESOS.md) explica 
 
 El timer de VitaliLab produce un respaldo diario a las 02:30 de Colombia, con hasta cinco minutos de variación. Conserva 14 días en la carpeta privada del proyecto. El monitor comprueba `/ready` cada cinco minutos y registra fallos en systemd; esto no significa que ya envíe mensajes personales de alerta.
 
-Un respaldo se comprueba restaurando en otra base, comparando las siete tablas y la revisión Alembic y verificando deriva. En esta entrega se hizo esa prueba y se eliminó únicamente la base temporal; se conservó la base activa y su dump.
+Un respaldo se comprueba restaurando en otra base, comparando conteos y revisión Alembic y verificando deriva. El primer montaje comprobó las siete tablas originales y eliminó únicamente la base temporal. La evolución amplía la comparación a las nueve entidades; la evidencia de publicación debe registrar el nuevo ensayo y conservar la base activa y su dump.
 
 Un archivo en el mismo VPS no basta frente a pérdida del servidor. Se debe conservar una copia fuera del host mediante un canal protegido, definir retención y ensayar recuperación. Los objetivos propuestos para laboratorio son RPO de 24 horas y RTO de una hora; no son garantías de disponibilidad ni una prueba de recuperación de todo NexoStack.
 
@@ -822,7 +835,7 @@ La decisión de reemplazar Render con este proyecto es posterior y exige aprobac
 
 ### 14.1 Laboratorio de montaje
 
-Instala desde una copia limpia, configura SQLite, migra y siembra. Abre inicio, `/health` y `/ready`. Produce captura, revisión Alembic y conteo de cuatro hábitos. Para aprobar, un compañero debe reproducir el montaje con tus notas.
+Instala desde una copia limpia, configura SQLite, migra y siembra. Abre inicio, `/health` y `/ready`. Produce captura, revisión Alembic y conteo de ocho hábitos. Para aprobar, un compañero debe reproducir el montaje con tus notas.
 
 ### 14.2 Laboratorio de identidad
 
@@ -842,7 +855,7 @@ En una rama local cambia un texto de ayuda y una medida CSS pequeña. Revisa esc
 
 ### 14.6 Laboratorio de modelo de datos
 
-Dibuja las siete entidades con sus claves. Crea ejemplos ficticios en papel y predice si una combinación duplicada sería rechazada. Después compara con el caso de prueba. Para un cambio real de esquema, prepara una migración nueva en una base desechable con revisión del docente; no practiques `downgrade` sobre datos compartidos.
+Dibuja las siete entidades del núcleo y añade las dos nuevas con sus claves. Crea ejemplos ficticios en papel y predice si una combinación duplicada sería rechazada. Después compara con el caso de prueba. Para un cambio real de esquema, prepara una migración nueva en una base desechable con revisión del docente; no practiques `downgrade` sobre datos compartidos.
 
 ### 14.7 Laboratorio de pruebas
 
@@ -873,7 +886,7 @@ Si el docente asigna menos tiempo, reduce la demostración y conserva el recorri
 
 Para cada respuesta usa problema, decisión y evidencia. Si preguntan por PostgreSQL, explica primero que la aplicación compartida necesita datos persistentes, después la elección del motor y al final la migración o el ensayo que lo demuestra.
 
-**Por qué siete tablas.** Cada entidad representa una responsabilidad y evita mezclar identidad, catálogo, historial y eventos. Muestra una relación específica.
+**Por qué nueve tablas.** Las siete del núcleo separan identidad, catálogo, historial y eventos. Las dos nuevas distinguen una meta ajustable de una percepción diaria. Muestra una relación y una restricción única específica.
 
 **Cómo se evita duplicación.** La sesión identifica al usuario, la ruta valida y el servicio consulta. La combinación única de la base resuelve también solicitudes simultáneas.
 

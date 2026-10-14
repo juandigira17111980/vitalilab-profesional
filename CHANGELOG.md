@@ -4,6 +4,18 @@ Los cambios relevantes de VitaliLab se documentan siguiendo una adaptación de K
 
 ## [Unreleased]
 
+### Evolución premium del laboratorio
+
+- Nuevo inicio de producto, logo SVG, textos funcionales y navegación móvil con área segura.
+- Corrección del anillo mediante Grid, tipografía más legible y tarjetas compactas.
+- Ocho hábitos; seis rutinas con búsqueda y temporizador pausable, reanudable y reiniciable.
+- Metas personales por hábito y bitácora diaria con rangos, unicidad y acceso propio.
+- Mapa de actividad de 28 días y registro rápido desde Hoy.
+- Migración aditiva 54e1c8bb7901 y permisos limitados para las dos tablas nuevas.
+- Fechas de usuario coherentes entre hábitos, metas, bitácora y nuevas mediciones; tzdata explícita.
+- 42 pruebas y 91,75 % local; CI ejercita las nueve entidades y su backup/restore.
+- Documentación 19 y 20 con decisiones de UX, recorridos de datos y límites de SaaS comercial.
+
 ### Added
 
 - Fábrica Flask y módulos de autenticación, perfil, hábitos, contenido y administración.
