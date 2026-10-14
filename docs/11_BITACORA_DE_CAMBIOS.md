@@ -18,6 +18,11 @@
 | 2026-09-30 | Git | Reconstrucción integrada a `staging` | PR #2, commit `2120e31` | ✅ |
 | 2026-09-30 | Seguridad | Bandit sin hallazgos medios/altos | GitHub Actions PR #3 | ✅ |
 | 2026-09-30 | DBA | Backup y restore aislado PostgreSQL 18 | GitHub Actions PR #3 | ✅ |
+| 2026-10-01 | Infra | PostgreSQL de práctica creada en Staging con acceso externo cerrado | Estado API Render | ✅ disponible al 13 de octubre |
+| 2026-10-13 | Documentación | Manual desde cero, laboratorios y guía docente | capítulos 15, 16 y 17 | ✅ |
+| 2026-10-13 | Exactitud | Sesión cookie firmada, configuración local explícita y límites reales de SMTP | revisión de código y fuentes oficiales | ✅ |
+| 2026-10-13 | Vercel | Entrada, assets públicos y escritura temporal preparados | configuración, esquema y pruebas | ✅ local / 🟡 remoto |
+| 2026-10-13 | QA | 26 pruebas y 90,43 %; instalación y práctica con base desechable | salida local y flujo CSRF | ✅ |
 
 ## 2. Defectos encontrados durante validación
 

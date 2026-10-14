@@ -89,7 +89,7 @@ No existe una tabla de saldos ni `daily_checkins`: puntos, nivel y racha se deri
 | `announcements` | Comunicación administrativa | autor, contenido, estado | autor RESTRICT |
 | `audit_events` | Trazabilidad operativa | actor, acción, entidad | actor SET NULL |
 
-La retención legal/educativa debe aprobarse antes de Production. Técnicamente, la eliminación de una cuenta elimina perfil, medidas y cumplimientos; conserva auditoría sin identificar al actor.
+La retención legal/educativa debe aprobarse antes de Production. Las relaciones CASCADE eliminan perfil, medidas y cumplimientos cuando puede eliminarse el usuario; auditoría conserva el evento con actor nulo. Un autor con comunicados tiene RESTRICT y no se puede borrar sin resolver antes esas referencias. No existe todavía una ruta pública de eliminación de cuenta.
 
 ## 4. Integridad
 

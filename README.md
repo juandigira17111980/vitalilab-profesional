@@ -10,7 +10,7 @@ VitaliLab es una aplicación web educativa para registrar hábitos saludables, c
 | Modelo de datos | 7 tablas, 2 migraciones Alembic, integridad e índices |
 | Seguridad | Hash scrypt, CSRF, autorización, bloqueo temporal, rate limits y cabeceras |
 | Frontend | Responsive, navegación móvil, formularios accesibles y estados controlados |
-| Calidad | 24 pruebas, 90,41 %, Ruff, Bandit y `pip-audit`; CI/PostgreSQL/Docker aprobados |
+| Calidad | 26 pruebas y 90,43 % local en la edición formativa; CI histórico/PostgreSQL/Docker aprobados |
 | Base de datos | Migración, deriva, backup y restauración aislada aprobados en PostgreSQL 18 CI |
 | Staging | Configuración declarativa lista; despliegue remoto pendiente de ejecutar/aprobar |
 | Production | Congelada; no se ha modificado |
@@ -52,15 +52,27 @@ Requiere Python 3.13.
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements-dev.txt
-Copy-Item .env.example .env
-flask --app wsgi:app db upgrade
-flask --app wsgi:app seed-habits
-flask --app wsgi:app run
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+$env:APP_ENV = "development"
+$env:DATABASE_URL = "sqlite:///vitalilab-aprendizaje.db"
+$env:SECRET_KEY = (.\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_hex(32))")
+$env:SESSION_COOKIE_SECURE = "false"
+.\.venv\Scripts\python.exe -m flask --app wsgi:app db upgrade
+.\.venv\Scripts\python.exe -m flask --app wsgi:app seed-habits
+.\.venv\Scripts\python.exe -m flask --app wsgi:app run
 ```
 
-Antes de iniciar, ajuste `.env` para una base local. El archivo está ignorado por Git y nunca debe contener valores que se copien a documentación o capturas.
+Estas variables deben establecerse en la misma terminal del arranque. `.env.example` es una referencia: copiarla no instala PostgreSQL ni garantiza cargar `.env`, porque `python-dotenv` no está declarado. Para la práctica inicial se usa SQLite exclusivo; en ambientes compartidos se exige PostgreSQL.
+
+## Aprender y sustentar
+
+Si estás empezando, lee primero [VitaliLab explicado desde cero](docs/15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md). Incluye fundamentos, montaje Windows, las razones del modelo de datos, recorridos del código, ocho laboratorios y preguntas de sustentación. Después consulta los capítulos técnicos por área.
+
+## Copia de práctica en Vercel
+
+`pyproject.toml` declara `wsgi:app`; `vercel.json` prepara `public/static` mediante `scripts/build_vercel.py`. La fábrica utiliza almacenamiento temporal cuando `VERCEL=1`. Las tablas se migran de forma controlada, fuera de las peticiones, sobre una PostgreSQL externa con TLS.
+
+La publicación necesita una cuenta Vercel autenticada, conexión Git o CLI y variables Preview privadas. La base Render existente tiene acceso externo cerrado y no se conecta a Vercel mediante su URL interna. Consulta [la guía de publicación](docs/16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md). Este estado significa configuración preparada; todavía no una URL remota aprobada.
 
 ## Inicio local con Docker
 

@@ -8,8 +8,9 @@
 | Datos compartidos | PostgreSQL 18 |
 | Datos locales/pruebas | SQLite permitido |
 | Repositorio | Privado: `juandigira17111980/vitalilab-profesional` |
-| Rama de trabajo | `feat/reconstruccion-profesional` |
-| Fecha de corte | 30 de septiembre de 2026 |
+| Rama integrada | `staging` |
+| Revisión formativa | `docs/manual-formativo-vercel` |
+| Fecha de actualización documental | 13 de octubre de 2026 |
 | Production | Congelada hasta aprobación explícita |
 
 ## 1. Propósito y alcance
@@ -17,6 +18,8 @@
 VitaliLab convierte acciones cotidianas en un registro comprensible de hábitos, puntos y constancia. Incluye registro y acceso, perfil, medidas opcionales, IMC educativo, hábitos, dashboard, contenidos y comunicados administrativos.
 
 No es un sistema clínico, no diagnostica y no reemplaza orientación profesional. La primera entrega profesional prioriza seguridad, integridad, claridad y facilidad de sustentación sobre complejidad innecesaria.
+
+Para estudiantes con primeros fundamentos, el punto de entrada es [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md). Este documento conserva la referencia técnica; el manual añade explicaciones progresivas, instalación comprobable y laboratorios. La opción Vercel se explica en la [guía de publicación](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md).
 
 ## 2. Transformación realizada
 
@@ -56,7 +59,7 @@ La aplicación es un monolito modular porque el alcance académico no justifica 
 | ADR-003 | PostgreSQL en ambientes compartidos | Persistencia, concurrencia e integridad | ✅ Configurado; 🟡 Staging remoto |
 | ADR-004 | Alembic/Flask-Migrate | Esquema reproducible y trazable | ✅ |
 | ADR-005 | Puntos derivados de eventos | Evita saldos manipulables y datos duplicados | ✅ |
-| ADR-006 | Sesiones de servidor firmadas | Adecuado para aplicación Jinja y menor superficie que JWT | ✅ |
+| ADR-006 | Cookie de sesión firmada de Flask y usuario cargado de DB | Adecuado para aplicación Jinja; no implica cifrado ni tabla de sesiones | ✅ |
 | ADR-007 | Local → Staging → Production | Aísla riesgo y exige evidencia | ✅ Proceso; 🟡 despliegue Staging |
 
 ## 5. Reglas de negocio
@@ -98,9 +101,9 @@ El servicio histórico de Production no comparte base, variables ni dominio con 
 | Riesgo | Estado | Control requerido |
 |---|---|---|
 | Staging aún sin URL funcional | 🟡 | Crear Blueprint, completar variables y smoke tests |
-| PostgreSQL no validado localmente por falta de Docker | 🟡 | Job `postgres-migration` en CI |
+| PostgreSQL compartido sin recorrido web nuevo | 🟡 | Migraciones y restore validados en CI; comprobar URL y proveedor |
 | SMTP no configurado | 🟡 | Registrar proveedor/secretos en Staging |
-| Backup/restauración no ensayados | 🔴 Production | Base persistente y simulacro documentado |
+| Backup operativo del proveedor pendiente | 🔴 Production | Restore aislado CI aprobado; definir retención y ensayo del proveedor |
 | Política institucional para salud/menores | 🔴 Production | Revisión del responsable de tratamiento |
 
 ## 9. Definición de terminado

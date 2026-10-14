@@ -1,5 +1,7 @@
 # Infraestructura y despliegue en Render
 
+Para la copia Vercel, consulte [Publicación de la copia de práctica](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md). Para aprender estos conceptos desde cero, consulte [el manual formativo](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md).
+
 ## 1. Topología
 
 ```mermaid
@@ -26,6 +28,8 @@ No se comparte DB, secreto ni dominio entre ambientes.
 
 El Blueprint usa rama `staging`, plan web Free y PostgreSQL Free como ambiente temporal. La base queda sin acceso público (`ipAllowList: []`). `SECRET_KEY` se genera y las credenciales SMTP requieren carga manual en el panel.
 
+Estado confirmado el 13 de octubre de 2026: PostgreSQL `vitalilab-staging-db` disponible, acceso externo cerrado y CLI autenticado; ningún servicio web de Staging. Render rechazó el acceso al repo privado. La credencial Git conectada es `ega1026`, distinta del propietario `juandigira17111980`. No debe reemplazarse la conexión histórica sin analizar su impacto.
+
 Inicio de Staging:
 
 ```text
@@ -37,6 +41,8 @@ La migración se ejecuta en el arranque porque el pre-deploy command no está di
 ## 4. Advertencia de persistencia
 
 El filesystem del servicio Render es efímero; no se usa SQLite compartido. PostgreSQL Free sirve para demostración temporal y puede expirar a los 30 días según el plan vigente. Production debe usar una base persistente pagada con backups y retención definidos.
+
+La instancia gratuita concreta vence el 31 de octubre de 2026 a las 21:36 de Colombia. Render Free bloquea salida a puertos SMTP 25, 465 y 587; los valores `MAIL_*` no bastan para enviar desde ese plan. La entrega real requiere alojamiento/envío compatibles o una integración por API implementada y probada. [Restricciones oficiales](https://render.com/docs/free).
 
 ## 5. Variables
 
