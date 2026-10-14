@@ -1,6 +1,6 @@
 # Estrategia y ejecución de QA
 
-Revalidación formativa del 13 de octubre de 2026: **26 pruebas aprobadas y 90,43 % de cobertura local**. Se agregan los casos de carpeta temporal Vercel y preparación de estáticos. Se comprobó además un flujo con migraciones reales sobre SQLite desechable, CSRF activo, seed repetido, hábito duplicado y rechazo de admin. La tabla histórica siguiente conserva los resultados del 30 de septiembre.
+Revalidación del 13 de octubre de 2026: **28 pruebas aprobadas y 90,67 % de cobertura local**. Incluye adaptación Vercel opcional, cookie remember Secure y aviso de laboratorio exclusivo de staging. Se comprobó un flujo SQLite desechable y, en NexoStack, registro real con CSRF, perfil ficticio, hábito repetido, permisos, dos administradores, gestión restringida, TLS SQL y restore aislado. Consulte [evidencia del laboratorio](18_NEXOSTACK_OPERACION_Y_ACCESOS.md). La tabla siguiente conserva el resultado histórico del 30 de septiembre, no reemplaza la validación de esta edición.
 
 ## 1. Resultado local
 

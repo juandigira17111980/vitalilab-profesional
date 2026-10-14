@@ -26,6 +26,16 @@ jobs:
         run: python -m bandit -q -r app scripts wsgi.py -ll
       - run: python -m pytest
       - run: python -m pip_audit -r requirements.txt --progress-spinner off
+      - name: Validate isolated deployment configuration
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+          POSTGRES_ADMIN_PASSWORD: ci-only-placeholder
+          POSTGRES_APP_PASSWORD: ci-only-placeholder
+          SECRET_KEY: ci-only-placeholder
+        run: |
+          for script in deploy/nexostack/*.sh; do bash -n "$script"; done
+          docker compose -f deploy/nexostack/compose.yaml config --quiet
+          sudo visudo -c -f deploy/nexostack/vitalilab.sudoers
 
   postgres-migration:
     runs-on: ubuntu-latest

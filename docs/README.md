@@ -8,7 +8,7 @@ Fecha de actualización documental: **13 de octubre de 2026**. Las pruebas y aud
 
 Lee [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) antes de los documentos por especialidad. Está escrito para primeros fundamentos de programación: cada concepto se relaciona con un archivo, una práctica y una explicación de sustentación.
 
-La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md) detalla Vercel y el estado real de Render. La [guía del docente](17_GUIA_DEL_DOCENTE_Y_EVIDENCIAS.md) contiene el orden de sesiones, resultados y criterios para acompañar el aprendizaje.
+La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md) detalla NexoStack. La [guía del docente](17_GUIA_DEL_DOCENTE_Y_EVIDENCIAS.md) contiene sesiones y criterios de aprendizaje. La [operación y accesos](18_NEXOSTACK_OPERACION_Y_ACCESOS.md) reúne permisos, respaldos y evidencia del laboratorio. Render y Vercel se conservan como alternativas, no como publicaciones nuevas de esta edición.
 
 | Marca | Significado |
 |---|---|
@@ -37,6 +37,7 @@ La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md
 16. [Manual de aprendizaje desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md)
 17. [Publicación de la copia de práctica](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md)
 18. [Guía del docente y evidencias](17_GUIA_DEL_DOCENTE_Y_EVIDENCIAS.md)
+19. [NexoStack operación y accesos](18_NEXOSTACK_OPERACION_Y_ACCESOS.md)
 
 ## Resultado actual
 
@@ -45,12 +46,13 @@ La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md
 - ✅ Modelo relacional de siete tablas y dos migraciones.
 - ✅ Controles de autenticación, autorización, CSRF, cabeceras y auditoría.
 - ✅ Diseño responsive probado en navegador real a 390 px y 1280 px.
-- ✅ 24 pruebas, 90,41 % de cobertura, análisis estático y dependencias limpios.
+- ✅ 28 pruebas, 90,67 % local, análisis estático y dependencias limpios en CI de esta edición.
 - ✅ PR #2 fusionado a `staging`; CI verde en la integración.
 - ✅ CI de cierre: calidad, SAST, PostgreSQL 18, backup/restore y construcción Docker.
 - ✅ CLI Render autorizado y PostgreSQL de práctica disponible, confirmado el 13 de octubre.
-- 🟡 Web Render Staging pendiente de resolver acceso Git al repositorio privado.
-- 🟡 Copia Vercel preparada en código; publicación y PostgreSQL externa pendientes.
+- ✅ Copia NexoStack con PostgreSQL propia, HTTPS y dos accesos individuales de gestión.
+- ✅ Backup y restore aislado comprobados; timers específicos del proyecto activos.
+- ⚪ Web Render Staging no creada y Vercel preparado como alternativa no utilizada.
 - 🔴 Production permanece congelada hasta aprobación, backup y validación final.
 
 ## Regla de evidencia

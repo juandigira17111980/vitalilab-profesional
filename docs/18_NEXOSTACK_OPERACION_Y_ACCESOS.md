@@ -6,7 +6,7 @@ Fecha de referencia: 13 de octubre de 2026, Colombia.
 
 Publicar una copia académica independiente en el VPS NexoStack, manteniendo sin cambios la producción de Render y los proyectos existentes del servidor. No migrar datos de personas reales del prototipo.
 
-URL objetivo: `https://vitalilab.lab.nexostack.app`. Estado antes de ejecutar: preparado, pendiente de evidencia de URL, base y acceso. Este documento se completará con los resultados reales, no con una promesa de 100/100.
+URL publicada y comprobada: `https://vitalilab.lab.nexostack.app`. Primera publicación verificada: commit `455d5ee4a23a8776607fd312607d77bdd91bdca9`. La versión activa se consulta en `/health`; las revisiones posteriores deben comprobar su propio commit. Laboratorio aprobado para práctica, no promoción de producción.
 
 ## 2 Qué significa el montaje para un estudiante
 
@@ -68,7 +68,43 @@ La comprobación remota no reemplaza pruebas unitarias. Un contenedor saludable 
 
 ## 7 Registro de resultado
 
-Pendiente de completar con commit, fecha, versión Alembic, pruebas, respaldo, restauración y estado de las demás aplicaciones. Hasta completar ese registro, no presentar la URL objetivo como una web ya validada.
+| Comprobación | Resultado observado |
+|---|---|
+| CI del primer release | Tres trabajos aprobados, run 38500297528 |
+| Pruebas locales de cierre | 28 aprobadas, cobertura 90,67 % |
+| URL | HTTPS, /health y /ready con 200 |
+| Esquema | Alembic 208469fd48ef, sin deriva |
+| Catálogo | Cuatro hábitos |
+| Runtime SQL | vitalilab_app, TLS 1.3 y sin privilegios administrativos/CREATE |
+| Web | UID 10001, raíz de solo lectura y sin puertos publicados en el host |
+| Accesos | Login y admin de Juan/Emanuel probados; cookie Secure/HttpOnly; logout correcto |
+| Gestores SSH | Ambos ejecutan status; id rechazado con salida 2; forwarding rechazado |
+| Hábito repetido | Respuesta 200 y mensaje de no duplicación; un cumplimiento conservado |
+| Interfaz real | Registro, hábito y perfil ficticio; 390/1280 px sin desborde, consola sin errores |
+| Persistencia y permiso normal | Tras reinicio propio: perfil conservado y /admin/ con 403 |
+| Comunicados | Borrador no público, publicación visible y archivo correcto con cuenta autorizada |
+| Backup y restore | Dump 20261014T022937Z, siete conteos y Alembic iguales, sin deriva |
+| Tiempo del restore | 9,37 segundos para esta base pequeña; no es RTO del VPS completo |
+| Convivencia inicial | Los 29 contenedores previos conservan ID, imagen, inicio y reinicios |
+
+El dump capturó tres usuarios y perfiles, cuatro hábitos, un cumplimiento y ocho eventos en ese instante. Esos conteos son evidencia de esa copia, no valores fijos para una base que sigue recibiendo práctica. La base temporal `vitalilab_restore_qa_20261013` se eliminó al terminar; la base activa y el respaldo permanecieron.
+
+El ensayo de restore ejecutó una tarea puntual que inicialmente recreó solo su dependencia PostgreSQL. El volumen conservó los datos. Se ajustó el comando a `run --no-deps` después de validar la base, para evitar ese efecto en las tareas posteriores. El monitor se cambió de nobody a una identidad dinámica específica. La lista SSH se amplió solo con los dos operadores tras validar sintaxis y comprobar que root/nexoadmin se conservan.
+
+El reinicio deliberado de la web produjo una respuesta 503 durante su breve transición; al volver a saludable se confirmó el perfil persistente y el rechazo 403 de admin al usuario normal. No se presenta una interrupción de mantenimiento como pérdida de datos ni como prueba de disponibilidad continua. Las llaves de ambos operadores se probaron; Emanuel también generó un backup con su permiso limitado.
+
+CI verificable: [ejecución del release inicial](https://github.com/juandigira17111980/vitalilab-profesional/actions/runs/38500297528). Los resultados adicionales y la versión final del paquete se registran con la entrega, sin incluir credenciales.
+
+## 9 Criterios utilizados
+
+- `arquitecto-infra-devops`: aislamiento lógico, límites de recursos, HTTPS, respaldo, monitor y reversión.
+- `git-github-devops`: rama separada, commit identificable, PR y CI antes de activar.
+- `auditor-qa-final`: evidencias reales, pruebas negativas, convivencia y separación de laboratorio/producción.
+- `arquitecto-dba-empresarial`: PostgreSQL relacional propia, rol DML, TLS, volumen y restore aislado.
+- `arquitecto-backend-desktop`: revisión de sesión/configuración y prueba de cookie remember Secure.
+- `desarrollador-web-fullstack`: flujo completo, formularios, permisos y validación de interfaz publicada.
+- `playwright`: prueba en navegador de registro, hábito y pantalla móvil, sin confundirla con tests unitarios.
+- `pages:write-page` y `pdf:pdf`: manual progresivo fiel al código y revisión de su presentación para estudiantes.
 
 ## 8 Alcance y límites
 

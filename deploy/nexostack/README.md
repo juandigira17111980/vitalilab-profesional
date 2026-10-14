@@ -33,6 +33,8 @@ Los usuarios Linux `vitalilab-juan` y `vitalilab-emanuel` utilizan llaves indepe
 
 `ssh-gateway.sh` solo acepta `status`, `health`, `restart`, `backup` y `events`. `vitalilab.sudoers` concede únicamente esas cinco invocaciones exactas a `ops.sh`, propiedad de root. No permite cambiar código, exportar datos, restaurar o eliminar una base, leer secretos o operar otro proyecto.
 
+La lista SSH existente admite root y nexoadmin. `99-vitalilab-operators.conf` agrega únicamente los dos operadores, sin quitar nombres anteriores ni habilitar contraseñas. Se valida con `sshd -t`, se comprueba la lista efectiva y se recarga SSH, no se reinicia el VPS. El monitor utiliza `DynamicUser` para no compartir la identidad global nobody.
+
 En la aplicación, las cuentas individuales con rol `admin` gestionan comunicados y consultan el resumen de auditoría. Ese rol no administra el VPS ni ofrece un editor libre de SQL. No hay una cuenta principal compartida.
 
 ## Respaldos y monitoreo

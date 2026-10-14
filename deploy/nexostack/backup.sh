@@ -4,7 +4,9 @@ umask 077
 base=/opt/labs/vitalilab
 [[ ${EUID} == 0 && -d $base/backups ]] || exit 1
 [[ $(realpath -e "$base/backups") == /opt/labs/vitalilab/backups ]] || exit 2
-stamp=$(date -u +%Y%m%dT%H%M%SZ)
+exec 8>"$base/backup.lock"
+flock -n 8 || { echo 'Another VitaliLab backup is active.' >&2; exit 3; }
+stamp=$(date -u +%Y%m%dT%H%M%S%NZ)
 target=$base/backups/vitalilab-$stamp.dump
 docker exec vitalilab-db-lab pg_dump -U vitalilab_owner -d vitalilab_staging \
   --format=custom > "$target.part"

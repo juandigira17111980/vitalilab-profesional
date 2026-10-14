@@ -1,6 +1,6 @@
 # Infraestructura y despliegue en Render
 
-Para la copia Vercel, consulte [Publicación de la copia de práctica](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md). Para aprender estos conceptos desde cero, consulte [el manual formativo](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md).
+La copia académica vigente se publica en NexoStack: consulte [publicación](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md) y [operación](18_NEXOSTACK_OPERACION_Y_ACCESOS.md). Este capítulo conserva el montaje Render como alternativa y el estado histórico sin cambios de producción. Para aprender desde cero, consulte [el manual formativo](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md).
 
 ## 1. Topología
 

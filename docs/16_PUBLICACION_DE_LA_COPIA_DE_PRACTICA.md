@@ -1,103 +1,103 @@
-# Publicación de la copia de práctica
+# Publicación de la copia de práctica en NexoStack
 
-Edición del 13 de octubre de 2026. Esta guía operativa complementa los capítulos 11 a 13 del [manual desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md). Primero se aprende y verifica en local; después se prueba una URL compartida.
+Edición del 13 de octubre de 2026, Colombia. Complementa los capítulos 11 a 13 del [manual desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) y la [guía operativa](18_NEXOSTACK_OPERACION_Y_ACCESOS.md).
 
-## 1 Estado confirmado y decisiones pendientes
+## 1 Qué se publica y qué se conserva
 
-El repositorio privado pertenece a `juandigira17111980` y se llama `vitalilab-profesional`. La reconstrucción se integra en `staging`; el Render histórico utiliza otro repositorio, `ega1026/vitalilab`. No confundir un cambio en nuestro repositorio con un cambio ya ejecutado por ese servicio.
+VitaliLab de práctica utiliza `https://vitalilab.lab.nexostack.app`, una PostgreSQL propia y el código del repositorio privado `juandigira17111980/vitalilab-profesional`. No sustituye la web original de Render ni migra sus datos. Los proyectos existentes del VPS no se reconstruyen ni se reinician para este montaje.
 
-La base `vitalilab-staging-db` de Render estaba disponible el 13 de octubre, con acceso externo cerrado. No existe todavía un servicio web de Staging validado. La cuenta Render tiene credencial Git `ega1026`; por eso no se resolvió el acceso al repositorio privado nuevo. La instancia gratuita concreta vence el 31 de octubre a las 21:36 de Colombia.
+La primera publicación comprobada corresponde al commit `455d5ee4a23a8776607fd312607d77bdd91bdca9`, con CI aprobado. La versión activa se consulta en `/health`; cada actualización debe relacionar ese valor con su commit, resultado de pruebas y registro de despliegue.
 
-Para Vercel se añadieron `vercel.json`, entrada `wsgi:app`, preparación de `public/static` y carpeta temporal de ejecución. Esa preparación no crea una cuenta Vercel ni una PostgreSQL externa.
+## 2 Condiciones antes de publicar
 
-## 2 Lo que necesita el docente
+1. Confirmar autorización sobre el laboratorio, no sobre una promoción productiva.
+2. Verificar CI del commit, espacio de disco, memoria y nombres de recursos nuevos.
+3. Guardar identificadores, imágenes, inicio y reinicios de los servicios anteriores.
+4. Confirmar DNS y el proxy existentes, sin reemplazar su configuración.
+5. Preparar credenciales propias y un esquema vacío con datos ficticios.
 
-1. Iniciar sesión en Vercel desde el navegador con su propia cuenta.
-2. Crear un proyecto separado, llamado `vitalilab-practica` o equivalente disponible.
-3. Elegir una PostgreSQL de práctica accesible desde Vercel, con TLS y costo autorizado.
-4. Configurar secretos en los campos privados del proveedor.
-5. Aplicar migraciones y verificar el recorrido funcional.
+El administrador de infraestructura conserva la cuenta confiable del servidor. Los estudiantes reciben código y documentación; los responsables reciben accesos privados individuales.
 
-No debe enviar tokens o contraseñas por chat. Una autorización por navegador permite conectar el CLI sin compartirlos. Crear un plan pagado exige una decisión explícita de costo, no una inferencia a partir de la necesidad de publicar.
+## 3 Archivos que hacen reproducible el montaje
 
-## 3 Configuración incluida en el código
+| Archivo | Responsabilidad |
+|---|---|
+| Dockerfile | Python, dependencias, usuario no root y Gunicorn |
+| deploy/nexostack/compose.yaml | Web, tarea de migración, base, redes, volumen y límites |
+| bootstrap.sh | Secretos aleatorios y certificado de base |
+| init-database.sh | Usuario runtime sin privilegios de administración |
+| deploy.sh | Bloqueo, build, backup previo, migración, seed y activación |
+| backup.sh | Dump privado, huella SHA-256 y retención limitada |
+| ops.sh y ssh-gateway.sh | Cinco operaciones exactas para gestores |
+| vitalilab.sudoers | Privilegios únicamente para el control de VitaliLab |
+| 99-vitalilab-operators.conf | Dos operadores agregados a la lista SSH existente |
+| vitalilab-backup.timer | Backup diario del proyecto |
+| vitalilab-check.timer | Comprobación periódica de readiness |
 
-`pyproject.toml` selecciona `wsgi:app` como entrada Vercel. El build definido en `vercel.json` ejecuta `python scripts/build_vercel.py`, que copia los archivos de `app/static` a `public/static`. Las plantillas siguen usando `/static/css/app.css`, `/static/js/app.js` y `/static/img/brand-mark.svg`.
+El `compose.yaml` de la raíz corresponde a desarrollo local y no se publica con sus secretos de ejemplo. Las contraseñas reales del VPS se generan fuera de Git.
 
-El bundle excluye documentación, pruebas, migraciones y activos públicos. Las migraciones se ejecutan desde una terminal o job administrado antes de usar la copia. No se hacen dentro de una solicitud de usuario.
+## 4 Secuencia del administrador
 
-Al detectar `VERCEL=1`, Flask ubica `instance` en la carpeta temporal del runtime. Esa adaptación resuelve la escritura de ejecución en un bundle de solo lectura; no convierte archivos temporales en almacenamiento permanente.
+1. Empaquetar el commit verificado con `git archive`, cargar el archivo por SSH y comparar SHA-256.
+2. Extraer solamente en `/opt/labs/vitalilab/releases/<SHA completo>`.
+3. Ejecutar `bootstrap.sh` para preparar configuración privada; no imprimirla.
+4. Ejecutar `deploy.sh <SHA completo>` como administrador confiable.
+5. Esperar base saludable, migraciones, seed, ausencia de deriva y web saludable.
+6. Crear las cuentas individuales autorizadas con claves distintas, sin enviar secretos al chat.
+7. Instalar únicamente los operadores, controles y timers de VitaliLab; validar sudoers y SSH antes de recargar.
+8. Probar la URL, los permisos y la persistencia.
+9. Crear un dump, restaurarlo en una base temporal, comparar tablas y Alembic y eliminar solo la base temporal.
+10. Comparar el estado de todos los servicios previos y registrar el resultado.
 
-Las pruebas de despliegue verifican carpeta temporal y preservación de las direcciones estáticas. La validación del esquema oficial de `vercel.json` también pasó localmente. Todavía se requiere una construcción real con Vercel y una URL funcional.
+No usar limpieza global de Docker, reinicio del VPS o del proxy, eliminación de volúmenes, migraciones sobre Supabase ajena o comandos `down` sobre otros proyectos. No se instala acceso a Docker ni una terminal de root para los gestores.
 
-## 4 Secuencia por CLI
+## 5 Seguridad de conexión y datos
 
-Desde la raíz del proyecto y con Node.js disponible:
+Solo la web comparte la red del proxy. PostgreSQL permanece en una red interna sin puertos publicados. La web conecta por TLS con verificación del certificado y nombre del servidor. Se comprobó TLS 1.3 y el rol `vitalilab_app` sin superusuario, CREATEDB, CREATEROLE ni CREATE de esquema.
 
-```powershell
-npx vercel login
-npx vercel link
-```
+Las migraciones usan otro rol en esta misma PostgreSQL independiente. La base persistente no está en la imagen web. En PostgreSQL 18 se monta el volumen en `/var/lib/postgresql`, de acuerdo con su estructura versionada.
 
-Seleccione la cuenta correcta y el proyecto nuevo de práctica. Si aparece otro proyecto, corrija la selección antes de continuar. Configure en Preview `APP_ENV=staging`, `APP_VERSION`, `SECRET_KEY`, `DATABASE_URL`, `SESSION_COOKIE_SECURE=true` y `SESSION_COOKIE_SAMESITE=Lax`.
+La web utiliza una identidad no root, archivos de solo lectura, temporales limitados, capacidades eliminadas y límites de memoria/CPU. Los logs de acceso no incluyen direcciones de recuperación ni cabeceras o contraseñas.
 
-La conexión PostgreSQL debe ser del ambiente de práctica y seguir los parámetros TLS del proveedor. La base Render cerrada no admite esta conexión externa mediante su host interno. No se debe cambiar esa protección a acceso universal como atajo.
-
-Desde una terminal autorizada, con esas variables privadas cargadas, ejecute:
-
-```powershell
-.\.venv\Scripts\python.exe -m flask --app wsgi:app db upgrade
-.\.venv\Scripts\python.exe -m flask --app wsgi:app seed-habits
-.\.venv\Scripts\python.exe -m flask --app wsgi:app db check
-npx vercel deploy
-```
-
-No añada `--prod` para este primer Preview. Guarde la URL y el commit. La configuración local de enlace `.vercel` está ignorada por Git.
-
-## 5 Secuencia por el panel
-
-Elija crear proyecto e importar el repositorio privado autorizado. Revise qué rama contiene esta edición y el framework Flask. El build está en el archivo de configuración. Cargue las variables del ambiente correspondiente y prepare la base.
-
-La importación inicial puede publicar el ambiente llamado Production del proyecto de demostración. No es el servicio Render histórico, pero debe quedar nombrado y documentado como copia académica. Después mantenga Previews para revisiones y no asigne el dominio real a esta copia antes de aprobar la transición.
-
-## 6 Lista de aceptación de la URL
+## 6 Lista de aceptación
 
 | Prueba | Evidencia esperada |
 |---|---|
-| Inicio y recursos públicos | HTTPS y CSS JS SVG cargados |
-| Health | 200 y versión del commit |
-| Readiness | 200 y PostgreSQL disponible |
-| Registro y sesión | Cuenta ficticia accede al panel |
-| Persistencia | Login posterior conserva datos |
-| Hábito repetido | Un evento diario y puntos sin duplicación |
-| Perfil | Validación cruzada y datos de usuario propio |
-| Administración | Usuario normal 403 y admin permitido |
-| Comunicado | Borrador privado y publicación visible |
-| Móvil y teclado | Menú usable y formularios legibles |
-| Recuperación | Correo real solo si servicio configurado y comprobado |
-| Logs | Sin errores recurrentes ni secretos |
+| Entrada pública | HTTPS válido, HTTP redirige y assets locales cargan |
+| Proceso y datos | /health con commit y /ready con 200 |
+| Registro | Usuario ficticio creado con CSRF activo |
+| Persistencia | Login posterior conserva progreso tras reinicio propio |
+| Hábito repetido | Un cumplimiento, sin sumar otra vez |
+| Perfil | Validación cruzada y datos del usuario conectado |
+| Administración | Usuario normal 403 y cada administrador autorizado 200 |
+| Comunicado | Borrador privado, publicación visible y archivo correcto |
+| Móvil y teclado | Navegación y formularios utilizables |
+| Gestión SSH | Cinco operaciones permitidas, otras órdenes y forwarding rechazados |
+| Base | TLS y permisos runtime mínimos comprobados |
+| Recuperación | Dump restaurado aparte, conteos/revisión iguales y sin deriva |
+| Convivencia | Servicios previos conservan IDs, imágenes, inicio y reinicios |
 
-Si Preview exige acceso, confirme cómo ingresarán los estudiantes según el plan y la protección disponible. Un enlace protegido no es automáticamente una URL abierta para todo el grupo.
+La aceptación se completa con la evidencia de [operación y accesos](18_NEXOSTACK_OPERACION_Y_ACCESOS.md). No memorizar una nota técnica: explicar el resultado, sus límites y cómo repetirlo.
 
-## 7 Límites que no deben ocultarse
+## 7 Lo que todavía requiere una decisión productiva
 
-El rate limiting actual utiliza memoria del proceso. Vercel puede ejecutar varias instancias y esa memoria no es un contador global. Antes de usuarios reales debe implementarse y verificarse almacenamiento compartido compatible o protección central.
+El laboratorio usa un worker con rate limiting en memoria. SMTP real, alertas personales, retención offsite automatizada, accesibilidad formal y privacidad institucional requieren validación adicional. No declarar 100/100 ni producción aprobada a partir de un conjunto de pruebas.
 
-SMTP requiere servicio real y compatibilidad del alojamiento. Render Free bloquea puertos SMTP usuales; no basta completar `MAIL_*`. Cambiar el transporte a una API de correo sería otra implementación.
+Un grupo que comparte una IP puede alcanzar los límites de registro/acceso de la aplicación. Organice las primeras prácticas en local; una prueba simultánea de toda la clase requiere dimensionar y revisar su política de límites, no deshabilitar controles sin evaluar el riesgo.
 
-La aplicación exige PostgreSQL en staging y production. No se usa SQLite del bundle ni `/tmp` para conservar registros compartidos. Un backup probado en CI no equivale a retención y recuperación operativas del proveedor.
+Cada usuario recibe instrucciones y una llave propias en archivos privados separados del paquete académico. Debe retirarse su llave y revocarse su cuenta cuando deje de gestionar el proyecto. La recuperación por correo no está conectada a un proveedor real en esta entrega.
 
-## 8 Registro de publicación
+## 8 Alternativas conservadas
 
-Al terminar, complete fecha, propietario, proyecto, ambiente, URL, commit, versión Alembic, proveedor de datos, resultados de la lista anterior y limitaciones. Registre nombres de variables, nunca sus valores privados.
+`render.yaml` sigue describiendo una alternativa Render Staging. La base temporal creada allí no es la de NexoStack y no se expone al exterior. `vercel.json` y su preparación de estáticos siguen como adaptación opcional; no se publica en Vercel en esta entrega.
 
-Si falta cuenta, permiso o base, el estado es preparado para publicación y la práctica continúa en local. No se sustituye esa evidencia con una captura del sitio histórico.
+La elección actual aprovecha el VPS ya disponible. Un cambio futuro de proveedor requiere autorización, comprobación de sus condiciones vigentes y una nueva validación de la URL.
 
-## 9 Fuentes oficiales
+## 9 Referencias
 
-- [Flask en Vercel](https://vercel.com/docs/frameworks/backend/flask)
-- [Runtime Python](https://vercel.com/docs/functions/runtimes/python)
-- [Ambientes Vercel](https://vercel.com/docs/deployments/environments)
-- [Flask en Render](https://render.com/docs/deploy-flask)
-- [Conexión Git a Render](https://render.com/docs/git-provider)
-- [Restricciones Render Free](https://render.com/docs/free)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [Imagen oficial PostgreSQL y volumen de la versión 18](https://hub.docker.com/_/postgres)
+- [Traefik y proveedor Docker](https://doc.traefik.io/traefik/reference/install-configuration/providers/docker/)
+- [OpenSSH y AllowUsers](https://man.openbsd.org/sshd_config)
+- [Roles y permisos de Coolify](https://coolify.io/docs/core/team/roles-and-permissions)
+- [Límites Render Free](https://render.com/docs/free)

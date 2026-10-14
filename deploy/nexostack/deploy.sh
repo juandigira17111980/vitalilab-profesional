@@ -17,8 +17,10 @@ nice -n 15 ionice -c 2 -n 7 "${dc[@]}" build web
 if [[ -L $base/current ]]; then
   "$base/current/deploy/nexostack/backup.sh"
 fi
-"${dc[@]}" run --rm migrate
+"${dc[@]}" run --no-deps --rm migrate
 "${dc[@]}" exec -T db psql -U vitalilab_owner -d vitalilab_staging -v ON_ERROR_STOP=1 <<'SQL'
+REVOKE ALL ON DATABASE vitalilab_staging FROM PUBLIC;
+GRANT CONNECT ON DATABASE vitalilab_staging TO vitalilab_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON users, user_profiles, health_measurements,
   habits, habit_entries, announcements, audit_events TO vitalilab_app;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO vitalilab_app;

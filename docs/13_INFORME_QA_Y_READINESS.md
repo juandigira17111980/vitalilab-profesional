@@ -5,7 +5,7 @@ Versión: candidata `v0.1.0`, rama `staging`, integración `2120e31`
 Decisión preliminar: **GO para PR/CI y Staging; NO-GO para Production**  
 Preparación actual: **90/100 — Apto con observaciones**
 
-Esta cifra corresponde a la rúbrica interna del corte original; no es una nota académica ni una certificación de seguridad. La edición formativa del 13 de octubre agrega 26 pruebas y 90,43 % local, preparación Vercel y guías para estudiantes. Una nueva publicación debe cerrar acceso, PostgreSQL del proveedor, controles compartidos, recorrido remoto y recuperación antes de valorar su preparación operativa.
+Esta cifra corresponde a la rúbrica interna del corte original; no es una nota académica ni una certificación de seguridad. La edición del 13 de octubre registra 28 pruebas y 90,67 % local y una copia NexoStack con PostgreSQL, accesos y restore aislado comprobados. Su evidencia está en [operación del laboratorio](18_NEXOSTACK_OPERACION_Y_ACCESOS.md). El score histórico no se actualiza automáticamente por publicar la web; SMTP real, retención offsite automatizada, alertas personales, accesibilidad formal y privacidad institucional siguen pendientes para producción.
 
 Escala: 0–40 No apto · 41–60 Riesgo alto · 61–75 Requiere correcciones · 76–90 Apto con observaciones · 91–100 Apto para producción.
 

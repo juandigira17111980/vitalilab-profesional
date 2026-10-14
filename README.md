@@ -10,12 +10,12 @@ VitaliLab es una aplicación web educativa para registrar hábitos saludables, c
 | Modelo de datos | 7 tablas, 2 migraciones Alembic, integridad e índices |
 | Seguridad | Hash scrypt, CSRF, autorización, bloqueo temporal, rate limits y cabeceras |
 | Frontend | Responsive, navegación móvil, formularios accesibles y estados controlados |
-| Calidad | 26 pruebas y 90,43 % local en la edición formativa; CI histórico/PostgreSQL/Docker aprobados |
+| Calidad | 28 pruebas y 90,67 % local; CI PostgreSQL, seguridad y Docker aprobado |
 | Base de datos | Migración, deriva, backup y restauración aislada aprobados en PostgreSQL 18 CI |
-| Staging | Configuración declarativa lista; despliegue remoto pendiente de ejecutar/aprobar |
+| Staging | Copia académica en NexoStack; evidencia en docs/18 |
 | Production | Congelada; no se ha modificado |
 
-La calificación final no se declara como 100/100 hasta validar Render Staging, SMTP, accesibilidad y las decisiones institucionales de privacidad. Consulte [Informe QA y readiness](docs/13_INFORME_QA_Y_READINESS.md).
+La copia es un laboratorio, no un reemplazo productivo de Render. SMTP real, accesibilidad formal, alertas personales, operación offsite y privacidad institucional siguen requiriendo validación. No se declara una calificación 100/100 por publicar contenedores. Consulte [Informe QA y readiness](docs/13_INFORME_QA_Y_READINESS.md) y [evidencia NexoStack](docs/18_NEXOSTACK_OPERACION_Y_ACCESOS.md).
 
 ## Funciones
 
@@ -68,11 +68,13 @@ Estas variables deben establecerse en la misma terminal del arranque. `.env.exam
 
 Si estás empezando, lee primero [VitaliLab explicado desde cero](docs/15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md). Incluye fundamentos, montaje Windows, las razones del modelo de datos, recorridos del código, ocho laboratorios y preguntas de sustentación. Después consulta los capítulos técnicos por área.
 
-## Copia de práctica en Vercel
+## Copia de práctica en NexoStack
 
-`pyproject.toml` declara `wsgi:app`; `vercel.json` prepara `public/static` mediante `scripts/build_vercel.py`. La fábrica utiliza almacenamiento temporal cuando `VERCEL=1`. Las tablas se migran de forma controlada, fuera de las peticiones, sobre una PostgreSQL externa con TLS.
+[Abrir VitaliLab de práctica](https://vitalilab.lab.nexostack.app). Usa web no root, PostgreSQL 18 propia con TLS, volumen persistente y recursos limitados. El montaje está en `deploy/nexostack`, separado de Mercanta, Murano, Krono 57 y el Render histórico.
 
-La publicación necesita una cuenta Vercel autenticada, conexión Git o CLI y variables Preview privadas. La base Render existente tiene acceso externo cerrado y no se conecta a Vercel mediante su URL interna. Consulta [la guía de publicación](docs/16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md). Este estado significa configuración preparada; todavía no una URL remota aprobada.
+Juan y Emanuel tienen cuentas individuales de aplicación y llaves distintas para cinco operaciones de gestión: estado, salud, reinicio de esta web, backup y eventos. No se entrega acceso administrativo general al VPS o a Coolify. Consulta [publicación](docs/16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md) y [operación y accesos](docs/18_NEXOSTACK_OPERACION_Y_ACCESOS.md). Los secretos no se incluyen en el repositorio ni en el material para estudiantes.
+
+La adaptación `vercel.json` se conserva como opción, no como proveedor activo. `render.yaml` sigue describiendo una alternativa de prueba; no se modifica la producción actual.
 
 ## Inicio local con Docker
 
@@ -106,7 +108,7 @@ El CI repite estas comprobaciones, ejecuta análisis estático de seguridad, mig
 ## Ambientes y ramas
 
 ```text
-feature/fix/docs -> PR -> staging -> Render Staging -> aprobación -> main -> Production
+feature/fix/docs -> PR -> staging -> NexoStack laboratorio -> aprobación -> main -> Production
 ```
 
 - `staging`: integración y demostración con datos ficticios.
