@@ -1,7 +1,8 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
 from app.extensions import db
 from app.models import Habit, HabitEntry
+from app.services.clock import local_day
 from app.services.progress import calculate_bmi, complete_habit, level_for, progress_for
 
 
@@ -26,7 +27,7 @@ def test_habit_completion_is_idempotent(user_factory):
 def test_streak_counts_consecutive_days(user_factory):
     user = user_factory()
     habit = db.session.scalar(db.select(Habit).order_by(Habit.id))
-    today = date.today()
+    today = local_day(user)
     for offset in (0, 1, 2):
         db.session.add(
             HabitEntry(

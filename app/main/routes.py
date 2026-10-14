@@ -6,7 +6,9 @@ from sqlalchemy import text
 
 from app.extensions import db
 from app.models import Announcement, Habit, HabitEntry
+from app.services.clock import local_day
 from app.services.progress import progress_for
+from app.services.wellness import goals_for
 
 bp = Blueprint("main", __name__)
 
@@ -110,7 +112,7 @@ def dashboard():
         db.session.scalars(
             db.select(HabitEntry.habit_id).where(
                 HabitEntry.user_id == current_user.id,
-                HabitEntry.completed_on == date.today(),
+                HabitEntry.completed_on == local_day(current_user),
             )
         )
     )
@@ -126,6 +128,7 @@ def dashboard():
         habits=habits,
         completed_ids=completed_ids,
         announcement=announcement,
+        goals=goals_for(current_user),
     )
 
 

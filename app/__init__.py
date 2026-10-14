@@ -75,12 +75,14 @@ def _register_blueprints(app: Flask) -> None:
     from app.habits.routes import bp as habits_bp
     from app.main.routes import bp as main_bp
     from app.profile.routes import bp as profile_bp
+    from app.wellness.routes import bp as wellness_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(habits_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(wellness_bp)
 
 
 def _register_errors(app: Flask) -> None:
@@ -115,6 +117,17 @@ def _register_security_headers(app: Flask) -> None:
             response.headers.setdefault(
                 "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
             )
-        if request.path.startswith(("/panel", "/perfil", "/habitos", "/admin")):
+        if request.path.startswith(
+            (
+                "/panel",
+                "/perfil",
+                "/habitos",
+                "/admin",
+                "/metas",
+                "/bitacora",
+                "/progreso",
+                "/acceso",
+            )
+        ):
             response.headers.setdefault("Cache-Control", "no-store")
         return response

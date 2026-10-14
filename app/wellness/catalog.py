@@ -1,0 +1,88 @@
+"""Reviewed educational routines; not clinical prescriptions or treatment plans."""
+
+ROUTINES = (
+    {
+        "slug": "pausa-consciente",
+        "name": "Un minuto para volver a ti",
+        "category": "Calma",
+        "seconds": 60,
+        "icon": "calm",
+        "habit_code": "mindful-minute",
+        "description": "Suelta la pantalla y observa tu respiración, sin forzarla.",
+        "steps": (
+            "Busca una posición cómoda y mira un punto tranquilo.",
+            "Observa cómo entra y sale el aire a tu ritmo natural.",
+            "Al terminar, elige una sola acción para continuar tu día.",
+        ),
+    },
+    {
+        "slug": "pausa-activa",
+        "name": "Cambia de postura",
+        "category": "Movimiento",
+        "seconds": 180,
+        "icon": "move",
+        "habit_code": "active-break",
+        "description": "Una pausa para moverte suavemente después de estar sentado.",
+        "steps": (
+            "Despeja el espacio y acomódate según tus posibilidades.",
+            "Cambia de postura y mueve hombros y manos suavemente, sin dolor.",
+            "Si te resulta cómodo, da unos pasos; también puedes realizar la pausa sentado.",
+        ),
+    },
+    {
+        "slug": "ritual-de-descanso",
+        "name": "Cierra el día con calma",
+        "category": "Descanso",
+        "seconds": 120,
+        "icon": "moon",
+        "habit_code": "sleep",
+        "description": "Deja listo un pequeño ritual para tu próxima hora de descanso.",
+        "steps": (
+            "Elige una hora realista para empezar a desconectarte.",
+            "Reduce las distracciones y deja preparado lo que necesitarás mañana.",
+            "Identifica una actividad tranquila que te ayude a cerrar el día.",
+        ),
+    },
+    {
+        "slug": "foco-en-una-cosa",
+        "name": "Una cosa a la vez",
+        "category": "Enfoque",
+        "seconds": 300,
+        "icon": "focus",
+        "habit_code": "daily-intention",
+        "description": "Dedica cinco minutos a comenzar una tarea concreta.",
+        "steps": (
+            "Elige una tarea pequeña que puedas empezar ahora.",
+            "Silencia distracciones opcionales y prepara solo lo necesario.",
+            "Trabaja hasta que termine el reloj; después decide si continuar o pausar.",
+        ),
+    },
+    {
+        "slug": "pausa-de-pantallas",
+        "name": "Mira más allá de la pantalla",
+        "category": "Enfoque",
+        "seconds": 90,
+        "icon": "sun",
+        "habit_code": "screen-break",
+        "description": "Interrumpe el desplazamiento automático y cambia de actividad.",
+        "steps": (
+            "Deja el dispositivo en una posición segura.",
+            "Mira tu entorno o conversa brevemente sin otra pantalla.",
+            "Decide con intención para qué quieres volver al dispositivo.",
+        ),
+    },
+    {
+        "slug": "momento-de-hidratacion",
+        "name": "Una pausa para hidratarte",
+        "category": "Calma",
+        "seconds": 60,
+        "icon": "water",
+        "habit_code": "hydration",
+        "description": "Prepara una pausa de agua acorde con tus necesidades personales.",
+        "steps": (
+            "Ten agua disponible si forma parte de tus indicaciones personales.",
+            "Haz una pausa breve y bebe con tranquilidad si lo necesitas.",
+            "Relaciona esa pausa con un momento habitual de tu día para recordarla.",
+        ),
+    },
+)

@@ -1,11 +1,10 @@
-from datetime import date
-
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.extensions import db, limiter
 from app.forms import HabitCompletionForm
 from app.models import Habit, HabitEntry
+from app.services.clock import local_day
 from app.services.progress import complete_habit, progress_for
 
 bp = Blueprint("habits", __name__, url_prefix="/habitos")
@@ -23,7 +22,7 @@ def index():
         db.session.scalars(
             db.select(HabitEntry.habit_id).where(
                 HabitEntry.user_id == current_user.id,
-                HabitEntry.completed_on == date.today(),
+                HabitEntry.completed_on == local_day(current_user),
             )
         )
     )
@@ -50,4 +49,6 @@ def complete(habit_id: int):
         flash(f"¡Bien! Sumaste {habit.points} puntos con {habit.name}.", "success")
     else:
         flash("Este hábito ya estaba registrado hoy. Tus puntos no se duplicaron.", "info")
-    return redirect(url_for("habits.index"))
+    return redirect(
+        url_for("main.dashboard" if request.form.get("return_to") == "panel" else "habits.index")
+    )

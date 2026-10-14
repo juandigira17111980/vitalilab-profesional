@@ -7,6 +7,7 @@ from wtforms import (
     DecimalField,
     EmailField,
     PasswordField,
+    SelectField,
     StringField,
     SubmitField,
     TextAreaField,
@@ -125,3 +126,47 @@ class AnnouncementForm(FlaskForm):
 
 class EmptyForm(FlaskForm):
     submit = SubmitField("Confirmar")
+
+
+class GoalForm(FlaskForm):
+    habit_id = SelectField(
+        "¿Qué hábito quieres priorizar?", coerce=int, validators=[InputRequired()]
+    )
+    target_days = SelectField(
+        "Tu meta en siete días",
+        coerce=int,
+        choices=[
+            (number, f"{number} {'día' if number == 1 else 'días'}") for number in range(1, 8)
+        ],
+        validators=[InputRequired(), NumberRange(min=1, max=7)],
+        default=3,
+    )
+    submit = SubmitField("Guardar mi meta")
+
+
+class CheckInForm(FlaskForm):
+    energy = SelectField(
+        "¿Cómo sientes tu energía hoy?",
+        coerce=int,
+        choices=[
+            (1, "1 · Muy baja"),
+            (2, "2 · Baja"),
+            (3, "3 · Media"),
+            (4, "4 · Alta"),
+            (5, "5 · Muy alta"),
+        ],
+        validators=[InputRequired(), NumberRange(min=1, max=5)],
+    )
+    focus = SelectField(
+        "¿Cómo sientes tu capacidad de enfocarte?",
+        coerce=int,
+        choices=[
+            (1, "1 · Muy baja"),
+            (2, "2 · Baja"),
+            (3, "3 · Media"),
+            (4, "4 · Alta"),
+            (5, "5 · Muy alta"),
+        ],
+        validators=[InputRequired(), NumberRange(min=1, max=5)],
+    )
+    submit = SubmitField("Guardar mi registro")

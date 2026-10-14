@@ -1,78 +1,56 @@
-{% extends "base.html" %}
-{% block title %}VitaliLab · Tu bienestar empieza hoy{% endblock %}
+{% extends 'base.html' %}{% from 'macros/icons.html' import icon %}
+{% block title %}VitaliLab · Un plan que sí cabe en tu día{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="shell hero-grid">
+<section class="product-hero">
+  <div class="shell product-hero__grid">
     <div class="hero-copy">
-      <p class="eyebrow">Bienestar que sí cabe en tu día</p>
-      <h1>Convierte pequeñas acciones en una rutina que perdura.</h1>
-      <p class="hero-lead">VitaliLab te ayuda a registrar hábitos cotidianos, entender tu progreso y avanzar a tu ritmo, sin juicios ni metas imposibles.</p>
+      <p class="product-kicker"><span></span> Tu espacio de bienestar cotidiano</p>
+      <h1>Tu bienestar,<br>con un plan que <em>sí cabe en tu día.</em></h1>
+      <p class="hero-lead">Menos propósitos que se quedan en el aire. Elige tus hábitos, crea una meta posible y encuentra pequeñas rutinas para darle continuidad.</p>
       <div class="button-row">
-        {% if current_user.is_authenticated %}
-          <a class="button button--primary" href="{{ url_for('main.dashboard') }}">Ver mi progreso <span aria-hidden="true">→</span></a>
-        {% else %}
-          <a class="button button--primary" href="{{ url_for('auth.register') }}">Empezar gratis <span aria-hidden="true">→</span></a>
-          <a class="button button--ghost" href="{{ url_for('auth.login') }}">Ya tengo cuenta</a>
-        {% endif %}
+        <a class="button button--primary" href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('auth.register') }}">{{ 'Ir a mi día' if current_user.is_authenticated else 'Crear mi plan' }} {{ icon('arrow') }}</a>
+        <a class="button button--ghost" href="{{ url_for('wellness.library') }}">Probar una rutina</a>
       </div>
-      <ul class="trust-list" aria-label="Beneficios">
-        <li>Datos protegidos</li><li>Progreso diario</li><li>Experiencia sin anuncios</li>
-      </ul>
+      <p class="hero-footnote">A tu ritmo. Sin anuncios. Una acción a la vez.</p>
+      <div class="hero-categories"><span>{{ icon('move') }} Movimiento</span><span>{{ icon('moon') }} Descanso</span><span>{{ icon('calm') }} Calma</span><span>{{ icon('focus') }} Enfoque</span></div>
     </div>
-    <div class="hero-visual" aria-label="Vista conceptual del progreso de hábitos">
-      <div class="orbit orbit--one"></div><div class="orbit orbit--two"></div>
-      <div class="wellness-card">
-        <div class="wellness-card__top"><span>Tu día</span><span class="pill pill--success">En marcha</span></div>
-        <strong>3 de 4</strong><p>hábitos completados</p>
-        <div class="ring" aria-hidden="true"><span>75%</span></div>
-        <div class="mini-habits"><span>💧 Hidratación</span><span>↗ Pausa activa</span><span>☾ Descanso</span></div>
+    <div class="product-preview" aria-label="Ejemplo ilustrativo del panel, no son tus datos">
+      <div class="preview-heading"><div><span class="preview-eyebrow">UN DÍA CON INTENCIÓN</span><h2>Pequeños pasos.<br>Un espacio para ti.</h2></div>{{ icon('sun', 'preview-sun') }}</div>
+      <div class="preview-bento">
+        <div class="preview-progress"><span class="preview-label">Acciones de hoy</span><div class="ring" aria-hidden="true"><span>38%</span></div><p><strong>3</strong> de 8 hábitos</p></div>
+        <div class="preview-goal"><span class="preview-icon">{{ icon('focus') }}</span><span class="preview-label">Mi meta semanal</span><strong>3 días</strong><p>de pausa consciente</p><div class="preview-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="preview-small">2 días registrados</span></div>
+        <div class="preview-task"><span class="preview-icon preview-icon--lime">{{ icon('water') }}</span><div><strong>Una pausa de agua</strong><span>Un momento para cuidarte</span></div><span class="preview-done">{{ icon('check') }}</span></div>
+        <div class="preview-next"><span>{{ icon('calm') }} Tu próxima pausa</span><strong>Un minuto para volver a ti</strong><a href="{{ url_for('wellness.routine', slug='pausa-consciente') }}">Probar ahora {{ icon('arrow') }}</a></div>
       </div>
-      <div class="floating-note floating-note--streak"><b>7 días</b><span>de constancia</span></div>
-      <div class="floating-note floating-note--calm"><b>+15 XP</b><span>cada paso cuenta</span></div>
+      <p class="preview-disclaimer">Vista de ejemplo · tu progreso empieza con tu primer registro</p>
     </div>
   </div>
 </section>
 
-<section class="section shell" aria-labelledby="como-funciona">
-  <div class="section-heading">
-    <p class="eyebrow">Un método simple</p>
-    <h2 id="como-funciona">Tu bienestar en tres movimientos</h2>
-    <p>No necesitas cambiar todo de una vez. Necesitas una señal clara, una acción posible y una forma amable de ver el avance.</p>
-  </div>
-  <div class="feature-grid">
-    <article class="feature-card"><span class="feature-number">01</span><div class="feature-icon">◎</div><h3>Elige</h3><p>Encuentra acciones pequeñas que encajan con tu rutina real.</p></article>
-    <article class="feature-card feature-card--accent"><span class="feature-number">02</span><div class="feature-icon">✓</div><h3>Registra</h3><p>Marca cada logro una sola vez al día y suma progreso verificable.</p></article>
-    <article class="feature-card"><span class="feature-number">03</span><div class="feature-icon">↗</div><h3>Comprende</h3><p>Observa puntos, constancia e indicadores con explicaciones sencillas.</p></article>
+<section class="product-strip"><div class="shell"><p>Un solo espacio.<br><strong>Más formas de cuidar tu rutina.</strong></p><span>8 hábitos diarios</span><span>Metas a tu medida</span><span>6 rutinas guiadas</span><span>28 días de perspectiva</span></div></section>
+
+<section class="section shell" id="herramientas" aria-labelledby="tools-title">
+  <div class="section-heading section-heading--left"><p class="eyebrow">Del propósito a la práctica</p><h2 id="tools-title">No necesitas más presión.<br>Necesitas un siguiente paso.</h2><p>Herramientas sencillas que trabajan juntas, para ayudarte a empezar y a volver cuando lo necesites.</p></div>
+  <div class="capability-grid">
+    {% for symbol, title, description, endpoint in [
+      ('check','Tu plan de hoy','Ocho acciones de movimiento, descanso, nutrición y enfoque. Registra las que encajan contigo.','habits.index'),
+      ('focus','Metas que puedes ajustar','Prioriza un hábito y elige cuántos días quieres practicarlo. Tu avance se calcula con tus registros.','wellness.goals'),
+      ('calm','Pausas que puedes probar','Seis rutinas breves con instrucciones y un temporizador que puedes pausar. No necesitas cuenta para probar.','wellness.library'),
+      ('journal','Una bitácora para escucharte','Registra cómo percibes tu energía y enfoque. Puedes actualizar el día sin duplicar información.','wellness.checkin'),
+      ('chart','Perspectiva de tu progreso','Consulta tu actividad de 28 días, la constancia y tus metas. Reconoce lo que sí pudiste hacer.','wellness.progress'),
+      ('grid','Un espacio que va contigo','Tu perfil, tus acciones y tu historial en una experiencia pensada para móvil y escritorio.','main.dashboard') ] %}
+    <article class="capability-card"><div class="capability-icon">{{ icon(symbol) }}</div><h3>{{ title }}</h3><p>{{ description }}</p><a class="text-link" href="{{ url_for(endpoint) }}">Explorar {{ icon('arrow') }}<span class="sr-only">{{ title }}</span></a></article>
+    {% endfor %}
   </div>
 </section>
 
-<section class="section section--tinted">
-  <div class="shell split-grid">
-    <div>
-      <p class="eyebrow">Herramienta educativa</p>
-      <h2>Calcula un IMC orientativo</h2>
-      <p>Úsalo como punto de conversación, no como diagnóstico. La salud no se resume en un número.</p>
-      <a class="text-link" href="{{ url_for('main.content', slug='imc') }}">Entender mejor el indicador →</a>
-    </div>
-    <form class="calculator-card" data-bmi-form>
-      <div class="field-row">
-        <div class="field"><label for="bmi-weight">Peso en kg</label><input id="bmi-weight" name="weight" type="number" min="20" max="500" step="0.1" required placeholder="Ej. 62"></div>
-        <div class="field"><label for="bmi-height">Altura en cm</label><input id="bmi-height" name="height" type="number" min="80" max="250" step="0.1" required placeholder="Ej. 168"></div>
-      </div>
-      <button class="button button--dark button--full" type="submit">Calcular indicador</button>
-      <div class="calculator-result" aria-live="polite" data-bmi-result>Ingresa tus datos para ver una referencia.</div>
-    </form>
-  </div>
+<section class="section section--tinted" id="como-funciona">
+  <div class="shell method-grid"><div><p class="eyebrow">Simple desde el primer día</p><h2>Empieza pequeño.<br>Encuentra tu ritmo.</h2><p>No tienes que completar todo el catálogo. Elige lo que tenga sentido para ti, con espacio para cambiar de plan.</p><a class="button button--primary" href="{{ url_for('wellness.library') }}">Encontrar mi primera rutina {{ icon('arrow') }}</a></div><ol class="method-steps"><li><span>01</span><div><h3>Elige una acción posible</h3><p>Empieza con un hábito o prueba una rutina sin registrarte.</p></div></li><li><span>02</span><div><h3>Dale un lugar en tu semana</h3><p>Crea una cuenta y define una meta que puedas ajustar.</p></div></li><li><span>03</span><div><h3>Registra, observa y vuelve</h3><p>Tu panel conecta lo que haces con el avance de tus metas.</p></div></li></ol></div>
 </section>
 
-{% if announcements %}
-<section class="section shell" aria-labelledby="novedades">
-  <div class="section-heading section-heading--left"><p class="eyebrow">Comunidad</p><h2 id="novedades">Novedades de VitaliLab</h2></div>
-  <div class="announcement-grid">
-    {% for announcement in announcements %}<article class="announcement-card"><span>Comunicado</span><h3>{{ announcement.title }}</h3><p>{{ announcement.body }}</p></article>{% endfor %}
-  </div>
-</section>
-{% endif %}
+{% if announcements %}<section class="section shell"><div class="section-heading section-heading--left"><p class="eyebrow">Novedades</p><h2>Lo que está pasando en VitaliLab</h2></div><div class="announcement-grid">{% for announcement in announcements %}<article class="announcement-card"><span>Comunicado</span><h3>{{ announcement.title }}</h3><p>{{ announcement.body }}</p></article>{% endfor %}</div></section>{% endif %}
 
-<section class="section shell"><div class="cta-panel"><div><p class="eyebrow eyebrow--light">Empieza con una acción</p><h2>Tu próxima racha comienza hoy.</h2><p>Crea una cuenta y registra tu primer hábito en menos de dos minutos.</p></div><a class="button button--light" href="{{ url_for('auth.register') if not current_user.is_authenticated else url_for('habits.index') }}">{{ 'Crear mi cuenta' if not current_user.is_authenticated else 'Ir a mis hábitos' }} →</a></div></section>
+<section class="section shell faq-section" aria-labelledby="faq-title"><div><p class="eyebrow">Antes de empezar</p><h2 id="faq-title">Claro desde el principio.</h2></div><div class="faq-list"><details><summary>¿Tengo que hacer todos los hábitos?</summary><p>No. Son opciones para elegir, no una lista de obligaciones. Tus metas pueden empezar con un solo hábito.</p></details><details><summary>¿Puedo probarlo sin crear una cuenta?</summary><p>Sí. La biblioteca y los temporizadores son públicos. Una cuenta permite conservar hábitos, metas y bitácora.</p></details><details><summary>¿Es un tratamiento o una consulta médica?</summary><p>No. Es una herramienta educativa para organizar hábitos cotidianos. Las rutinas se adaptan a tus posibilidades y no sustituyen atención profesional.</p></details><details><summary>¿Ya puedo contratarlo para una institución?</summary><p>Esta edición es un laboratorio académico. La modalidad institucional, pagos y administración de organizaciones forman parte de una fase futura; no están a la venta en esta versión.</p></details></div></section>
+
+<section class="section shell section--cta"><div class="cta-panel"><div><p class="eyebrow eyebrow--light">Haz espacio para ti</p><h2>Tu siguiente paso<br>puede ser pequeño.</h2><p>Empieza con una rutina. Construye el resto a tu ritmo.</p></div><a class="button button--light" href="{{ url_for('wellness.library') }}">Elegir una rutina {{ icon('arrow') }}</a></div></section>
 {% endblock %}

@@ -43,6 +43,7 @@ if (bmiForm) {
 }
 
 document.querySelectorAll("[data-bar-value]").forEach((bar) => {
-  const value = Math.min(Number(bar.dataset.barValue || 0), 4);
-  bar.style.height = `${Math.max(8, value * 23)}%`;
+  const maximum = Math.max(1, Number(bar.closest('[data-bar-max]')?.dataset.barMax || 8));
+  const value = Math.min(Number(bar.dataset.barValue || 0), maximum);
+  bar.style.height = `${value / maximum * 100}%`;
 });

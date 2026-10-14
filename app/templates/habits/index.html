@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Mis hábitos · VitaliLab{% endblock %}
 {% block content %}
-<section class="dashboard-head dashboard-head--habits"><div class="shell"><div><p class="eyebrow">Acciones de hoy</p><h1>Pequeño, claro y alcanzable</h1><p>Registra cada hábito una vez. VitaliLab protege tus puntos incluso si haces doble clic.</p></div><div class="head-score"><strong>{{ summary.completed_today }}/{{ summary.total_habits }}</strong><span>completados hoy</span></div></div></section>
-<section class="section shell"><div class="habit-grid">
+<section class="dashboard-head dashboard-head--habits"><div class="shell"><div><p class="eyebrow">Opciones, no obligaciones</p><h1>Haz espacio para una acción.</h1><p>Elige los hábitos que encajan contigo. Cada uno se registra una vez al día.</p></div><div class="head-score"><strong>{{ summary.completed_today }} / {{ summary.total_habits }}</strong><span>registrados hoy</span></div></div></section>
+<section class="section shell workspace-section"><div class="habit-grid">
 {% for habit in habits %}<article class="habit-card{% if habit.id in completed_ids %} habit-card--done{% endif %}"><div class="habit-card__top"><span class="habit-icon">{{ habit.icon }}</span><span class="pill">+{{ habit.points }} XP</span></div><p class="eyebrow">{{ habit.category }}</p><h2>{{ habit.name }}</h2><p>{{ habit.description }}</p>{% if habit.id in completed_ids %}<div class="completed-state"><span>✓</span> Completado hoy</div>{% else %}<form action="{{ url_for('habits.complete', habit_id=habit.id) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button button--primary button--full" type="submit">Marcar como cumplido</button></form>{% endif %}</article>{% endfor %}
 </div><div class="notice notice--center"><strong>¿No salió como esperabas?</strong><p>Una racha es una herramienta de motivación, no una calificación personal. Puedes retomarla mañana.</p></div></section>
 {% endblock %}

@@ -7,6 +7,7 @@ from app.extensions import db
 from app.forms import ProfileForm
 from app.models import HealthMeasurement
 from app.services.audit import record_event
+from app.services.clock import local_day
 from app.services.progress import bmi_label, calculate_bmi
 
 bp = Blueprint("profile", __name__, url_prefix="/perfil")
@@ -37,6 +38,7 @@ def edit():
                     weight_kg=weight,
                     height_cm=height,
                     bmi_snapshot=Decimal(str(bmi)),
+                    measured_on=local_day(current_user),
                 )
                 db.session.add(latest)
         record_event("profile.updated", "user_profile", current_user.id, current_user.id)

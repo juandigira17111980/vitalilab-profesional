@@ -22,7 +22,7 @@ fi
 REVOKE ALL ON DATABASE vitalilab_staging FROM PUBLIC;
 GRANT CONNECT ON DATABASE vitalilab_staging TO vitalilab_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON users, user_profiles, health_measurements,
-  habits, habit_entries, announcements, audit_events TO vitalilab_app;
+  habits, habit_entries, announcements, audit_events, user_goals, daily_checkins TO vitalilab_app;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO vitalilab_app;
 GRANT SELECT ON alembic_version TO vitalilab_app;
 SQL
