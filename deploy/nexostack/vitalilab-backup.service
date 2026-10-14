@@ -1,0 +1,11 @@
+[Unit]
+Description=Backup of the isolated VitaliLab practice database
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/labs/vitalilab/current/deploy/nexostack/backup.sh
+UMask=0077
+Nice=15
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

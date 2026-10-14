@@ -6,7 +6,7 @@ Vas a aprender cómo funciona VitaliLab siguiendo el viaje de una acción sencil
 
 Este material empieza con fundamentos y llega a decisiones de diseño y operación. La experiencia se construye con las prácticas: leer un documento no convierte a alguien en experto. Tu objetivo inicial es comprender, ejecutar y explicar el proyecto con tus propias palabras.
 
-La aplicación mejorada está en el repositorio privado `juandigira17111980/vitalilab-profesional`. La rama `staging` reúne la reconstrucción; `main` conserva la versión anterior. Los cambios de esta edición se preparan en `docs/manual-formativo-vercel` y se integran a `staging` después de pasar las pruebas. La web histórica está alojada en Render. La copia de práctica en Vercel requiere todavía acceso a esa cuenta y una PostgreSQL accesible desde Vercel. Una configuración lista no significa que ya exista una web publicada.
+La aplicación mejorada está en el repositorio privado `juandigira17111980/vitalilab-profesional`. La rama `staging` reúne la reconstrucción; `main` conserva la versión anterior. La copia académica se publica en `https://vitalilab.lab.nexostack.app`, con PostgreSQL propia y accesos individuales de gestión. La web histórica de Render no se reemplaza. Estudia esta edición y consulta su registro de pruebas antes de afirmar qué está validado; una demostración de laboratorio no equivale a una aprobación de producción.
 
 ## 1 Cómo estudiar y comprobar que entendiste
 
@@ -20,7 +20,7 @@ Estudia en este orden. No necesitas aprender todas las herramientas el primer d�
 | Backend | Rutas, formularios y servicios | Seguir un registro de hábito en el código |
 | Frontend | HTML, Jinja, CSS y JavaScript | Cambiar un texto y mostrar el resultado |
 | Calidad | Pruebas, errores y control de versiones | Ejecutar una prueba y explicar su resultado |
-| Publicación | Vercel o Render y configuración | Completar una lista de verificación del despliegue |
+| Publicación | NexoStack Docker y configuración | Completar una lista de verificación del despliegue |
 | Sustentación | Demostración y preguntas | Exponer un caso de extremo a extremo |
 
 Puedes repartirlo en ocho sesiones de 60 a 90 minutos, más tiempo de práctica. Si una sesión no alcanza, continúa al día siguiente. El criterio para avanzar es poder repetir el ejercicio y explicar el resultado, no cumplir un tiempo exacto.
@@ -173,7 +173,7 @@ Set-Location vitalilab-estudio
 git branch --show-current
 ```
 
-La salida debe mostrar `staging`. Si la guía todavía está en su rama de revisión, el docente entregará el ZIP de esa versión o indicará `docs/manual-formativo-vercel`. `main` no contiene automáticamente las mejoras por ser la rama que GitHub muestra primero.
+La salida debe mostrar `staging`. El docente entrega el ZIP del commit de esta edición o indica la rama de revisión correspondiente. `main` no contiene automáticamente las mejoras por ser la rama que GitHub muestra primero.
 
 Si usas el ZIP, extráelo y entra a la carpeta que contiene `wsgi.py`. Un ZIP creado con `git archive` no incluye el historial `.git`; puedes ejecutar la aplicación, pero las órdenes de historial necesitan una copia clonada o un repositorio local nuevo para practicar.
 
@@ -396,7 +396,7 @@ Dos solicitudes pueden consultar casi al mismo tiempo y ambas creer que falta el
 
 SQLite es un motor que guarda esta práctica en un archivo. Facilita empezar sin otro servidor. PostgreSQL es un servidor de datos que permite conexiones compartidas, restricciones y operación administrada. En `staging` y `production` la configuración exige PostgreSQL y rechaza SQLite.
 
-No afirmes que SQLite es inútil ni que PostgreSQL elimina todos los errores. La elección responde a cómo se ejecutará esta aplicación. Vercel no conserva una base local dentro de cada función como almacenamiento permanente; esa copia necesita una base externa.
+No afirmes que SQLite es inútil ni que PostgreSQL elimina todos los errores. La elección responde a cómo se ejecutará esta aplicación. En NexoStack los datos viven en la PostgreSQL independiente y su volumen persistente, no dentro de la imagen de la web. Si se utilizara Vercel, sería necesaria una base externa porque la función no ofrece almacenamiento local permanente.
 
 ### 6.9 Migraciones y restauración
 
@@ -697,143 +697,126 @@ Publicación continua exige además conectar el alojamiento y observar el result
 
 Build significa preparar una entrega: instalar bibliotecas y preparar archivos. Deploy significa colocarla y activarla en el alojamiento. Log es el registro de mensajes del proceso. HTTPS protege el transporte entre navegador y servidor. Un dominio es un nombre amigable; para practicar puede utilizarse la dirección generada por el proveedor.
 
-### 11.2 Qué cambió para Vercel
+### 11.2 El montaje elegido en NexoStack
 
-La aplicación tiene una entrada explícita `wsgi:app` en `pyproject.toml`. `vercel.json` indica Flask y ejecuta `python scripts/build_vercel.py`. Ese script copia CSS, JavaScript y SVG a `public/static` para que Vercel los sirva como archivos públicos. Conserva las direcciones `/static/...` que generan las plantillas y no importa la aplicación ni toca la base durante el build.
+NexoStack es el VPS de laboratorio que ya utiliza el propietario. La copia de VitaliLab se monta allí como un proyecto Docker separado. No se reemplaza Render ni se utiliza la base de Mercanta o Murano. El archivo `deploy/nexostack/compose.yaml` reúne web, migrador y PostgreSQL propia. El migrador es una tarea puntual; no queda atendiendo solicitudes.
 
-La fábrica utiliza una carpeta temporal de escritura al detectar Vercel. Las migraciones se ejecutan de manera controlada antes del uso, nunca en cada petición. La función no lanza Gunicorn como un servidor permanente: Vercel atiende la aplicación mediante su runtime de Python.
+La web corre con el usuario 10001 y raíz de archivos de solo lectura. Tiene una carpeta temporal para `instance` y un límite de 384 MiB. La base tiene límite de 256 MiB y un volumen persistente específico. Esos límites son máximos de uso, no una reserva exclusiva ni una promesa de soportar cualquier número de usuarios.
 
-La configuración fue preparada para esta edición. Solo será correcto afirmar que está desplegada cuando un proyecto autenticado de Vercel haya construido el commit, tenga base y variables correctas y pase las pruebas de su URL.
+Traefik, el proxy existente, reconoce únicamente el dominio de VitaliLab y envía esas solicitudes al puerto 10000 de su web. No se reinicia el proxy para agregar el contenedor. La base no publica el puerto 5432 y permanece en la red interna de VitaliLab. Solo la web pertenece también a la red de entrada compartida: varios proyectos comparten el VPS y el proxy, no sus tablas ni contraseñas.
 
-### 11.3 Qué cambia entre Render y Vercel
+### 11.3 Por qué el contenedor no es la base de datos
 
-| Tema | Render en esta configuración | Vercel en esta configuración |
-|---|---|---|
-| Ejecución | Proceso Gunicorn | Función Python administrada |
-| Estáticos | Flask sirve app/static | CDN sirve public/static |
-| Escritura de ejecución | No usar almacenamiento efímero para datos | Escritura temporal exclusivamente |
-| Base | PostgreSQL independiente | PostgreSQL externa accesible con TLS |
-| Migraciones | Arranque Staging Free documentado | Ejecución controlada previa al uso |
-| Límites de peticiones | Memoria válida solo en instancia única de demostración | Memoria por instancia no equivale a límite global |
-| Prueba compartida | Ambiente Staging | Deployment Preview de un proyecto separado |
+La imagen contiene código y bibliotecas. Un contenedor ejecuta esa imagen. El volumen conserva datos aparte. Cambiar la imagen de la web no debe borrar usuarios ni hábitos.
 
-El rate limit en memoria no se comparte entre varias instancias. Una publicación destinada a usuarios reales necesita almacenamiento compartido compatible o protección central verificada. La copia de práctica con pocos usuarios debe declarar esta limitación. Configurar Redis exige tanto el servicio como su dependencia cliente y sus credenciales; no basta con escribir una URL al azar.
+PostgreSQL 18 en la imagen oficial usa una carpeta versionada dentro de `/var/lib/postgresql`. Por eso el volumen de esta edición se monta allí; no se reutiliza sin revisión el ejemplo antiguo de `/var/lib/postgresql/data`. La persistencia debe comprobarse después de recrear el servicio, no deducirse solo al leer YAML.
 
-### 11.4 Las bases y sus conexiones
+La carpeta `/opt/labs/vitalilab/releases` guarda versiones por commit. `current` señala la activa. `secrets` contiene valores privados y `backups` conserva dumps. Un estudiante recibe el código, no esos secretos ni la llave principal del servidor.
 
-`DATABASE_URL` reúne servidor, usuario, contraseña y nombre de base. Es un secreto. En Vercel necesitamos una PostgreSQL que permita conexiones desde ese alojamiento, con TLS y permisos definidos por el proveedor. No se comparte una base de producción con un Preview.
+### 11.4 Roles y conexiones de la base
 
-La PostgreSQL ya creada en el espacio de Emanuel en Render tiene acceso externo deshabilitado. No puede utilizarse desde Vercel simplemente copiando su conexión interna. Mantén esa protección; el docente debe elegir una base de práctica accesible mediante una conexión autorizada desde Vercel.
+`DATABASE_URL` reúne servidor, usuario, contraseña y nombre de base. Es un secreto. `vitalilab_owner` administra únicamente la PostgreSQL independiente de este laboratorio y ejecuta migraciones. La web utiliza `vitalilab_app`, que puede consultar y modificar las siete tablas de negocio, pero no crear bases, roles o tablas.
 
-Una conexión con pool administrado puede ayudar cuando hay varias instancias. Debe verificarse con el proveedor y el driver Psycopg del proyecto. La ubicación de la función y de la base afecta al tiempo de respuesta. Estas son decisiones de operación que un principiante puede comprender sin tener que administrar servidores el primer día.
+La conexión de la aplicación verifica el certificado y el nombre `db` con `sslmode=verify-full`. La comprobación real registró TLS 1.3. HTTPS del navegador y TLS de base son conexiones distintas: un candado en la página no prueba cómo se conectó PostgreSQL.
 
-## 12 Publicar una copia de práctica en Vercel paso a paso
+El rate limit actual usa memoria de un worker y se reinicia con el proceso. Para varias instancias o usuarios reales habría que implementar y comprobar almacenamiento compartido. La autenticación y los datos de negocio no se trasladan a esa memoria temporal.
 
-### 12.1 Preparar la cuenta y el proyecto
+## 12 Publicar y gestionar la copia de práctica en NexoStack
 
-El docente inicia sesión en su cuenta Vercel desde el navegador. Puede utilizar su identidad GitHub. Si debe crear una cuenta, él mismo revisa y acepta las condiciones. No comparte contraseña, código de un solo uso ni token por el chat.
+### 12.1 Distinguir estudiante y administrador de infraestructura
 
-La copia se llamará `vitalilab-practica` o un nombre disponible equivalente. Se crea como proyecto separado de la web histórica. El docente autoriza a Vercel únicamente los repositorios necesarios. No cambia la visibilidad del repositorio privado para resolver una conexión.
+El estudiante sigue primero el montaje local y practica con datos ficticios. El administrador de infraestructura publica versiones verificadas. No se entrega a todos los alumnos la cuenta principal del VPS ni el grupo Docker.
 
-Hay dos rutas: importar GitHub mediante el panel o usar el CLI oficial. Ambas requieren una cuenta autenticada. El CLI permite publicar desde la copia local y evita depender de la cuenta Git conectada al Render histórico.
+Para esta edición se autorizó una copia de laboratorio en `https://vitalilab.lab.nexostack.app`. La web original de Render continúa aparte. La publicación nueva no migra automáticamente sus personas ni sus registros.
 
-### 12.2 Preparar una PostgreSQL de práctica
+### 12.2 Preparar la versión y comprobar el servidor
 
-En el catálogo de almacenamiento o Marketplace de Vercel, el docente puede elegir un proveedor PostgreSQL administrado. Antes de confirmar revisa costo, caducidad, acceso externo, TLS y copias disponibles. Selecciona un plan que esté autorizado; el nombre de un plan gratuito no garantiza que todos sus servicios lo sean.
+El administrador identifica el commit de la rama `staging`, verifica el resultado de CI y guarda el estado de las aplicaciones que ya funcionan: identificadores, imágenes, fechas de inicio y reinicios. Comprueba memoria, disco, nombres de contenedores y resolución del dominio antes de crear el proyecto.
 
-Si ya dispone de una PostgreSQL compatible, crea allí una base y un usuario exclusivos de práctica. Copia su conexión en los campos privados de configuración, no en el documento. Agrega los parámetros TLS que exija el proveedor. Verifica que el host sea alcanzable desde Vercel.
+El código se empaqueta desde un commit con `git archive`. Se carga por SSH y se compara su SHA-256. Así se sabe qué versión llegó y se evita copiar el entorno local, una base de desarrollo o un archivo privado por accidente.
 
-No se trasladan filas del prototipo en este paso. Primero se instala un esquema vacío y se crean cuentas ficticias. Migrar datos históricos requiere otra actividad con inventario, respaldo y validación.
+### 12.3 Crear configuración privada y la PostgreSQL
 
-### 12.3 Crear el proyecto por CLI
+`bootstrap.sh` genera secretos aleatorios en el servidor, prepara un certificado exclusivo de base y no imprime contraseñas. El ejemplo `runtime.env.example` enseña los nombres de las variables; sus palabras de referencia no se utilizan como contraseñas reales.
 
-En la carpeta del proyecto y con Node.js disponible, el docente utiliza el CLI oficial:
+El contenedor PostgreSQL inicializa una base vacía y el rol de la aplicación. Solo sus propios servicios pueden alcanzar la red de datos. No se abre acceso universal al puerto 5432 ni se conectan las migraciones al Supabase de los otros proyectos.
 
-```powershell
-npx vercel login
-npx vercel link
+### 12.4 Construir migrar y activar
+
+La orden del administrador tiene esta forma:
+
+```bash
+bash deploy/nexostack/deploy.sh SHA_COMPLETO_VERIFICADO
 ```
 
-La primera orden inicia el acceso en el navegador. En la segunda, selecciona su cuenta, crea o elige `vitalilab-practica` y vincula la carpeta. Si el asistente pregunta por un proyecto histórico, vuelve a seleccionar la copia nueva antes de confirmar.
+`SHA_COMPLETO_VERIFICADO` representa los 40 caracteres del commit que pasó CI. No se copia literalmente esa palabra. El procedimiento se ejecuta como infraestructura confiable en la versión cargada del VPS, no en la terminal de un estudiante.
 
-`.vercel` guarda información local del enlace y está ignorada por Git. No es la base de datos. El mínimo de CLI para el soporte documentado de Flask es 48.2.10; utiliza una versión actual del distribuidor oficial.
+El script valida Compose, construye la imagen, inicia su base, aplica las dos migraciones, sincroniza cuatro hábitos y comprueba deriva. Después concede los permisos de negocio a la web y activa solo su contenedor. Las migraciones no se ejecutan al visitar una pantalla.
 
-### 12.4 Configurar Preview
+La tarea de migración usa `--no-deps` después de verificar la base, para no recrear una dependencia saludable como efecto de la tarea puntual. Un bloqueo evita dos despliegues de VitaliLab simultáneos. Si hay una versión anterior, se respalda antes de la actualización.
 
-En Settings y Environment Variables del proyecto configura los valores para Preview. El mismo nombre con otro ambiente puede tener otro valor.
+### 12.5 Verificar la publicación con una persona ficticia
 
-| Nombre | Configuración para la copia |
-|---|---|
-| APP_ENV | staging |
-| APP_VERSION | Etiqueta del commit que se publicará |
-| SECRET_KEY | Valor aleatorio exclusivo estable entre peticiones |
-| DATABASE_URL | Conexión privada del proveedor PostgreSQL de práctica |
-| SESSION_COOKIE_SECURE | true |
-| SESSION_COOKIE_SAMESITE | Lax |
-| MAIL_HOST MAIL_PORT MAIL_USERNAME MAIL_PASSWORD MAIL_FROM | Solo si hay proveedor de correo de prueba configurado |
-| RATELIMIT_STORAGE_URI | Según almacenamiento compatible verificado |
+1. Abre la dirección HTTPS y verifica estilos, JavaScript y la marca local.
+2. Visita `/health` y compara su versión con el commit publicado.
+3. Visita `/ready`; una respuesta 200 confirma conexión, no todo el esquema.
+4. Crea una cuenta ficticia mediante el formulario real, con CSRF activo.
+5. Completa un hábito y observa sus 15 puntos.
+6. Repite el POST del mismo hábito en una prueba controlada: debe quedar un cumplimiento.
+7. Cierra e inicia sesión; el progreso debe conservarse.
+8. Prueba que una cuenta normal no puede entrar a `/admin/`.
+9. Con un administrador comprueba borrador, publicación y archivo de un comunicado.
+10. Revisa móvil, teclado y errores; reinicia solo la web de VitaliLab y vuelve a comprobar datos.
 
-El runtime establece `VERCEL`; no necesitas crear esa variable por cuenta propia en el panel. Python 3.13 está fijado en `.python-version`. `APP_BASE_URL` existe como opción de configuración, pero el correo actual genera enlaces con `url_for(..., _external=True)` desde el contexto de la petición; no presentes esa variable como un control ya aplicado al host del enlace.
+No intentes saltar las restricciones del navegador en una web ajena. Las pruebas de solicitudes repetidas se hacen únicamente sobre el laboratorio autorizado y con datos ficticios.
 
-Si configuras secretos después de un deploy, vuelve a desplegar para que esa versión los reciba. Un valor vacío o la clave de desarrollo no debe utilizarse en el ambiente compartido.
+### 12.6 Los accesos de Juan y Emanuel
 
-### 12.5 Crear tablas de manera controlada
+Hay dos cuentas individuales de administrador de aplicación. Permiten gestionar comunicados y ver un resumen de auditoría; no son cuentas administradoras del VPS. Cada persona recibe sus credenciales de forma privada.
 
-Una persona responsable aplica las migraciones a la PostgreSQL de práctica desde una terminal confiable. Establece allí `APP_ENV`, `DATABASE_URL` y `SECRET_KEY` con valores privados, sin escribir la contraseña en instrucciones compartidas. Después ejecuta:
+También hay dos llaves independientes para gestión básica de infraestructura. El acceso utiliza SSH con un comando forzado: únicamente estado, salud, reinicio de la web, backup y eventos del monitor. No permite una terminal libre, cambiar código, leer secretos, descargar bases o administrar otras aplicaciones.
 
-```powershell
-.\.venv\Scripts\python.exe -m flask --app wsgi:app db upgrade
-.\.venv\Scripts\python.exe -m flask --app wsgi:app seed-habits
-.\.venv\Scripts\python.exe -m flask --app wsgi:app db current
-.\.venv\Scripts\python.exe -m flask --app wsgi:app db check
-```
+El administrador agregó solamente esos dos nombres a la lista de usuarios SSH permitidos, conservando los accesos anteriores. Validó la configuración antes de recargar el servicio. Las restricciones de cada llave impiden transferencia de archivos y reenvío de puertos.
 
-Comprueba que apunta a la base de práctica antes de ejecutar. El acceso de esa terminal también debe estar permitido por el proveedor. Si está bloqueado, utiliza su mecanismo autorizado de administración en lugar de abrir indiscriminadamente la base a todas las direcciones.
+La [guía de operación y accesos](18_NEXOSTACK_OPERACION_Y_ACCESOS.md) explica cómo entrar y qué orden corresponde a cada acción. No compartas una llave ni una contraseña entre ambos responsables. Si alguien deja el proyecto, revoca la cuenta de aplicación y su llave: son permisos distintos.
 
-La migración no se ejecuta al abrir una pantalla ni al importar `wsgi.py`. Así dos funciones de Vercel no intentan cambiar el esquema simultáneamente. Tampoco se crea una ruta pública para aplicar migraciones.
+### 12.7 Respaldar restaurar y observar
 
-### 12.6 Publicar Preview
+El timer de VitaliLab produce un respaldo diario a las 02:30 de Colombia, con hasta cinco minutos de variación. Conserva 14 días en la carpeta privada del proyecto. El monitor comprueba `/ready` cada cinco minutos y registra fallos en systemd; esto no significa que ya envíe mensajes personales de alerta.
 
-```powershell
-npx vercel deploy
-```
+Un respaldo se comprueba restaurando en otra base, comparando las siete tablas y la revisión Alembic y verificando deriva. En esta entrega se hizo esa prueba y se eliminó únicamente la base temporal; se conservó la base activa y su dump.
 
-Esta orden publica un Preview por defecto. No añadas `--prod` para esta primera copia de práctica. Verifica en el resultado el nombre del proyecto y guarda la URL generada. El build debe copiar los tres recursos actuales: CSS, JavaScript y SVG. Revisa la salida del servidor si no encuentra el módulo o falla la instalación.
+Un archivo en el mismo VPS no basta frente a pérdida del servidor. Se debe conservar una copia fuera del host mediante un canal protegido, definir retención y ensayar recuperación. Los objetivos propuestos para laboratorio son RPO de 24 horas y RTO de una hora; no son garantías de disponibilidad ni una prueba de recuperación de todo NexoStack.
 
-Si prefieres importar por GitHub, selecciona el repositorio privado y la rama que contiene esta versión. Durante la importación Vercel puede crear un deployment etiquetado Production dentro del proyecto de demostración. Ese nombre se refiere a ese proyecto nuevo, no al Render histórico. Para las siguientes revisiones crea Previews y mantén claramente separado el dominio real.
+### 12.8 Actualizar o regresar sin tocar otro proyecto
 
-### 12.7 Comprobar la URL y registrar evidencia
+Un cambio sigue rama, PR, pruebas y `staging`. Solo después se publica su commit en VitaliLab. Los operadores básicos no despliegan código nuevo ni ejecutan migraciones: eso sigue a cargo de infraestructura.
 
-1. Abre la página por HTTPS y confirma estilos y navegación.
-2. Abre `/health` y comprueba su versión.
-3. Abre `/ready`; espera 200. Si responde 503, revisa conexión y disponibilidad.
-4. Registra una cuenta ficticia con CSRF real.
-5. Completa un hábito y comprueba los puntos.
-6. Repite la acción y confirma un solo cumplimiento.
-7. Cierra e inicia sesión otra vez; observa persistencia.
-8. Con cuenta normal verifica el rechazo de `/admin/`.
-9. Prueba el administrador ficticio y un comunicado de práctica.
-10. En otro navegador prueba móvil, teclado y mensajes.
+Para regresar a un código anterior, debe conservarse compatibilidad con el esquema. No ejecutes `db downgrade` ni borres un volumen para arreglar una pantalla. Una restauración real requiere diagnóstico, respaldo y aprobación. No se utilizan limpieza global de Docker, reinicio del proxy ni comandos sobre Mercanta, Murano o Krono 57.
 
-Registra fecha, URL, commit, proveedor de datos, resultado y errores corregidos. Si el Preview tiene protección de acceso, el docente invita o habilita el mecanismo de prueba permitido para el grupo; no comparte la sesión del propietario ni supone que un enlace protegido abre para todos.
+**Para sustentar.** Señala la diferencia entre imagen, contenedor y volumen. Después explica por qué gestionar un comunicado no autoriza entrar al VPS y cómo se demuestra que una versión nueva conservó los datos.
 
-### 12.8 Qué hacer si todavía no existe acceso a Vercel
+## 13 Render y Vercel como alternativas
 
-La falta de una cuenta autenticada o de una PostgreSQL de práctica impide cerrar una publicación funcional. Mientras se resuelve, los estudiantes pueden completar todos los laboratorios locales. La demostración local es una evidencia válida si se identifica como local; no la presentes como una web que ya responde en internet.
+### 13.1 El Render histórico queda sin cambios
 
-Para continuar con un asistente, el docente inicia la autorización oficial de Vercel y selecciona el proyecto de práctica. Los secretos se introducen directamente en los campos del proveedor. Una vez construido el Preview, se vuelve a comprobar el comportamiento real de la URL.
+La aplicación original utiliza el repositorio `ega1026/vitalilab`; la reconstrucción pertenece al repositorio privado `juandigira17111980/vitalilab-profesional`. Compartir permisos del primer repositorio no es lo mismo que reemplazar un servicio publicado.
 
-## 13 La alternativa Render y el estado de los accesos
+La base temporal `vitalilab-staging-db` que se creó en Render estaba disponible al 13 de octubre, con acceso externo cerrado y vencimiento el 31 de octubre a las 21:36 de Colombia. No es la base de este laboratorio NexoStack. El servicio web Staging de Render no se creó en esa revisión por el acceso Git pendiente. No se elimina esa base ni se cambia producción como consecuencia de esta publicación.
 
-Render utiliza `render.yaml` como descripción de servicio y base. Propone el proyecto VitaliLab, ambiente Staging, servicio `vitalilab-staging`, PostgreSQL independiente y comprobación `/ready`. En esta configuración Free el arranque aplica migraciones, seed y Gunicorn con un worker y cuatro threads. Para una operación pagada se puede separar la migración en un paso previo al deploy.
+Render Free puede dormir por inactividad, no aporta backups administrados para PostgreSQL Free y bloquea puertos SMTP 25, 465 y 587. Sus valores de configuración no superan esos límites. Una implementación en Render utiliza `render.yaml`, Gunicorn y una base independiente, con validación propia antes de dar una URL por aprobada.
 
-El 13 de octubre se confirmó que el CLI de Render seguía autorizado y la PostgreSQL `vitalilab-staging-db` estaba disponible en el espacio de Emanuel. No había un servicio web de Staging. La conexión Git de esa cuenta es `ega1026`; no alcanza por sí misma para leer el repositorio privado de `juandigira17111980`.
+### 13.2 La configuración Vercel no está en uso
 
-No reemplaces las credenciales del servicio histórico para practicar. Las cuentas y permisos requieren resolución del propietario. Un usuario Render admite una cuenta por proveedor Git; conectar un usuario nuevo, compartir un repositorio o cambiar credenciales son decisiones distintas y deben conservar el alcance autorizado.
+El código conserva una adaptación opcional a Vercel: entrada `wsgi:app`, `vercel.json`, el script que prepara `public/static` y una carpeta temporal al detectar ese runtime. Esa ruta ejecutaría Flask como función administrada y necesitaría PostgreSQL externa accesible con TLS.
 
-La PostgreSQL Free creada tiene vencimiento registrado el 31 de octubre de 2026 a las 21:36 de Colombia. Esa fecha corresponde a esta instancia concreta. No la confundas con una base permanente para el proyecto. El plan Free no aporta backups administrados y la web Free puede dormir por inactividad. Guarda evidencia de la demostración y decide la permanencia antes de depender de esa instancia.
+NexoStack ejecuta Gunicorn y su PostgreSQL privada. No necesita una cuenta de Vercel, ejecutar `npx vercel login` ni convertir la base Render en pública. No confundas archivos de una alternativa con el proveedor realmente utilizado. La comparación sirve para aprender que una misma aplicación puede tener configuraciones de infraestructura diferentes.
 
-El correo SMTP del backend utiliza puertos habituales que Render Free bloquea. Para una prueba que incluya entrega real, utiliza una solución de alojamiento y envío compatible autorizada; cambiar a una API de correo sería un cambio de código adicional, no un valor que se arregla en el panel.
+### 13.3 Qué sigue pendiente antes de producción real
+
+La entrega es una copia académica con datos ficticios. SMTP y recepción de correo, alertas personales, automatización offsite, accesibilidad formal y decisiones institucionales de privacidad requieren validación adicional. La existencia de la URL no elimina los límites de fechas por servidor, puntos históricos del catálogo ni sesiones sin revocación global.
+
+La decisión de reemplazar Render con este proyecto es posterior y exige aprobación, ensayo de migración de datos y plan de reversión. No se presenta una demostración de laboratorio como una sustitución productiva ya aprobada.
 
 ## 14 Laboratorios con resultados observables
 
@@ -867,7 +850,7 @@ Ejecuta Pytest, interpreta un caso y documenta su preparación, acción y compar
 
 ### 14.8 Laboratorio de publicación
 
-Completa la lista de Vercel o Render cuando exista acceso. Anota cuál ambiente, qué commit y qué base se usaron. Prueba desde otra sesión de navegador. Para aprobar necesitas persistencia y rol comprobados, no solo que abra la página inicial.
+Completa la lista de NexoStack sobre la copia autorizada, junto al docente. Anota cuál ambiente, qué commit y qué base se usaron. Prueba desde otra sesión de navegador. Para aprobar necesitas persistencia y rol comprobados, no solo que abra la página inicial. No necesitas acceso administrativo al VPS para demostrar una ruta de aplicación.
 
 ## 15 Preparar una sustentación que demuestre comprensión
 
@@ -902,7 +885,7 @@ Para cada respuesta usa problema, decisión y evidencia. Si preguntan por Postgr
 
 **Cómo funciona la sesión.** Cookie firmada de Flask más usuario cargado de la base. La firma evita modificación silenciosa; no cifra su contenido.
 
-**Por qué Vercel requiere otra preparación.** Ejecuta Flask como función y sirve archivos públicos por CDN; los datos van a PostgreSQL externa y el esquema se prepara separadamente.
+**Por qué persisten los datos en NexoStack.** La web utiliza su PostgreSQL y un volumen separado. Cambiar la imagen de la aplicación no elimina ese volumen. Se demuestra reiniciando únicamente VitaliLab y comprobando el mismo cumplimiento.
 
 **Qué está pendiente.** Una URL nueva validada, correo real, operación de backups, decisiones institucionales y revisión formal de accesibilidad. No declares todos esos puntos resueltos por tener pruebas locales.
 
@@ -966,7 +949,7 @@ Para aprender una herramienta, formula una pregunta verificable. Por ejemplo: qu
 
 ## 18 Material de referencia y estado de entrega
 
-El documento maestro y los capítulos técnicos continúan como referencia detallada. Empieza por este manual y consulta después `03_MODELO_DE_DATOS_DBA.md`, `04_BACKEND.md`, `05_FRONTEND_UX.md` y `09_QA_Y_PRUEBAS.md`. La guía de sustentación reúne un guion breve; la matriz de trazabilidad enlaza requisitos y evidencia.
+El documento maestro y los capítulos técnicos continúan como referencia detallada. Empieza por este manual y consulta después `03_MODELO_DE_DATOS_DBA.md`, `04_BACKEND.md`, `05_FRONTEND_UX.md` y `09_QA_Y_PRUEBAS.md`. La operación actual está en `18_NEXOSTACK_OPERACION_Y_ACCESOS.md`. La guía de sustentación reúne un guion breve; la matriz de trazabilidad enlaza requisitos y evidencia.
 
 Las instrucciones de proveedores se verificaron el 13 de octubre de 2026. Sus pantallas, límites y precios pueden cambiar. Cuando la documentación del proveedor contradiga una receta antigua, compara la versión y valida el cambio en un ambiente de práctica.
 

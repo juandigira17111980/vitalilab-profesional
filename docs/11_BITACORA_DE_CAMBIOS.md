@@ -23,6 +23,10 @@
 | 2026-10-13 | Exactitud | Sesión cookie firmada, configuración local explícita y límites reales de SMTP | revisión de código y fuentes oficiales | ✅ |
 | 2026-10-13 | Vercel | Entrada, assets públicos y escritura temporal preparados | configuración, esquema y pruebas | ✅ local / 🟡 remoto |
 | 2026-10-13 | QA | 26 pruebas y 90,43 %; instalación y práctica con base desechable | salida local y flujo CSRF | ✅ |
+| 2026-10-13 | NexoStack | Web y PostgreSQL propias, TLS y gestión restringida | PR #5, primer deploy `455d5ee` | ✅ laboratorio |
+| 2026-10-13 | Seguridad | Cookie remember Secure, web no root y logs sin URL de tokens | 27 pruebas, 90,67 %, CI verde | ✅ |
+| 2026-10-13 | DBA | Volumen PostgreSQL 18, rol DML y restore aislado de siete tablas | backup `20261014T022937Z`, restore 9,37 s | ✅ ensayo |
+| 2026-10-13 | Accesos | Juan y Emanuel: cuentas/llaves independientes y comandos limitados | Login/roles; id y forwarding rechazados | ✅ |
 
 ## 2. Defectos encontrados durante validación
 
@@ -38,7 +42,7 @@
 
 | Hito | Requerido |
 |---|---|
-| Render Staging | URL y deploy/commit |
+| Producción futura | Aprobación y plan de migración; NexoStack solo laboratorio |
 | SMTP Staging | correo ficticio recibido |
 | Backup/restauración | fecha, duración, conteos y responsable |
 | Production | aprobación explícita; no ejecutada |

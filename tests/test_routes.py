@@ -17,6 +17,13 @@ def test_private_pages_redirect_anonymous_user(client):
     assert "/acceso/ingresar" in response.location
 
 
+def test_staging_banner_identifies_fictional_lab_data(client, app):
+    app.config["APP_ENV"] = "staging"
+    assert "Laboratorio académico" in client.get("/").text
+    app.config["APP_ENV"] = "production"
+    assert "Laboratorio académico" not in client.get("/").text
+
+
 def test_profile_stores_optional_measurement(client, user_factory, login):
     user = user_factory()
     login()

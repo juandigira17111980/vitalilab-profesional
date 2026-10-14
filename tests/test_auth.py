@@ -69,6 +69,24 @@ def test_failed_logins_lock_account_temporarily(client, user_factory):
     assert "Correo o contraseña incorrectos" in response.text
 
 
+def test_remember_cookie_is_secure_in_https_configuration(client, app, user_factory):
+    user_factory()
+    app.config.update(SESSION_COOKIE_SECURE=True, REMEMBER_COOKIE_SECURE=True)
+    response = client.post(
+        "/acceso/ingresar",
+        data={"email": "user@example.com", "password": "SecurePass123", "remember": "y"},
+        base_url="https://localhost",
+    )
+    remember = next(
+        value
+        for value in response.headers.getlist("Set-Cookie")
+        if value.startswith("remember_token=")
+    )
+    assert "; Secure" in remember
+    assert "; HttpOnly" in remember
+    assert "; SameSite=Lax" in remember
+
+
 def test_password_reset_token_expires_after_password_change(app, user_factory):
     user = user_factory()
     token = user.generate_reset_token()

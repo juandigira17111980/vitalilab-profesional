@@ -12,6 +12,9 @@
 </head>
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  {% if config.APP_ENV == 'staging' %}
+  <div class="lab-banner" role="note">Laboratorio académico · utiliza datos ficticios. No es el sitio de producción.</div>
+  {% endif %}
   <header class="site-header" data-header>
     <div class="shell header-inner">
       <a class="brand" href="{{ url_for('main.home') }}" aria-label="VitaliLab, inicio">

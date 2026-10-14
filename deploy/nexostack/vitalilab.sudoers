@@ -1,0 +1,2 @@
+# The operator accounts are NOT in sudo or docker groups.
+vitalilab-juan,vitalilab-emanuel ALL=(root) NOPASSWD: /usr/local/sbin/vitalilab-ops status, /usr/local/sbin/vitalilab-ops health, /usr/local/sbin/vitalilab-ops restart, /usr/local/sbin/vitalilab-ops backup, /usr/local/sbin/vitalilab-ops events

@@ -6,7 +6,7 @@ El [manual desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) permite que e
 
 Entregue el PDF y una copia del código de la misma versión. Si el estudiante recibe un ZIP, recuerde que puede ejecutar el código pero no incluye el historial Git. Compruebe Python 3.13 y una carpeta de trabajo propia.
 
-Use SQLite local para la primera práctica y correos ficticios. Reserve PostgreSQL y Vercel para la etapa de despliegue. No entregue un `.env` real, contraseñas administrativas compartidas o una copia de datos de la institución.
+Use SQLite local para la primera práctica y correos ficticios. Reserve PostgreSQL y NexoStack para la etapa de despliegue. No entregue un `.env` real, contraseñas administrativas compartidas o una copia de datos de la institución.
 
 Pida una bitácora por estudiante. Cada evidencia debe incluir acción, resultado observado y explicación. Si se trabaja en parejas, intercambie quién ejecuta y quién explica.
 
@@ -20,7 +20,7 @@ Pida una bitácora por estudiante. Cada evidencia debe incluir acción, resultad
 | 4 | Backend | Recorrido de registro y hábito | Localiza ruta formulario servicio y modelo |
 | 5 | Frontend | Cambio de texto y navegación móvil | Diferencia Jinja CSS y JavaScript |
 | 6 | Calidad y Git | Prueba diff commit y revisión | Relaciona evidencia con versión |
-| 7 | Publicación | Preparar Preview con docente | Explica variables persistencia y límites |
+| 7 | Publicación | Revisar el laboratorio NexoStack con docente | Explica variables persistencia y límites |
 | 8 | Sustentación | Demo y preguntas al azar | Todos operan y responden sobre un flujo |
 
 Las sesiones orientan el orden, no una promesa de dominio en ocho horas. Ajuste la duración al nivel del grupo y repita los ejercicios que no puedan explicar.
@@ -48,7 +48,7 @@ Una medida validada guarda el cálculo del servidor. Enviar solo peso o solo alt
 7. Explique por qué guardar un token CSRF no sustituye comprobar el rol.
 8. Distinga firma de cookie y cifrado de contenido.
 9. Prediga qué sucede con el puntaje histórico si cambia el catálogo.
-10. Explique por qué un Preview de Vercel necesita PostgreSQL externa.
+10. Explique por qué cambiar la imagen web de NexoStack no debe borrar los hábitos y qué papel tiene el volumen.
 11. Identifique qué pasos prepara el build y cuáles cambian la base.
 12. Señale una comprobación que todavía debe hacerse en la URL real.
 

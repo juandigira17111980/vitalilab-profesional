@@ -9,7 +9,7 @@
 | Datos locales/pruebas | SQLite permitido |
 | Repositorio | Privado: `juandigira17111980/vitalilab-profesional` |
 | Rama integrada | `staging` |
-| Revisión formativa | `docs/manual-formativo-vercel` |
+| Despliegue académico | NexoStack, PR #5 hacia `staging` |
 | Fecha de actualización documental | 13 de octubre de 2026 |
 | Production | Congelada hasta aprobación explícita |
 
@@ -19,7 +19,7 @@ VitaliLab convierte acciones cotidianas en un registro comprensible de hábitos,
 
 No es un sistema clínico, no diagnostica y no reemplaza orientación profesional. La primera entrega profesional prioriza seguridad, integridad, claridad y facilidad de sustentación sobre complejidad innecesaria.
 
-Para estudiantes con primeros fundamentos, el punto de entrada es [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md). Este documento conserva la referencia técnica; el manual añade explicaciones progresivas, instalación comprobable y laboratorios. La opción Vercel se explica en la [guía de publicación](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md).
+Para estudiantes con primeros fundamentos, el punto de entrada es [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md). Este documento conserva la referencia técnica; el manual añade explicaciones progresivas, instalación comprobable y laboratorios. La copia NexoStack se explica en la [guía de publicación](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md) y [operación](18_NEXOSTACK_OPERACION_Y_ACCESOS.md).
 
 ## 2. Transformación realizada
 
@@ -37,7 +37,7 @@ Para estudiantes con primeros fundamentos, el punto de entrada es [VitaliLab exp
 
 ```mermaid
 flowchart LR
-    U[Usuario] --> HTTPS[HTTPS / Render]
+    U[Usuario] --> HTTPS[HTTPS / NexoStack laboratorio]
     HTTPS --> W[Gunicorn]
     W --> F[Flask App Factory]
     F --> M[Blueprints: main, auth, profile, habits, admin]
@@ -80,15 +80,15 @@ La aplicación es un monolito modular porque el alcance académico no justifica 
 | Ambiente | Rama | Base | Datos | Estado |
 |---|---|---|---|---|
 | Local | feature/fix | SQLite o PostgreSQL local | Sintéticos | ✅ verificado |
-| Staging | `staging` | PostgreSQL exclusivo | Sintéticos | 🟡 código integrado; despliegue Render pendiente |
+| Staging | `staging` | PostgreSQL exclusivo | Sintéticos | ✅ copia NexoStack; evidencia capítulo 18 |
 | Production | `main`/release aprobada | PostgreSQL exclusivo antes de migrar | Reales | 🔴 no modificar todavía |
 
 El servicio histórico de Production no comparte base, variables ni dominio con Staging.
 
 ## 7. Calidad y evidencia
 
-- 24 pruebas automatizadas aprobadas.
-- Cobertura total: 90,41 %, por encima del umbral obligatorio de 85 %.
+- 28 pruebas automatizadas aprobadas en esta edición.
+- Cobertura total local: 90,67 %, por encima del umbral obligatorio de 85 %.
 - Ruff: sin errores de formato ni análisis.
 - Migraciones: upgrade desde base vacía y `db check` aprobados en SQLite local.
 - Navegador: registro, login/logout, dashboard, hábito, menú móvil, administración y comunicados aprobados.

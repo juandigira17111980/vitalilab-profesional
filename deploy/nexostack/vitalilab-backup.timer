@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily VitaliLab backup (UTC schedule)
+
+[Timer]
+OnCalendar=*-*-* 07:30:00 UTC
+RandomizedDelaySec=300
+Persistent=true
+Unit=vitalilab-backup.service
+
+[Install]
+WantedBy=timers.target
