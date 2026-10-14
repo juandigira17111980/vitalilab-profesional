@@ -275,6 +275,10 @@ vitalilab-profesional/
     services/progress.py    Puntos niveles racha e IMC
     services/audit.py       Registra eventos sin datos sensibles
     services/email.py       Envía recuperación por SMTP
+    services/clock.py       Fecha en la zona del usuario
+    services/wellness.py    Metas bitácora e historial
+    wellness/routes.py     Nuevos espacios personales y rutinas
+    wellness/catalog.py    Seis rutinas educativas versionadas
     templates/              Pantallas y componentes Jinja
     static/                 CSS JavaScript y marca SVG
   migrations/versions/      Cambios de estructura de la base
@@ -576,9 +580,9 @@ Un formulario de modificación incluye `form.hidden_tag()`, que agrega datos ocu
 
 ### 8.4 Estilos y adaptación al celular
 
-`app/static/css/app.css` agrupa los estilos. Un selector decide qué elementos reciben una regla. Una clase como `.button` permite reutilizar presentación. Las variables CSS reúnen colores y medidas para facilitar cambios consistentes.
+`app/static/css/app.css` agrupa los estilos base y `premium.css` añade la capa de producto. Un selector decide qué elementos reciben una regla. Una clase como `.button` permite reutilizar presentación. Las variables CSS reúnen colores y medidas para facilitar cambios consistentes.
 
-Las media queries cambian la distribución según el ancho. El sistema incluye cortes en 900, 720 y 440 píxeles. La prueba de 390 píxeles ayuda a observar una pantalla pequeña; no significa que se hayan comprobado todos los celulares del mercado.
+Las media queries cambian la distribución según el ancho. La capa de producto utiliza cortes en 1000, 900, 600 y 440 píxeles. Se ensayan 320, 360, 390, 768 y 1440 px en Chromium y WebKit; eso no significa que se hayan comprobado todos los celulares ni un iPhone físico.
 
 La tipografía procede del sistema y la marca es SVG local. Esto evita depender de una descarga de fuentes o imágenes externas para la pantalla inicial.
 
@@ -703,6 +707,7 @@ Publicación continua exige además conectar el alojamiento y observar el result
 |---|---|---|
 | Repositorio GitHub | Código e historial | No ejecuta automáticamente el backend |
 | Vercel o Render | Ejecución y dirección web | No inventa las tablas ni tus secretos |
+| NexoStack VPS | Montaje elegido con Docker y proxy compartido | No reemplaza Render ni concede permisos sobre otros proyectos |
 | PostgreSQL | Datos persistentes | No construye la interfaz |
 | Variables de entorno | Configuración por ambiente | No deben convertirse en documentación pública |
 | Migraciones | Estructura de datos | No copian usuarios históricos automáticamente |
@@ -827,7 +832,7 @@ NexoStack ejecuta Gunicorn y su PostgreSQL privada. No necesita una cuenta de Ve
 
 ### 13.3 Qué sigue pendiente antes de producción real
 
-La entrega es una copia académica con datos ficticios. SMTP y recepción de correo, alertas personales, automatización offsite, accesibilidad formal y decisiones institucionales de privacidad requieren validación adicional. La existencia de la URL no elimina los límites de fechas por servidor, puntos históricos del catálogo ni sesiones sin revocación global.
+La entrega es una copia académica con datos ficticios. SMTP y recepción de correo, alertas personales, automatización offsite, accesibilidad formal y decisiones institucionales de privacidad requieren validación adicional. Las fechas del usuario ya se implementan mediante clock.py; siguen pendientes los puntos históricos independientes del catálogo y la revocación global de sesiones.
 
 La decisión de reemplazar Render con este proyecto es posterior y exige aprobación, ensayo de migración de datos y plan de reversión. No se presenta una demostración de laboratorio como una sustitución productiva ya aprobada.
 
@@ -927,7 +932,7 @@ Esta rúbrica mide competencias; no asigna automáticamente una nota institucion
 
 Cuando puedas explicar esta versión, mejora una capacidad por vez. Primero escribe pruebas de límites de formularios y un caso de error. Después diseña un cambio de esquema pequeño y revisa su migración. Luego estudia transacciones concurrentes y cómo ensayar una restauración. Finalmente analiza despliegue, conexiones y monitoreo con una URL real.
 
-Extensiones posibles del proyecto son calcular fechas con la zona del usuario, conservar el puntaje histórico por evento, revocar sesiones después de un cambio de clave, integrar almacenamiento compartido del rate limit y mejorar accesibilidad con herramientas y personas. Son ejercicios futuros; no figuran como funciones ya terminadas.
+Extensiones posibles del proyecto son permitir elegir la zona horaria desde el perfil, conservar el puntaje histórico por evento, revocar sesiones después de un cambio de clave, integrar almacenamiento compartido del rate limit y mejorar accesibilidad con personas y herramientas asistivas. Son ejercicios futuros; no figuran como funciones ya terminadas.
 
 Para aprender una herramienta, formula una pregunta verificable. Por ejemplo: qué pasa con una segunda inserción concurrente, qué cookie cambia al salir o qué consulta usa el índice. Diseña un experimento en una base de prueba y documenta lo observado. Esa práctica construye criterio técnico.
 

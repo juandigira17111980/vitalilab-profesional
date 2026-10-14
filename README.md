@@ -6,11 +6,11 @@ VitaliLab es una aplicación web educativa para registrar hábitos saludables, c
 
 | Componente | Resultado |
 |---|---|
-| Aplicación y backend | Integrados en `staging` mediante PR #2 |
+| Aplicación y backend | Reconstrucción y evolución premium integradas en `staging`, PR #2 y #6 |
 | Modelo de datos | 9 tablas de negocio, 3 migraciones Alembic, integridad e índices |
 | Seguridad | Hash scrypt, CSRF, autorización, bloqueo temporal, rate limits y cabeceras |
 | Frontend | Responsive, navegación móvil, formularios accesibles y estados controlados |
-| Calidad | 42 pruebas y 91,75 % local; PostgreSQL, seguridad y Docker son gates de CI |
+| Calidad | 42 pruebas y 91,75 % local; CI premium PostgreSQL, seguridad y Docker aprobado |
 | Base de datos | Migración, deriva, backup y restauración aislada aprobados en PostgreSQL 18 CI |
 | Staging | Copia académica en NexoStack; evidencia en docs/18 |
 | Production | Congelada; no se ha modificado |

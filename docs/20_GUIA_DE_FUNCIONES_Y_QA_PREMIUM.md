@@ -96,14 +96,24 @@ La auditoría combina revisión de repositorio y navegador, no es solo documenta
 | Frontend y UX | Sin hallazgos automáticos en pantallas ensayadas | 45 combinaciones por motor, Chromium y WebKit; 320, 360, 390, 768 y 1440 px |
 | Accesibilidad automática | Sin violaciones detectadas del conjunto ejecutado | axe en nueve pantallas a 390 y 1440 por motor; no equivale a conformidad total |
 | Seguridad estática | Sin hallazgos medios/altos detectados | Ruff y Bandit; cabeceras y controles conservados |
-| Infraestructura | Preparada para actualizar solo VitaliLab | Permisos DML de dos tablas nuevas, backup previo y esquema compatible |
-| Publicación | Gate posterior al cierre local | Exige CI PostgreSQL/Docker, versión activa, flujos reales y comparación de contenedores |
+| Infraestructura | Comprobada en el laboratorio publicado | TLS 1.3, rol sin CREATE, migración sin deriva y restore de nueve entidades |
+| Publicación | Primera publicación premium comprobada | CI verde, versión 6b23598 activa, flujos reales y auditoría responsive remota |
 
 Cobertura local: 91,75 %, umbral 85 %. Una advertencia de deprecación de Flask-Login procede de la dependencia, no de un fallo de las 42 pruebas. CI ejercita las dos entidades en una PostgreSQL desechable llamada exactamente vitalilab_test y compara los nueve conteos en el restore; el script rechaza otro destino antes de escribir.
 
 WebKit mantuvo centrado el anillo y operó el temporizador: 00:50 en marcha, 00:50 después de pausar, 00:00 al terminar y 01:00 al reiniciar. El recorrido por teclado mostró un foco sólido de 3 px. Los controles principales se diseñan para 44 px, como objetivo más conservador que el mínimo AA de 24 px y sus excepciones. La instrumentación automática de WebKit puede intentar insertar estilos que CSP rechaza; navegación normal se comprobó por separado sin eliminar CSP. No se prueba un iPhone físico con este ensayo.
 
-Lighthouse inicial sobre NexoStack: rendimiento 98, accesibilidad 96, buenas prácticas 100, SEO 100, LCP 1,34 segundos y CLS 0 en esa ejecución de laboratorio. La medición de la versión nueva se realiza sobre la misma URL después de publicar; no se extrapola a INP de usuarios reales ni se atribuye mejora comercial a esos números.
+Lighthouse inicial sobre NexoStack: rendimiento 98, accesibilidad 96, buenas prácticas 100, SEO 100, LCP 1,34 segundos y CLS 0. La versión premium sobre la misma URL dio 100/100/100/100, LCP 1,32 segundos y CLS 0 en la ejecución de laboratorio. La diferencia temporal pequeña está dentro de la variación de una medición; no demuestra por sí sola mayor velocidad bajo carga, INP real ni conversión comercial.
+
+### Evidencia remota de la primera activación premium
+
+Se publicó `6b235983c1b2485c90f5aa47c25c68c87a7f2213` por el [PR 6](https://github.com/juandigira17111980/vitalilab-profesional/pull/6). CI del PR: [38510985340](https://github.com/juandigira17111980/vitalilab-profesional/actions/runs/38510985340); CI de staging: [38511109742](https://github.com/juandigira17111980/vitalilab-profesional/actions/runs/38511109742). Ambos completaron calidad/seguridad, PostgreSQL y Docker. `/health` y `/ready` confirmaron la publicación; la versión de cierre se identifica siempre por el health actual y la evidencia del paquete.
+
+En navegador HTTPS se crearon y ajustaron metas y se guardó la bitácora con CSRF activo. El temporizador completó pausa, continuación, final y reinicio; Tab mostró foco visible. Se repitieron 45 combinaciones de layout y 18 auditorías axe sobre la web publicada, sin hallazgos automáticos ni errores de ejecución JavaScript detectados. Los accesos de Juan y Emanuel y el ciclo borrador/publicación/archivo de un comunicado también se comprobaron.
+
+El dump `vitalilab-20261014T042831842704942Z.dump` se restauró en una base desechable distinta del laboratorio en 3,49 segundos. Coincidieron nueve conteos, incluidos una meta y una bitácora; la revisión fue 54e1c8bb7901 y no hubo deriva. Se eliminó solo esa base temporal y se conservaron el laboratorio y el dump. Estos segundos no son el tiempo de recuperación de todo el VPS. Los nombres del dump están en UTC, por eso indican 14 de octubre, aunque el cierre local corresponde al 13 en Colombia.
+
+Una tanda de pruebas de acceso alcanzó el límite por IP y devolvió 429. Después de liberarse su ventana, el acceso volvió a funcionar sin desactivar protección ni modificar contraseñas. Este comportamiento debe considerarse al preparar una clase con muchos estudiantes bajo la misma conexión.
 
 ## Hallazgos pendientes y preparación comercial
 
