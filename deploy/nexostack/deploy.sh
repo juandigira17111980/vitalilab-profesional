@@ -10,7 +10,11 @@ release=$base/releases/$sha
 exec 9>"$base/deploy.lock"
 flock -n 9 || { echo 'Another VitaliLab deployment is active.' >&2; exit 4; }
 export RELEASE_SHA=$sha
-dc=(docker compose --env-file "$base/secrets/runtime.env" -f "$release/deploy/nexostack/compose.yaml")
+domain_options=()
+if python3 "$release/scripts/check_domain_dns.py"; then
+  domain_options=(-f "$release/deploy/nexostack/domain-https.yaml")
+fi
+dc=(docker compose --env-file "$base/secrets/runtime.env" -f "$release/deploy/nexostack/compose.yaml" "${domain_options[@]}")
 "${dc[@]}" config --quiet
 nice -n 15 ionice -c 2 -n 7 "${dc[@]}" build web
 "${dc[@]}" up -d --wait --wait-timeout 90 db

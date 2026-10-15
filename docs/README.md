@@ -77,4 +77,6 @@ La quinta revisión, `a903b5d7e214`, amplía a catorce entidades y añade colegi
 
 ## Regla de evidencia
 
+25. [Conexión del dominio principal de Hostinger](24_DOMINIO_PRINCIPAL_HOSTINGER.md): cambio mínimo del CNAME, preparación sin emisión prematura, activación y reversión. Conectar la dirección pública no elimina Render ni importa sus cuentas.
+
 Un cambio no se presenta como desplegado si solo existe localmente. Cada promoción debe registrar rama, commit, CI, URL de Staging, smoke tests, responsable y resultado. Nunca se adjuntan secretos ni datos personales.

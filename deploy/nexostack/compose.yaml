@@ -82,6 +82,7 @@ services:
     environment:
       APP_ENV: staging
       APP_VERSION: ${RELEASE_SHA}
+      APP_BASE_URL: https://vitalilab.space
       SECRET_KEY: ${SECRET_KEY}
       DATABASE_URL: postgresql://vitalilab_app:${POSTGRES_APP_PASSWORD}@db:5432/vitalilab_staging?sslmode=verify-full&sslrootcert=/run/secrets/postgres-ca.crt
       SESSION_COOKIE_SECURE: "true"
@@ -102,6 +103,15 @@ services:
       traefik.http.routers.vitalilab-lab-https.tls: "true"
       traefik.http.routers.vitalilab-lab-https.tls.certresolver: letsencrypt
       traefik.http.services.vitalilab-lab.loadbalancer.server.port: "10000"
+      # Keep the lab certificate independent. Main-domain ACME is enabled only after DNS checks.
+      traefik.http.routers.vitalilab-main-http.rule: Host(`vitalilab.space`) || Host(`www.vitalilab.space`)
+      traefik.http.routers.vitalilab-main-http.entrypoints: http
+      traefik.http.routers.vitalilab-main-http.service: vitalilab-lab
+      traefik.http.routers.vitalilab-main-http.middlewares: vitalilab-lab-https
+      traefik.http.routers.vitalilab-main-https.rule: Host(`vitalilab.space`) || Host(`www.vitalilab.space`)
+      traefik.http.routers.vitalilab-main-https.entrypoints: https
+      traefik.http.routers.vitalilab-main-https.service: vitalilab-lab
+      traefik.http.routers.vitalilab-main-https.tls: "true"
 
 networks:
   data:

@@ -2,7 +2,7 @@
 
 Este montaje utiliza Docker Compose y el proxy Traefik existente, como los laboratorios del VPS. No recrea Coolify ni usa las bases Supabase de Mercanta/Murano. No convierte este servicio manual en un recurso administrado por el panel de Coolify.
 
-Destino autorizado: `https://vitalilab.lab.nexostack.app`. El estado real y la evidencia de publicación están en `docs/18_NEXOSTACK_OPERACION_Y_ACCESOS.md`.
+Destino original: `https://vitalilab.lab.nexostack.app`. El propietario autorizó añadir `vitalilab.space` y `www.vitalilab.space`, conservando Render. Ver `docs/24_DOMINIO_PRINCIPAL_HOSTINGER.md` para las etapas de DNS y HTTPS; preparación no equivale a conexión terminada.
 
 ## Componentes
 
