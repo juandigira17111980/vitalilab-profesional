@@ -14,6 +14,8 @@ El [informe de verificación y publicación](28_QA_Y_PUBLICACION_PERSONALIZACION
 
 La [revisión visual móvil](29_REVISION_VISUAL_MOVIL.md) documenta el ajuste mínimo de menú, contraste y foco, con el código de negocio y la base sin cambios.
 
+El manual integral incluye ahora ese ajuste explicado desde cero, un ejercicio guiado y el cierre publicado `815b6e2`. Su edición PDF reúne el texto y el diccionario de datos/rutas en un único documento compartible; las cifras de pruebas se distinguen de las limitaciones y pendientes reales.
+
 ## Empieza aquí si eres estudiante
 
 Lee [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) antes de los documentos por especialidad. Está escrito para primeros fundamentos de programación: cada concepto se relaciona con un archivo, una práctica y una explicación de sustentación.
