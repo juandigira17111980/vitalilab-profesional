@@ -1,5 +1,15 @@
 # Changelog
 
+## Limpieza del montaje y explicación de referencias — 2026-10-15
+
+- Retirada la configuración de un proveedor no utilizado, su script de copia de estáticos y la detección específica en la fábrica Flask.
+- Conservados `wsgi:app`, Docker, el montaje NexoStack y la alternativa Render; sin cambios de modelo, migraciones, mediciones, permisos ni rutinas.
+- Sustituidas las dos pruebas del adaptador por verificaciones de arranque Flask y entrega de CSS.
+- Manuales actualizados con la diferencia entre NexoStack actual y Render histórico, sin instrucciones de alojamiento ajenas al montaje.
+- Explicación de `app/data`, columnas OMS, ejemplo de lectura y guion de sustentación; CSV original y cálculo sin modificar.
+
+Validación local de este corte: 150 pruebas aprobadas, cobertura 94,89 %, Ruff y análisis estático sin errores. Los cinco avisos de deprecación de dependencias existentes no se corrigen en esta limpieza. No requiere migración ni modificación de los servicios activos.
+
 ## Ajuste visual móvil — 2026-10-15
 
 - Menú móvil con altura acotada y desplazamiento interno en pantallas bajas y horizontales.

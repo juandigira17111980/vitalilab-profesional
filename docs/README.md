@@ -14,13 +14,13 @@ El [informe de verificación y publicación](28_QA_Y_PUBLICACION_PERSONALIZACION
 
 La [revisión visual móvil](29_REVISION_VISUAL_MOVIL.md) documenta el ajuste mínimo de menú, contraste y foco, con el código de negocio y la base sin cambios.
 
-El manual integral incluye ahora ese ajuste explicado desde cero, un ejercicio guiado y el cierre publicado `815b6e2`. Su edición PDF reúne el texto y el diccionario de datos/rutas en un único documento compartible; las cifras de pruebas se distinguen de las limitaciones y pendientes reales.
+El manual integral incluye ahora ese ajuste explicado desde cero, un ejercicio guiado y el cierre publicado `815b6e2`. También explica la carpeta `app/data`, las columnas de la referencia OMS y un guion de sustentación, distinguiendo ese recurso de los datos personales en PostgreSQL. Su edición PDF reúne el texto y el diccionario de datos/rutas en un único documento compartible; las cifras de pruebas se distinguen de las limitaciones y pendientes reales.
 
 ## Empieza aquí si eres estudiante
 
 Lee [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) antes de los documentos por especialidad. Está escrito para primeros fundamentos de programación: cada concepto se relaciona con un archivo, una práctica y una explicación de sustentación.
 
-La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md) detalla NexoStack. La [guía del docente](17_GUIA_DEL_DOCENTE_Y_EVIDENCIAS.md) contiene sesiones y criterios de aprendizaje. La [operación y accesos](18_NEXOSTACK_OPERACION_Y_ACCESOS.md) reúne permisos, respaldos y evidencia del laboratorio. Render y Vercel se conservan como alternativas, no como publicaciones nuevas de esta edición.
+La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md) detalla NexoStack. La [guía del docente](17_GUIA_DEL_DOCENTE_Y_EVIDENCIAS.md) contiene sesiones y criterios de aprendizaje. La [operación y accesos](18_NEXOSTACK_OPERACION_Y_ACCESOS.md) reúne permisos, respaldos y evidencia del laboratorio. Render se conserva como alternativa independiente y sitio histórico, no como una publicación nueva de esta edición. Se retiraron las configuraciones de alojamiento no utilizadas.
 
 | Marca | Significado |
 |---|---|
@@ -64,7 +64,7 @@ La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md
 - ✅ CLI Render autorizado y PostgreSQL de práctica disponible, confirmado el 13 de octubre.
 - ✅ Copia NexoStack con PostgreSQL propia, HTTPS y dos accesos individuales de gestión.
 - ✅ Backup y restore aislado comprobados; timers específicos del proyecto activos.
-- ⚪ Web Render Staging no creada y Vercel preparado como alternativa no utilizada.
+- ⚪ Web Render Staging no creada en ese corte histórico.
 - 🔴 Production permanece congelada hasta aprobación, backup y validación final.
 
 ## Evolución premium

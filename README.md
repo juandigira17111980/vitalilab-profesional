@@ -91,7 +91,7 @@ Si estás empezando, lee primero [VitaliLab explicado desde cero](docs/15_MANUAL
 
 Juan y Emanuel tienen cuentas individuales de aplicación y llaves distintas para cinco operaciones de gestión: estado, salud, reinicio de esta web, backup y eventos. No se entrega acceso administrativo general al VPS o a Coolify. Consulta [publicación](docs/16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md) y [operación y accesos](docs/18_NEXOSTACK_OPERACION_Y_ACCESOS.md). Los secretos no se incluyen en el repositorio ni en el material para estudiantes.
 
-La adaptación `vercel.json` se conserva como opción, no como proveedor activo. `render.yaml` sigue describiendo una alternativa de prueba; no se modifica la producción actual.
+`deploy/nexostack/` describe el montaje actual. `render.yaml` conserva una alternativa de prueba independiente del servicio original. Se retiraron los adaptadores de alojamiento que no se utilizan; no se modifica el sitio histórico ni la infraestructura activa con esta limpieza.
 
 ## Inicio local con Docker
 

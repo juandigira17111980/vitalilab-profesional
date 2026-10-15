@@ -2,9 +2,6 @@
 testpaths = ["tests"]
 addopts = "-ra --strict-markers --cov=app --cov-report=term-missing --cov-fail-under=85"
 
-[tool.vercel]
-entrypoint = "wsgi:app"
-
 [tool.coverage.run]
 branch = true
 source = ["app"]
