@@ -35,6 +35,7 @@ jobs:
         run: |
           for script in deploy/nexostack/*.sh; do bash -n "$script"; done
           docker compose -f deploy/nexostack/compose.yaml config --quiet
+          docker compose -f deploy/nexostack/compose.yaml -f deploy/nexostack/domain-https.yaml config --quiet
           sudo visudo -c -f deploy/nexostack/vitalilab.sudoers
 
   postgres-migration:

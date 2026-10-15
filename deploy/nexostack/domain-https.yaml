@@ -1,0 +1,5 @@
+# Add this override only when both public names resolve exclusively to this VPS.
+services:
+  web:
+    labels:
+      traefik.http.routers.vitalilab-main-https.tls.certresolver: letsencrypt

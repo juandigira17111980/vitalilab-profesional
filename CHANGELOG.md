@@ -4,6 +4,13 @@ Los cambios relevantes de VitaliLab se documentan siguiendo una adaptación de K
 
 ## [Unreleased]
 
+### Conexión del dominio principal
+
+- Rutas específicas para vitalilab.space y www conservando la dirección de laboratorio y su certificado independiente.
+- Emisión HTTPS condicionada a DNS correcto de ambos nombres, sin cambios automáticos en Hostinger.
+- Aplicación de configuración solo a la web, con respaldo y rechazo de cambios de código/esquema en esa operación.
+- Guía 24: editar únicamente el CNAME www; conservar ALIAS, correo, nameservers y Render; validación y reversión.
+
 ### Bienestar personal y escolar (2026-10-14)
 
 - Registro personal/institucional con segundo paso de colegio, grupo y rol solicitado; selección sin privilegios automáticos.
