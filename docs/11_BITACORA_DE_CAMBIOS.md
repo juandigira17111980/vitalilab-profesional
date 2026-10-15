@@ -21,7 +21,7 @@
 | 2026-10-01 | Infra | PostgreSQL de práctica creada en Staging con acceso externo cerrado | Estado API Render | ✅ disponible al 13 de octubre |
 | 2026-10-13 | Documentación | Manual desde cero, laboratorios y guía docente | capítulos 15, 16 y 17 | ✅ |
 | 2026-10-13 | Exactitud | Sesión cookie firmada, configuración local explícita y límites reales de SMTP | revisión de código y fuentes oficiales | ✅ |
-| 2026-10-13 | Vercel | Entrada, assets públicos y escritura temporal preparados | configuración, esquema y pruebas | ✅ local / 🟡 remoto |
+| 2026-10-15 | Limpieza de infraestructura | Retirado el adaptador opcional de un proveedor no utilizado; se mantienen NexoStack y la alternativa Render | diff, pruebas de arranque y estáticos; historial anterior recuperable en Git | ✅ código |
 | 2026-10-13 | QA | 26 pruebas y 90,43 %; instalación y práctica con base desechable | salida local y flujo CSRF | ✅ |
 | 2026-10-13 | NexoStack | Web y PostgreSQL propias, TLS y gestión restringida | PR #5, primer deploy `455d5ee` | ✅ laboratorio |
 | 2026-10-13 | Seguridad | Cookie remember Secure, web no root y logs sin URL de tokens | 27 pruebas, 90,67 %, CI verde | ✅ |

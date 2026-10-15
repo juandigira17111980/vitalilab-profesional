@@ -98,7 +98,7 @@ Las dependencias se declaran en `requirements.txt`. Los números fijan versiones
 
 Local es la copia en tu equipo. Staging es una copia compartida de prueba. Producción es la versión que usan personas reales. Usaremos cuentas y datos ficticios en las prácticas. Cada entorno compartido necesita su propia base de datos y sus propios secretos.
 
-GitHub guarda el código y su historial. Render y Vercel ejecutan aplicaciones. Subir código a GitHub y publicarlo en internet son acciones diferentes. También es diferente publicar un PDF para estudiar y desplegar una aplicación que acepta registros.
+GitHub guarda el código y su historial. El alojamiento ejecuta la aplicación: la versión actual está en NexoStack y el sitio anterior en Render. Subir código a GitHub y publicarlo en internet son acciones diferentes. También es diferente publicar un PDF para estudiar y desplegar una aplicación que acepta registros.
 
 ### 2.7 Cómo leer las instrucciones de Python que encontrarás
 
@@ -257,8 +257,7 @@ vitalilab-profesional/
   wsgi.py                   Punto de entrada de la web
   requirements.txt          Dependencias para ejecutar
   requirements-dev.txt      Herramientas para desarrollo
-  pyproject.toml            Pruebas formato y entrada Vercel
-  vercel.json               Configuración de la copia Vercel
+  pyproject.toml            Configuración de pruebas y formato
   render.yaml               Configuración de la copia Render
   app/
     __init__.py             Construye la aplicación Flask
@@ -283,7 +282,7 @@ vitalilab-profesional/
     templates/              Pantallas y componentes Jinja
     static/                 CSS JavaScript y marca SVG
   migrations/versions/      Cambios de estructura de la base
-  scripts/build_vercel.py   Prepara archivos estáticos para CDN
+  deploy/nexostack/         Configuración del montaje actual
   tests/                    Comprobaciones automatizadas
   docs/                     Material técnico y esta guía
   .github/workflows/ci.yml   Comprobaciones de GitHub Actions
@@ -307,7 +306,7 @@ La primera línea importa una función. La segunda construye una aplicación y l
 
 La misma fábrica permite construir una aplicación de pruebas con otra base y otra configuración. Esto evita que una prueba tenga que modificar datos de un usuario real para funcionar.
 
-En Vercel la carpeta de la aplicación no permite escrituras de ejecución. La fábrica selecciona una carpeta temporal para `instance` cuando `VERCEL=1`. Esa carpeta es para archivos temporales; no se usa para guardar la PostgreSQL.
+La fábrica utiliza la carpeta estándar `instance` de Flask, separada del código de `app`. En NexoStack esa ruta tiene un montaje temporal específico porque la raíz del contenedor es de solo lectura. PostgreSQL guarda la información persistente en su propio volumen, no en esa carpeta temporal.
 
 ### 5.3 Por qué un monolito modular
 
@@ -403,7 +402,7 @@ Dos solicitudes pueden consultar casi al mismo tiempo y ambas creer que falta el
 
 SQLite es un motor que guarda esta práctica en un archivo. Facilita empezar sin otro servidor. PostgreSQL es un servidor de datos que permite conexiones compartidas, restricciones y operación administrada. En `staging` y `production` la configuración exige PostgreSQL y rechaza SQLite.
 
-No afirmes que SQLite es inútil ni que PostgreSQL elimina todos los errores. La elección responde a cómo se ejecutará esta aplicación. En NexoStack los datos viven en la PostgreSQL independiente y su volumen persistente, no dentro de la imagen de la web. Si se utilizara Vercel, sería necesaria una base externa porque la función no ofrece almacenamiento local permanente.
+No afirmes que SQLite es inútil ni que PostgreSQL elimina todos los errores. La elección responde a cómo se ejecutará esta aplicación. En NexoStack los datos viven en la PostgreSQL independiente y su volumen persistente, no dentro de la imagen de la web. Reconstruir la imagen no debe eliminar los registros de los usuarios.
 
 ### 6.9 Migraciones y restauración
 
@@ -654,7 +653,7 @@ Lee cómo prepara al usuario y al hábito, cómo repite la acción y qué cuenta
 | 429 | Espera el periodo del límite y revisa qué acción repetiste |
 | Perfil sin medición | Peso y altura deben validarse juntos |
 | /health bien y /ready mal | Conexión de base o disponibilidad |
-| Pantalla sin estilos en Vercel | Build de public/static y URL del archivo CSS |
+| Pantalla sin estilos | Archivos en app/static y respuesta de su URL CSS |
 | Recuperación sin correo | Credenciales servicio y restricciones del alojamiento |
 
 Lee el primer error útil y el archivo al que apunta. Un traceback es una lista del recorrido que terminó en fallo. El servidor puede registrar detalle; la pantalla pública de un error 500 no debe mostrar secretos ni toda la traza.
@@ -700,7 +699,7 @@ Subir una rama requiere permiso del propietario. `git push -u origin docs/mi-pra
 
 CI significa integración continua: comprobar cambios de forma repetible. Un resultado verde está asociado a un commit. Si modificas después el código, debes comprobar ese nuevo commit. No presentes como validación actual un resultado obtenido para otra versión.
 
-Publicación continua exige además conectar el alojamiento y observar el resultado. En Render el Blueprint propone publicar tras pasar los checks. En Vercel revisamos la configuración de su proyecto y la rama; los nombres de ambientes no son idénticos en todas las plataformas.
+Publicación continua exige además conectar el alojamiento y observar el resultado. En Render el Blueprint propone publicar tras pasar los checks. En el montaje actual de NexoStack se utiliza el procedimiento aislado de `deploy/nexostack/`; un CI verde no implica que ese commit ya esté publicado. Los nombres de ambientes no son idénticos en todas las plataformas.
 
 ## 11 Entender el montaje completo antes de desplegar
 
@@ -709,7 +708,7 @@ Publicación continua exige además conectar el alojamiento y observar el result
 | Pieza | Qué aporta | Qué no hace por sí sola |
 |---|---|---|
 | Repositorio GitHub | Código e historial | No ejecuta automáticamente el backend |
-| Vercel o Render | Ejecución y dirección web | No inventa las tablas ni tus secretos |
+| Render | Alojamiento del sitio anterior y alternativa configurada | No inventa las tablas ni tus secretos |
 | NexoStack VPS | Montaje elegido con Docker y proxy compartido | No reemplaza Render ni concede permisos sobre otros proyectos |
 | PostgreSQL | Datos persistentes | No construye la interfaz |
 | Variables de entorno | Configuración por ambiente | No deben convertirse en documentación pública |
@@ -817,21 +816,21 @@ Para regresar a un código anterior, debe conservarse compatibilidad con el esqu
 
 **Para sustentar.** Señala la diferencia entre imagen, contenedor y volumen. Después explica por qué gestionar un comunicado no autoriza entrar al VPS y cómo se demuestra que una versión nueva conservó los datos.
 
-## 13 Render y Vercel como alternativas
+## 13 Distinguir Render histórico del montaje NexoStack
 
 ### 13.1 El Render histórico queda sin cambios
 
-La aplicación original utiliza el repositorio `ega1026/vitalilab`; la reconstrucción pertenece al repositorio privado `juandigira17111980/vitalilab-profesional`. Compartir permisos del primer repositorio no es lo mismo que reemplazar un servicio publicado.
+La aplicación original utiliza el repositorio `ega1026/vitalilab`; la reconstrucción pertenece al repositorio `juandigira17111980/vitalilab-profesional`. Compartir permisos del primer repositorio no es lo mismo que reemplazar un servicio publicado.
 
 La base temporal `vitalilab-staging-db` que se creó en Render estaba disponible al 13 de octubre, con acceso externo cerrado y vencimiento el 31 de octubre a las 21:36 de Colombia. No es la base de este laboratorio NexoStack. El servicio web Staging de Render no se creó en esa revisión por el acceso Git pendiente. No se elimina esa base ni se cambia producción como consecuencia de esta publicación.
 
 Render Free puede dormir por inactividad, no aporta backups administrados para PostgreSQL Free y bloquea puertos SMTP 25, 465 y 587. Sus valores de configuración no superan esos límites. Una implementación en Render utiliza `render.yaml`, Gunicorn y una base independiente, con validación propia antes de dar una URL por aprobada.
 
-### 13.2 La configuración Vercel no está en uso
+### 13.2 El montaje actual tiene su propia configuración
 
-El código conserva una adaptación opcional a Vercel: entrada `wsgi:app`, `vercel.json`, el script que prepara `public/static` y una carpeta temporal al detectar ese runtime. Esa ruta ejecutaría Flask como función administrada y necesitaría PostgreSQL externa accesible con TLS.
+La versión actual se ejecuta en NexoStack con Flask y Gunicorn dentro de un contenedor Docker. `deploy/nexostack/compose.yaml` describe la web, el migrador y PostgreSQL propia; el dominio y HTTPS se complementan con su configuración específica. Flask sirve los archivos de `app/static` sin preparar una segunda copia para otro proveedor.
 
-NexoStack ejecuta Gunicorn y su PostgreSQL privada. No necesita una cuenta de Vercel, ejecutar `npx vercel login` ni convertir la base Render en pública. No confundas archivos de una alternativa con el proveedor realmente utilizado. La comparación sirve para aprender que una misma aplicación puede tener configuraciones de infraestructura diferentes.
+Se retiraron los adaptadores de alojamiento no utilizados para evitar confundir a quienes estudian el proyecto. Se mantiene `wsgi:app` porque es la entrada utilizada por Gunicorn, y `render.yaml` porque documenta una alternativa separada del servicio original. Esta limpieza no modifica el DNS, los datos ni los contenedores activos.
 
 ### 13.3 Qué sigue pendiente antes de producción real
 
@@ -982,9 +981,6 @@ Fuentes oficiales para profundizar:
 - Consultas SQLAlchemy: https://docs.sqlalchemy.org/en/20/tutorial/data_select.html
 - Migraciones Flask Migrate: https://flask-migrate.readthedocs.io/en/latest/
 - Git y fundamentos: https://git-scm.com/book/es/v2
-- Flask en Vercel: https://vercel.com/docs/frameworks/backend/flask
-- Runtime Python de Vercel: https://vercel.com/docs/functions/runtimes/python
-- Ambientes Vercel: https://vercel.com/docs/deployments/environments
 - Flask en Render: https://render.com/docs/deploy-flask
 - Conexión Git a Render: https://render.com/docs/git-provider
 - Límites Render Free: https://render.com/docs/free

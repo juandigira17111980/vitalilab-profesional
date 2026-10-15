@@ -89,7 +89,7 @@ Cada usuario recibe instrucciones y una llave propias en archivos privados separ
 
 ## 8 Alternativas conservadas
 
-`render.yaml` sigue describiendo una alternativa Render Staging. La base temporal creada allí no es la de NexoStack y no se expone al exterior. `vercel.json` y su preparación de estáticos siguen como adaptación opcional; no se publica en Vercel en esta entrega.
+`render.yaml` sigue describiendo una alternativa Render Staging. La base temporal creada allí no es la de NexoStack y no se expone al exterior. El montaje actual utiliza exclusivamente la configuración de `deploy/nexostack/`; se retiraron los adaptadores de proveedores no utilizados.
 
 La elección actual aprovecha el VPS ya disponible. Un cambio futuro de proveedor requiere autorización, comprobación de sus condiciones vigentes y una nueva validación de la URL.
 

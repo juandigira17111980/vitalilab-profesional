@@ -117,6 +117,32 @@ Orientación general sobre actividad por edad: https://www.cdc.gov/physical-acti
 
 ## Modelo relacional y decisiones de DBA
 
+### Entender la carpeta data antes de estudiar las tablas
+
+`app/data` no es la base de datos de los estudiantes. Es una carpeta de consulta que acompaña al programa, como una tabla de fórmulas en un libro. Su archivo `who_bmi_2007.csv` es texto dividido en columnas mediante comas. Contiene 336 filas de parámetros de la referencia OMS 2007, además de una cabecera; no contiene nombres, correos, contraseñas ni medidas de usuarios.
+
+La primera línea es `sex,month,L,M,S`. La fila visible en la captura compartida por el equipo, `female,144,-1.4006,17.9966,0.13129`, representa una consulta para la referencia femenina a los 144 meses cumplidos, es decir, 12 años. No representa una estudiante registrada. Los números al margen del editor son números de línea, no identificadores de personas.
+
+| Campo | Cómo explicarlo |
+|---|---|
+| `sex` | Identifica cuál de las dos referencias de crecimiento se consulta; no es el nombre ni la identidad de una persona |
+| `month` | Edad en meses cumplidos; no es el mes del año |
+| `L` | Ajusta la asimetría de la distribución; un valor negativo no es un error ni un IMC negativo |
+| `M` | Mediana de IMC de esa referencia a esa edad |
+| `S` | Dispersión relativa de la referencia; no es una duración en segundos |
+
+Primero el programa calcula el IMC con peso y altura. Ese cálculo no necesita el CSV. Después, si procede contextualizarlo, `growth_reference()` lee la tabla local y `growth_snapshot()` busca la pareja de referencia y edad en la fecha de medición. Usa L, M y S para obtener un valor estandarizado y un percentil dentro de los límites implementados. La lectura se conserva en memoria en cada proceso para no abrir el archivo con cada petición. No se envían medidas a la OMS ni se escribe en el CSV al guardar un perfil.
+
+La cobertura va de 61 a 228 meses. Sin edad o referencia adecuadas no se devuelve percentil, y tampoco se extrapola fuera del intervalo central implementado. Un percentil no es una nota sobre 100 ni un porcentaje de salud. El archivo tampoco determina qué ejercicio debe hacer el usuario.
+
+Por contraste, PostgreSQL sí almacena cuentas, perfiles y mediciones individuales. La tabla `health_measurements` guarda el resultado y su contexto histórico con los permisos de la aplicación. Git conserva el CSV como recurso de referencia; las copias de seguridad de PostgreSQL protegen los registros reales. Son responsabilidades diferentes.
+
+**Guion para sustentar.** «Esta carpeta contiene parámetros de referencia de crecimiento, no datos de estudiantes. El programa calcula el IMC y consulta la fila correspondiente a edad y referencia cuando tiene el contexto necesario. Los registros personales se guardan por separado en PostgreSQL. El resultado es descriptivo, no un diagnóstico ni una receta de ejercicios».
+
+**Práctica.** Busca `female,144`, explica por qué equivale a 12 años y sigue la consulta en `app/services/measurements.py`. Después localiza `HealthMeasurement` en los modelos y explica por qué sus registros no se guardan en el CSV. El detalle y la procedencia están en `app/data/README.md`; la fuente es la [referencia OMS de IMC por edad](https://www.who.int/toolkits/growth-reference-data-for-5to19-years/indicators/bmi-for-age).
+
+### Las entidades persistentes de la aplicación
+
 PostgreSQL guarda relaciones entre cuentas, registros y colegios. La carga principal es transaccional: muchas acciones pequeñas sobre los datos del usuario. Se utiliza un modelo relacional porque requiere integridad, relaciones verificables y operaciones atómicas. No se cambia de motor para añadir rutinas ni se introduce una segunda base innecesaria.
 
 | Tabla | Qué representa | Relación principal |

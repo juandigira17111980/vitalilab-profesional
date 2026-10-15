@@ -33,7 +33,6 @@ output/
 outputs/
 dist/
 build/
-.vercel/
 public/static/
 
 # Editors and operating systems

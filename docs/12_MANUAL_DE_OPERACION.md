@@ -16,7 +16,7 @@ $env:SESSION_COOKIE_SECURE = "false"
 
 Use una DB desechable y un `SECRET_KEY` local. No comparta `.env`.
 
-Las variables anteriores se configuran en la misma terminal. Copiar `.env.example` no garantiza cargar `.env`; `python-dotenv` no se declara. Para Vercel se usa PostgreSQL externa y el [procedimiento dedicado](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md).
+Las variables anteriores se configuran en la misma terminal. Copiar `.env.example` no garantiza cargar `.env`; `python-dotenv` no se declara. Para el montaje actual de NexoStack se utiliza PostgreSQL propia y el [procedimiento dedicado](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md).
 
 ## 2. Pruebas y diagnóstico
 

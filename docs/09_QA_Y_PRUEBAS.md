@@ -1,6 +1,6 @@
 # Estrategia y ejecución de QA
 
-Revalidación del 13 de octubre de 2026: **28 pruebas aprobadas y 90,67 % de cobertura local**. Incluye adaptación Vercel opcional, cookie remember Secure y aviso de laboratorio exclusivo de staging. Se comprobó un flujo SQLite desechable y, en NexoStack, registro real con CSRF, perfil ficticio, hábito repetido, permisos, dos administradores, gestión restringida, TLS SQL y restore aislado. Consulte [evidencia del laboratorio](18_NEXOSTACK_OPERACION_Y_ACCESOS.md). La tabla siguiente conserva el resultado histórico del 30 de septiembre, no reemplaza la validación de esta edición.
+Revalidación del 13 de octubre de 2026: **28 pruebas aprobadas y 90,67 % de cobertura local**. Incluye cookie remember Secure y aviso de laboratorio exclusivo de staging. Se comprobó un flujo SQLite desechable y, en NexoStack, registro real con CSRF, perfil ficticio, hábito repetido, permisos, dos administradores, gestión restringida, TLS SQL y restore aislado. Consulte [evidencia del laboratorio](18_NEXOSTACK_OPERACION_Y_ACCESOS.md). La tabla siguiente conserva el resultado histórico del 30 de septiembre, no reemplaza la validación de esta edición. La limpieza del 15 de octubre retira un adaptador de alojamiento no utilizado; sus pruebas se sustituyen por comprobaciones del arranque y los estáticos de Flask.
 
 ## 1. Resultado local
 

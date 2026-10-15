@@ -1,5 +1,4 @@
 import os
-import tempfile
 from logging.config import dictConfig
 
 from flask import Flask, request
@@ -11,14 +10,7 @@ from app.extensions import csrf, db, limiter, login_manager, migrate
 
 def create_app(test_config: dict | None = None) -> Flask:
     _configure_logging()
-    # Vercel's application bundle is read-only. Only temporary runtime files
-    # belong here; persistent data always lives in PostgreSQL.
-    instance_path = (
-        os.path.join(tempfile.gettempdir(), "vitalilab-instance")
-        if os.getenv("VERCEL") == "1"
-        else None
-    )
-    app = Flask(__name__, instance_path=instance_path)
+    app = Flask(__name__)
     app.config.from_object(TestingConfig if test_config is not None else Config)
     if test_config:
         app.config.update(test_config)
