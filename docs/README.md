@@ -66,7 +66,14 @@ Este corte amplía la base original de siete entidades con metas y bitácora: nu
 
 22. [Cómo funcionan los dos enfoques de perfil](21_ENFOQUES_PERSONAL_E_INSTITUCIONAL.md)
 
-La cuarta revisión, `7ca6e014b982`, añade dos columnas al perfil sin crear tablas nuevas: siguen siendo nueve entidades. Esta selección personaliza el formulario; no implementa membresías, organizaciones multiusuario ni permisos institucionales.
+La cuarta revisión, `7ca6e014b982`, añadió dos columnas al perfil sin crear tablas nuevas. En ese corte la selección solo personalizaba el formulario; la extensión siguiente incorpora vinculaciones y permisos reales.
+
+## Experiencia personal y escolar
+
+23. [Diseño del módulo escolar y decisiones de seguridad](22_DISENO_MODULO_ESCOLAR.md)
+24. [Guía escolar desde cero y validación](23_GUIA_ESCOLAR_Y_VALIDACION.md)
+
+La quinta revisión, `a903b5d7e214`, amplía a catorce entidades y añade colegios, grupos, vinculaciones revisadas, asignaciones y rutinas registradas. Incluye seguimiento propio, referencia OMS documentada y próximo paso por objetivo funcional. Consulta la guía 23 para los recorridos de estudiante, docente y administrador, controles, pruebas y restricciones del piloto. No se habilita la recopilación de datos reales de menores por publicar esta versión.
 
 ## Regla de evidencia
 

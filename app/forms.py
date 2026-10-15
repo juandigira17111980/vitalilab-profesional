@@ -21,6 +21,7 @@ from wtforms.validators import (
     Length,
     NumberRange,
     Optional,
+    StopValidation,
     ValidationError,
 )
 
@@ -42,7 +43,18 @@ def normalize_email(value: str | None) -> str | None:
     return value.strip().lower() if value else value
 
 
+def finite_decimal(_form, field):
+    if field.data is not None and not field.data.is_finite():
+        raise StopValidation("Ingresa un número finito válido.")
+
+
 class RegisterForm(FlaskForm):
+    usage_mode = RadioField(
+        "¿Cómo usarás VitaliLab?",
+        choices=[("personal", "Uso personal"), ("institutional", "Uso institucional")],
+        default="personal",
+        validators=[DataRequired()],
+    )
     display_name = StringField("Nombre o apodo", validators=[DataRequired(), Length(min=2, max=80)])
     email = EmailField(
         "Correo electrónico",
@@ -93,6 +105,24 @@ class ResetPasswordForm(FlaskForm):
 class ProfileForm(FlaskForm):
     display_name = StringField("Nombre o apodo", validators=[DataRequired(), Length(min=2, max=80)])
     birth_date = DateField("Fecha de nacimiento", validators=[Optional()])
+    reference_sex = SelectField(
+        "Referencia de crecimiento (opcional)",
+        choices=[
+            ("unspecified", "Sin especificar"),
+            ("female", "Referencia femenina"),
+            ("male", "Referencia masculina"),
+        ],
+        default="unspecified",
+    )
+    movement_goal = SelectField(
+        "¿Qué quieres priorizar?",
+        choices=[
+            ("center", "Postura y centro"),
+            ("energy", "Energía cotidiana"),
+            ("strength", "Fuerza de base"),
+        ],
+        default="energy",
+    )
     usage_mode = RadioField(
         "¿Cómo quieres usar VitaliLab?",
         choices=[("personal", "Uso personal"), ("institutional", "Uso institucional")],
@@ -110,10 +140,14 @@ class ProfileForm(FlaskForm):
         validators=[Optional(), Length(max=80)],
     )
     weight_kg = DecimalField(
-        "Peso actual (kg)", validators=[Optional(), NumberRange(min=20, max=500)], places=2
+        "Peso actual (kg)",
+        validators=[Optional(), finite_decimal, NumberRange(min=10, max=500)],
+        places=2,
     )
     height_cm = DecimalField(
-        "Altura actual (cm)", validators=[Optional(), NumberRange(min=80, max=250)], places=2
+        "Altura actual (cm)",
+        validators=[Optional(), finite_decimal, NumberRange(min=50, max=250)],
+        places=2,
     )
     submit = SubmitField("Guardar cambios")
 
@@ -124,6 +158,15 @@ class ProfileForm(FlaskForm):
     def validate_height_cm(self, field) -> None:
         if field.data and not self.weight_kg.data:
             raise ValidationError("Ingresa peso y altura juntos para calcular el IMC.")
+        if (
+            field.data
+            and self.weight_kg.data
+            and field.data.is_finite()
+            and self.weight_kg.data.is_finite()
+        ):
+            bmi = self.weight_kg.data / ((field.data / 100) ** 2)
+            if not 5 <= bmi <= 100:
+                raise ValidationError("Revisa la combinación de peso y altura y sus unidades.")
 
     def validate_weight_kg(self, field) -> None:
         if field.data and not self.height_cm.data:

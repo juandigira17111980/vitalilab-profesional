@@ -149,4 +149,10 @@ def ready():
 
 @bp.app_context_processor
 def global_template_values():
-    return {"current_year": date.today().year}
+    from app.services.school import teacher_membership
+
+    return {
+        "current_year": date.today().year,
+        "has_teacher_access": current_user.is_authenticated
+        and teacher_membership(current_user) is not None,
+    }

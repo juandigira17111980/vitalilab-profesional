@@ -1,6 +1,74 @@
-"""Reviewed educational routines; not clinical prescriptions or treatment plans."""
+"""General educational routines, not clinically validated prescriptions."""
 
 ROUTINES = (
+    {
+        "slug": "fortalece-tu-centro",
+        "name": "Fortalece tu centro",
+        "category": "Movimiento",
+        "seconds": 90,
+        "icon": "focus",
+        "habit_code": "gentle-movement",
+        "description": (
+            "Haz una pausa para reconocer tu postura y activar suavemente "
+            "tu zona media, sin buscar cambiar tu cuerpo."
+        ),
+        "steps": (
+            "Siéntate con apoyo o elige una postura cómoda y estable.",
+            (
+                "Alarga suavemente tu espalda y activa el abdomen sin contener el aire; "
+                "suelta después de unos segundos."
+            ),
+            (
+                "Descansa y repite solo si te resulta cómodo. "
+                "No necesitas hacer una plancha ni soportar dolor."
+            ),
+        ),
+    },
+    {
+        "slug": "despierta-tu-energia",
+        "name": "Despierta tu energía",
+        "category": "Movimiento",
+        "seconds": 120,
+        "icon": "sun",
+        "habit_code": "gentle-movement",
+        "description": (
+            "Un momento de movimiento adaptable para retomar tu día con atención y vitalidad."
+        ),
+        "steps": (
+            "Despeja el espacio y elige moverte sentado o de pie con apoyo.",
+            (
+                "Alterna movimientos suaves de brazos y piernas a tu ritmo, "
+                "sin forzar las articulaciones."
+            ),
+            (
+                "Intercala pausas cuando lo necesites. El objetivo es participar con comodidad, "
+                "no completar un número de repeticiones."
+            ),
+        ),
+    },
+    {
+        "slug": "construye-tu-fuerza",
+        "name": "Construye tu fuerza",
+        "category": "Movimiento",
+        "seconds": 120,
+        "icon": "move",
+        "habit_code": "gentle-movement",
+        "description": (
+            "Explora una activación suave y progresiva, "
+            "con espacio para adaptar o detener la actividad."
+        ),
+        "steps": (
+            "Busca una postura estable, sentado o de pie, y relaja los hombros.",
+            (
+                "Junta las palmas frente al pecho y haz una presión suave durante unos segundos, "
+                "respirando con normalidad."
+            ),
+            (
+                "Descansa antes de repetir. Si aparece dolor, mareo o incomodidad, detente; "
+                "en clase, pide una alternativa al docente."
+            ),
+        ),
+    },
     {
         "slug": "pausa-consciente",
         "name": "Un minuto para volver a ti",

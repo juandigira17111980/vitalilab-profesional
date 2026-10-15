@@ -6,11 +6,11 @@ VitaliLab es una aplicación web educativa para registrar hábitos saludables, c
 
 | Componente | Resultado |
 |---|---|
-| Aplicación y backend | Reconstrucción y evolución premium integradas en `staging`, PR #2 y #6 |
-| Modelo de datos | 9 tablas de negocio, 3 migraciones Alembic, integridad e índices |
+| Aplicación y backend | Monolito modular con bienestar personal y módulo escolar; consultar CI y guía 23 para estado de publicación |
+| Modelo de datos | 14 tablas de negocio, 5 migraciones Alembic, integridad e índices |
 | Seguridad | Hash scrypt, CSRF, autorización, bloqueo temporal, rate limits y cabeceras |
 | Frontend | Responsive, navegación móvil, formularios accesibles y estados controlados |
-| Calidad | 42 pruebas y 91,75 % local; CI premium PostgreSQL, seguridad y Docker aprobado |
+| Calidad | Suite ampliada para permisos escolares, crecimiento y XP; evidencia de este cambio en guía 23 y CI del PR |
 | Base de datos | Migración, deriva, backup y restauración aislada aprobados en PostgreSQL 18 CI |
 | Staging | Copia académica en NexoStack; evidencia en docs/18 |
 | Production | Congelada; no se ha modificado |
@@ -19,10 +19,15 @@ La copia es un laboratorio, no un reemplazo productivo de Render. SMTP real, acc
 
 ## Funciones
 
-- Evolución de producto: ocho hábitos, metas personales, bitácora diaria, actividad de 28 días y seis rutinas públicas con temporizador.
+- Ocho hábitos, metas personales, bitácora diaria, actividad de 28 días y nueve rutinas públicas con temporizador.
+- Enfoque personal/institucional, catálogo de colegios, grupos por año, solicitudes verificadas y asignaciones docentes del mismo colegio.
+- Panel docente con reportes agregados, supresión de grupos pequeños y rutinas para proyectar sin datos individuales.
+- Seguimiento anual propio, referencia de crecimiento OMS cuando procede y «Tu próximo paso» por objetivo funcional; nunca por categoría corporal.
+- Registro de rutinas y hábito asociado sin duplicar XP diario, incluso con solicitudes simultáneas comprobadas en CI PostgreSQL.
 - Logo SVG propio, portada de producto, navegación compacta y móvil con accesos rápidos.
 - La calculadora IMC continúa en Indicadores educativos; privacidad y consentimiento permanecen activos.
 - [Diseño y auditoría UX](docs/19_EVOLUCION_DE_PRODUCTO_Y_AUDITORIA_UX.md) y [guía de funciones, datos y QA](docs/20_GUIA_DE_FUNCIONES_Y_QA_PREMIUM.md).
+- [Guía escolar paso a paso, arquitectura y validación](docs/23_GUIA_ESCOLAR_Y_VALIDACION.md). El laboratorio no está habilitado para datos reales de menores.
 
 - Registro, login, logout, bloqueo temporal y recuperación de contraseña.
 - Perfil propio y medidas opcionales con IMC educativo.
@@ -38,10 +43,12 @@ La copia es un laboratorio, no un reemplazo productivo de Render. SMTP real, acc
 app/
 ├── auth/       registro, acceso, cierre y recuperación
 ├── profile/    perfil propio y medidas
+├── school/     vinculaciones, permisos, grupos y panel docente
 ├── habits/     cumplimiento de hábitos
 ├── admin/      comunicados y eventos de auditoría
 ├── main/       inicio, contenidos, panel y health checks
-├── services/   progreso, correo y auditoría
+├── services/   progreso, correo, auditoría, movimiento y reglas escolares
+├── data/       parámetros oficiales OMS 2007 y procedencia
 ├── templates/  interfaz Jinja reutilizable
 └── static/     sistema visual y JavaScript progresivo
 migrations/       historial Alembic
@@ -64,6 +71,7 @@ $env:SECRET_KEY = (.\.venv\Scripts\python.exe -c "import secrets; print(secrets.
 $env:SESSION_COOKIE_SECURE = "false"
 .\.venv\Scripts\python.exe -m flask --app wsgi:app db upgrade
 .\.venv\Scripts\python.exe -m flask --app wsgi:app seed-habits
+.\.venv\Scripts\python.exe -m flask --app wsgi:app seed-schools
 .\.venv\Scripts\python.exe -m flask --app wsgi:app run
 ```
 
@@ -96,6 +104,7 @@ flask --app wsgi:app create-admin
 flask --app wsgi:app db upgrade
 flask --app wsgi:app db check
 flask --app wsgi:app seed-habits
+flask --app wsgi:app seed-schools
 ```
 
 El alta administrativa valida correo y aplica la misma política fuerte de contraseña. El seed es idempotente.

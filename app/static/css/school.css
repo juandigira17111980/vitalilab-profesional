@@ -1,0 +1,43 @@
+/* School workspace: reuses the established product palette and navigation. */
+.school-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; align-items: start; }
+.school-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1rem; }
+.field select { width: 100%; max-width: 100%; min-height: 48px; padding: .75rem .85rem; border: 1px solid #cbd4d0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; }
+.field--error select { border-color: var(--danger); }
+.profile-grid .field-row { align-items: flex-start; }
+.next-step-card { border: 1px solid #bcccac; background: #f1f5e5; border-radius: 20px; padding: 1.35rem; }
+.next-step-card h2 { margin-top: .5rem; font-size: 1.5rem; line-height: 1.3; }
+.next-step-card ol { padding-left: 1.2rem; font-size: .9rem; }
+.next-step-card li { margin-bottom: .8rem; }
+.next-step-card p { font-size: .9rem; }
+.next-step-card .field-hint { font-size: .76rem; }
+.bmi-card .button { margin-top: 1rem; }
+.table-scroll { width: 100%; max-width: 100%; overflow-x: auto; margin-block: 1rem; }
+.school-table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+.school-table caption { text-align: left; padding-bottom: .8rem; font-weight: 700; }
+.school-table th, .school-table td { padding: .8rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; min-width: 100px; }
+.school-table th { color: var(--forest); }
+.inline-filter { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+.inline-filter input { width: 110px; min-height: 48px; padding: .5rem; border: 1px solid #8b9c91; border-radius: 8px; font: inherit; }
+.growth-chart { margin: 1.5rem 0; }
+.growth-chart svg { width: 100%; min-height: 180px; overflow: visible; }
+.growth-chart text { fill: #43584f; font-size: 13px; }
+.growth-chart figcaption { font-size: .8rem; color: var(--muted); }
+.chart-axis { stroke: #839b90; fill: none; }
+.growth-line { stroke: #1d6d57; stroke-width: 3; fill: none; }
+.growth-point { fill: #184e40; }
+.spaced-form { margin-block: 1.5rem; }
+.admin-assignment { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; padding: 1rem 0; border-bottom: 1px solid var(--line); }
+.admin-assignment > span { min-width: 0; overflow-wrap: anywhere; flex: 1 1 220px; }
+.classroom-projection { background: #f2f5e9; }
+.projection-shell { max-width: 1100px; margin: auto; padding: 2rem; }
+.projection-shell h1 { color: var(--forest); font-size: clamp(2rem, 5vw, 4.5rem); }
+.projection-shell .routine-steps { font-size: clamp(1.1rem, 2.4vw, 1.6rem); }
+.projection-shell .timer-card { max-width: 500px; margin: 2rem auto; }
+.check-row { margin-block: 1rem; }
+.check-row input { width: 22px; height: 22px; flex-shrink: 0; }
+@media (max-width: 800px) {
+  .school-layout { grid-template-columns: minmax(0, 1fr); }
+  .school-table th, .school-table td { padding: .65rem; }
+  .next-step-card { padding: 1.15rem; }
+  .projection-shell { padding: 1.25rem; }
+}

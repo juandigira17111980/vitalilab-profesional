@@ -41,14 +41,20 @@ def register():
             return render_template("auth/register.html", form=form), 409
         user = User(email=email)
         user.set_password(form.password.data)
-        user.profile = UserProfile(display_name=form.display_name.data.strip())
+        user.profile = UserProfile(
+            display_name=form.display_name.data.strip(), usage_mode=form.usage_mode.data
+        )
         db.session.add(user)
         db.session.flush()
         record_event("account.registered", "user", user.id, user.id)
         db.session.commit()
         login_user(user)
         flash("Tu cuenta está lista. Empecemos con un hábito pequeño.", "success")
-        return redirect(url_for("main.dashboard"))
+        return redirect(
+            url_for(
+                "school.account" if user.profile.usage_mode == "institutional" else "main.dashboard"
+            )
+        )
     return render_template("auth/register.html", form=form)
 
 

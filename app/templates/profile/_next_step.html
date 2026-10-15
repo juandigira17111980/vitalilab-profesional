@@ -1,0 +1,8 @@
+<article class="next-step-card" aria-labelledby="next-step-title">
+  <p class="eyebrow">Tu próximo paso</p><h2 id="next-step-title">{{ suggested.name }}</h2>
+  <p>{{ suggested.description }}</p><ol>{% for step in suggested.steps %}<li>{{ step }}</li>{% endfor %}</ol>
+  <p class="field-hint">Pausa orientativa de {{ suggested.seconds }} segundos, con descansos a tu ritmo. Puedes adaptar o detener la actividad. En menores, el docente o adulto responsable debe valorar si es adecuada.</p>
+  <a class="text-link" href="{{ url_for('wellness.routine', slug=suggested.slug) }}">Abrir instrucciones y temporizador →</a>
+  <form method="post" action="{{ url_for('wellness.complete_routine', slug=suggested.slug) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="origin" value="profile"><p>¿Completaste esta rutina?</p><button class="button button--primary button--full" type="submit"{% if routine_completed %} disabled{% endif %}>{{ 'Registrada hoy' if routine_completed else 'Registrar en mi día' }}</button></form>
+  <p class="field-hint">Suma el hábito Movimiento a tu ritmo. Si ya lo registraste hoy, no vuelve a sumar XP.</p>
+</article>
