@@ -10,11 +10,13 @@ Empieza por el [manual integral del sistema](26_MANUAL_INTEGRAL_DEL_SISTEMA.md):
 
 El [diccionario completo y mapa de rutas](27_DICCIONARIO_Y_RUTAS_GENERADAS.md) se genera desde los modelos y direcciones reales; no consulta ni exporta datos del servidor.
 
-El [informe de verificación y publicación](28_QA_Y_PUBLICACION_PERSONALIZACION.md) registra la versión activa de NexoStack, 150 pruebas, la restauración de las diecisiete entidades, la convivencia con los otros proyectos y las condiciones pendientes para operación institucional real.
+El [informe de verificación y publicación](28_QA_Y_PUBLICACION_PERSONALIZACION.md) registra el corte de personalización, 150 pruebas, la restauración de las diecisiete entidades, la convivencia con los otros proyectos y las condiciones pendientes para operación institucional real. El cierre más reciente se consulta en el manual integral y en `/health`.
 
 La [revisión visual móvil](29_REVISION_VISUAL_MOVIL.md) documenta el ajuste mínimo de menú, contraste y foco, con el código de negocio y la base sin cambios.
 
 El manual integral incluye ahora ese ajuste explicado desde cero, un ejercicio guiado y el cierre publicado `815b6e2`. También explica la carpeta `app/data`, las columnas de la referencia OMS y un guion de sustentación, distinguiendo ese recurso de los datos personales en PostgreSQL. Su edición PDF reúne el texto y el diccionario de datos/rutas en un único documento compartible; las cifras de pruebas se distinguen de las limitaciones y pendientes reales.
+
+La actualización del comprobante de Google queda publicada como `6ac329e`, con 154 pruebas locales, cobertura 94,90 %, CI aprobado y comprobación pública en el dominio principal y `www`. El manual distingue la publicación del archivo de la confirmación que debe realizar el propietario en Search Console; no da la indexación por completada.
 
 ## Empieza aquí si eres estudiante
 

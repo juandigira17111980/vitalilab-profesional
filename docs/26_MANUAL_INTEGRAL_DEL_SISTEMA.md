@@ -396,7 +396,25 @@ SMTP, alertas externas, responsable del tratamiento y validación institucional 
 
 ## Versión publicada y qué demuestran las pruebas
 
-El último cierre comprobado corresponde al commit `815b6e2fd2291aabc559a6eabdc8336094c368b3`, publicado en `https://vitalilab.space` sobre NexoStack. La dirección con `www` y el nombre de NexoStack mostraron la misma versión. La base conserva la revisión `c842d6e190ab`; un cambio de estilos no requiere crear otra migración.
+### Comprobante de Google publicado
+
+La versión web comprobada después de añadir el comprobante de propiedad es `6ac329e00d787ba0b168b49c3d3f52e43e2a3a6c`, publicada en NexoStack el 15 de octubre de 2026. El [PR 17](https://github.com/juandigira17111980/vitalilab-profesional/pull/17) y su [CI aprobado](https://github.com/juandigira17111980/vitalilab-profesional/actions/runs/38786945543) relacionan código, pruebas y publicación. La entrega incluye también la limpieza de un adaptador no utilizado del PR 16.
+
+| Comprobación | Resultado | Alcance |
+|---|---|---|
+| Suite local | 154 pruebas, cobertura 94,90 % | Incluye cuatro casos nuevos del comprobante |
+| CI | Calidad, PostgreSQL 18 y construcción aprobados | Migración y restore se ensayan en CI, no sobre la base publicada |
+| Dominio principal y www | Diez comprobaciones HTTPS aprobadas | Comprobante, health, readiness, portada y rechazo de panel anónimo en cada nombre |
+| Archivo de Google | Respuesta 200, mismos bytes que el archivo recibido, sin redirección | No acredita todavía el clic de verificación en Search Console |
+| Conservación | Base y otros 29 contenedores sin cambios de ID, arranque o reinicios | Solo se sustituyó la web; esquema `c842d6e190ab` conservado |
+
+La comprobación previa comparó los archivos con la versión publicada y se detuvo inicialmente ante un README de referencia que no estaba en la lista de diferencias esperadas. Se comprobó que era documentación ya autorizada y se reintentó sobre una extracción idéntica al archivo verificado, sin sobrescribirla. Se generó un respaldo y se conservó la imagen anterior. No se ejecutaron migraciones, seeds, cambios de permisos, reinicios de PostgreSQL o del proxy, ni cambios DNS o Render.
+
+El propietario debe pulsar «Verificar» en su propiedad de Search Console y comunicar el resultado. Hasta tener esa evidencia, se registra como **comprobante publicado; confirmación en Google pendiente**. Este despliegue no certifica que Google haya actualizado el título antiguo ni incluye todavía sitemap o consolidación de nombres.
+
+### Cierre visual anterior, conservado como evidencia
+
+El cierre visual anterior corresponde al commit `815b6e2fd2291aabc559a6eabdc8336094c368b3`, publicado en `https://vitalilab.space` sobre NexoStack. La dirección con `www` y el nombre de NexoStack mostraron la misma versión. La base conserva la revisión `c842d6e190ab`; un cambio de estilos no requiere crear otra migración.
 
 El [PR 14](https://github.com/juandigira17111980/vitalilab-profesional/pull/14) relaciona el cambio con su revisión. La [ejecución CI del release](https://github.com/juandigira17111980/vitalilab-profesional/actions/runs/38695247152) aprobó sus tres trabajos. El [comentario de publicación](https://github.com/juandigira17111980/vitalilab-profesional/pull/14#issuecomment-6186372145) registra los resultados del sitio real. Son enlaces de consulta; los conceptos y resultados esenciales también están explicados en este documento para lectura sin conexión.
 
