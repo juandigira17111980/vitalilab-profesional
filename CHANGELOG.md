@@ -4,6 +4,12 @@ Los cambios relevantes de VitaliLab se documentan siguiendo una adaptación de K
 
 ## [Unreleased]
 
+### Limpieza del pie de página (2026-10-14)
+
+- Retirados el eslogan, el bloque «Explora» con sus enlaces y la línea de copyright/aviso educativo, según solicitud visual.
+- Conservado el logo en un pie compacto, sin modificar navegación principal, rutas, consentimiento ni controles de seguridad.
+- Pruebas de regresión en inicio y panel; verificación de rutas de contenido y privacidad.
+
 ### Evolución premium del laboratorio
 
 - Nuevo inicio de producto, logo SVG, textos funcionales y navegación móvil con área segura.

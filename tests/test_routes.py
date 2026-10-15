@@ -1,3 +1,5 @@
+import pytest
+
 from app.extensions import db
 from app.models import Announcement, HealthMeasurement
 
@@ -15,6 +17,41 @@ def test_private_pages_redirect_anonymous_user(client):
     response = client.get("/panel")
     assert response.status_code == 302
     assert "/acceso/ingresar" in response.location
+
+
+@pytest.mark.parametrize("path", ["/", "/panel"])
+def test_footer_only_shows_brand(client, user_factory, login, path):
+    if path == "/panel":
+        user_factory()
+        login()
+    response = client.get(path)
+    assert response.status_code == 200
+    footer = response.text.split('<footer class="site-footer">', 1)[1].split("</footer>", 1)[0]
+    assert 'class="brand brand--footer"' in footer
+    assert 'aria-label="VitaliLab, inicio"' in footer
+    assert footer.count("<a ") == 1
+    assert "<p" not in footer
+    assert "<h2" not in footer
+    for removed in (
+        "Haz espacio para lo que te hace bien.",
+        "Explora",
+        "Rutinas guiadas",
+        "Indicadores educativos",
+        "Cómo funciona",
+        "Privacidad",
+        "Proyecto educativo; no sustituye orientación médica.",
+        "©",
+    ):
+        assert removed not in footer
+
+
+def test_footer_cleanup_preserves_privacy_and_content_routes(client):
+    registration = client.get("/acceso/registro")
+    assert registration.status_code == 200
+    assert 'href="/privacidad"' in registration.text
+    assert 'name="privacy_accepted"' in registration.text
+    for path in ("/privacidad", "/contenido/imc", "/contenido/fundamentos", "/rutinas/"):
+        assert client.get(path).status_code == 200
 
 
 def test_staging_banner_identifies_fictional_lab_data(client, app):
