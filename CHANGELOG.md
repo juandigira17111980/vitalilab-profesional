@@ -11,6 +11,8 @@
 - Migración aditiva a diecisiete entidades; CI con conservación de datos previos y pruebas de concurrencia PostgreSQL.
 - Manual integral del sistema para estudio, operación y sustentación.
 
+Publicado en NexoStack como `81b5650`, con CI verde, 150 pruebas y restauración aislada de las diecisiete entidades. Consulta [evidencia, alcance y pendientes operativos](docs/28_QA_Y_PUBLICACION_PERSONALIZACION.md). El servicio original de Render no se modificó.
+
 Los cambios relevantes de VitaliLab se documentan siguiendo una adaptación de Keep a Changelog.
 
 ## [Unreleased]

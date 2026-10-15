@@ -10,6 +10,8 @@ Empieza por el [manual integral del sistema](26_MANUAL_INTEGRAL_DEL_SISTEMA.md):
 
 El [diccionario completo y mapa de rutas](27_DICCIONARIO_Y_RUTAS_GENERADAS.md) se genera desde los modelos y direcciones reales; no consulta ni exporta datos del servidor.
 
+El [informe de verificación y publicación](28_QA_Y_PUBLICACION_PERSONALIZACION.md) registra la versión activa de NexoStack, 150 pruebas, la restauración de las diecisiete entidades, la convivencia con los otros proyectos y las condiciones pendientes para operación institucional real.
+
 ## Empieza aquí si eres estudiante
 
 Lee [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) antes de los documentos por especialidad. Está escrito para primeros fundamentos de programación: cada concepto se relaciona con un archivo, una práctica y una explicación de sustentación.
