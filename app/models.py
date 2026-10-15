@@ -8,7 +8,17 @@ from typing import Any
 from flask import current_app
 from flask_login import UserMixin
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
-from sqlalchemy import JSON, CheckConstraint, Date, DateTime, ForeignKey, Numeric, String, Text
+from sqlalchemy import (
+    JSON,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Numeric,
+    String,
+    Text,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -111,6 +121,12 @@ class UserProfile(TimestampMixin, db.Model):
     __tablename__ = "user_profiles"
     __table_args__ = (
         CheckConstraint("usage_mode IN ('personal', 'institutional')", name="valid_usage_mode"),
+        CheckConstraint(
+            "reference_sex IN ('unspecified', 'female', 'male')", name="valid_reference_sex"
+        ),
+        CheckConstraint(
+            "movement_goal IN ('center', 'energy', 'strength')", name="valid_movement_goal"
+        ),
     )
 
     user_id: Mapped[int] = mapped_column(
@@ -122,9 +138,15 @@ class UserProfile(TimestampMixin, db.Model):
         String(20), default="personal", server_default="personal", nullable=False
     )
     institution_name: Mapped[str | None] = mapped_column(String(160))
+    reference_sex: Mapped[str] = mapped_column(
+        String(12), default="unspecified", server_default="unspecified", nullable=False
+    )
+    movement_goal: Mapped[str] = mapped_column(
+        String(12), default="energy", server_default="energy", nullable=False
+    )
     grade: Mapped[str | None] = mapped_column(String(80))
     timezone: Mapped[str] = mapped_column(String(50), default="America/Bogota", nullable=False)
-    privacy_version: Mapped[str] = mapped_column(String(20), default="2026-09", nullable=False)
+    privacy_version: Mapped[str] = mapped_column(String(20), default="2026-10-14", nullable=False)
     privacy_accepted_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, nullable=False)
 
     user: Mapped[User] = relationship(back_populates="profile")
@@ -133,9 +155,17 @@ class UserProfile(TimestampMixin, db.Model):
 class HealthMeasurement(db.Model):
     __tablename__ = "health_measurements"
     __table_args__ = (
-        CheckConstraint("weight_kg BETWEEN 20 AND 500", name="valid_weight"),
-        CheckConstraint("height_cm BETWEEN 80 AND 250", name="valid_height"),
+        CheckConstraint("weight_kg BETWEEN 10 AND 500", name="valid_weight"),
+        CheckConstraint("height_cm BETWEEN 50 AND 250", name="valid_height"),
         CheckConstraint("bmi_snapshot BETWEEN 5 AND 100", name="valid_bmi"),
+        CheckConstraint(
+            "growth_percentile IS NULL OR growth_percentile BETWEEN 0 AND 100",
+            name="valid_growth_percentile",
+        ),
+        CheckConstraint(
+            "reference_sex IS NULL OR reference_sex IN ('male', 'female')",
+            name="valid_measurement_reference_sex",
+        ),
         db.Index("ix_health_measurements_user_measured_on", "user_id", "measured_on"),
     )
 
@@ -146,6 +176,10 @@ class HealthMeasurement(db.Model):
     weight_kg: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)
     height_cm: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)
     bmi_snapshot: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)
+    age_months: Mapped[int | None] = mapped_column()
+    reference_sex: Mapped[str | None] = mapped_column(String(12))
+    reference_source: Mapped[str | None] = mapped_column(String(32))
+    growth_percentile: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
     measured_on: Mapped[date] = mapped_column(Date, default=date.today, index=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, nullable=False)
 
@@ -256,6 +290,114 @@ class DailyCheckIn(TimestampMixin, db.Model):
     checked_on: Mapped[date] = mapped_column(Date, nullable=False)
     energy: Mapped[int] = mapped_column(nullable=False)
     focus: Mapped[int] = mapped_column(nullable=False)
+
+
+class School(TimestampMixin, db.Model):
+    __tablename__ = "schools"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String(60), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    active: Mapped[bool] = mapped_column(default=True, nullable=False)
+
+
+class SchoolGroup(TimestampMixin, db.Model):
+    __tablename__ = "school_groups"
+    __table_args__ = (
+        db.UniqueConstraint("school_id", "academic_year", "name", name="uq_school_group_year_name"),
+        db.UniqueConstraint("id", "school_id", name="uq_school_group_id_school"),
+        CheckConstraint("academic_year BETWEEN 2020 AND 2100", name="valid_academic_year"),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    school_id: Mapped[int] = mapped_column(
+        ForeignKey("schools.id", ondelete="RESTRICT"), index=True, nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(80), nullable=False)
+    academic_year: Mapped[int] = mapped_column(nullable=False)
+    active: Mapped[bool] = mapped_column(default=True, nullable=False)
+    school: Mapped[School] = relationship()
+
+
+class SchoolMembership(TimestampMixin, db.Model):
+    __tablename__ = "school_memberships"
+    __table_args__ = (
+        db.UniqueConstraint("id", "school_id", name="uq_school_membership_id_school"),
+        ForeignKeyConstraint(
+            ["group_id", "school_id"],
+            ["school_groups.id", "school_groups.school_id"],
+            ondelete="RESTRICT",
+            name="fk_school_membership_group_school",
+        ),
+        CheckConstraint("requested_role IN ('student', 'teacher')", name="valid_school_role"),
+        CheckConstraint(
+            "status IN ('pending', 'approved', 'rejected', 'revoked')",
+            name="valid_membership_status",
+        ),
+        db.Index("ix_membership_group_status", "group_id", "status"),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
+    school_id: Mapped[int] = mapped_column(
+        ForeignKey("schools.id", ondelete="RESTRICT"), index=True, nullable=False
+    )
+    group_id: Mapped[int | None] = mapped_column()
+    requested_role: Mapped[str] = mapped_column(String(12), nullable=False)
+    status: Mapped[str] = mapped_column(String(12), default="pending", nullable=False)
+    allow_aggregate: Mapped[bool] = mapped_column(default=False, nullable=False)
+    aggregate_since: Mapped[datetime | None] = mapped_column(DateTime)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime)
+    reviewed_by_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), index=True
+    )
+    authorization_confirmed: Mapped[bool] = mapped_column(default=False, nullable=False)
+    user: Mapped[User] = relationship(foreign_keys=[user_id])
+    school: Mapped[School] = relationship(foreign_keys=[school_id])
+    group: Mapped[SchoolGroup | None] = relationship(
+        foreign_keys=[group_id, school_id], overlaps="school"
+    )
+
+
+class TeacherGroupAssignment(TimestampMixin, db.Model):
+    __tablename__ = "teacher_group_assignments"
+    __table_args__ = (
+        db.UniqueConstraint("membership_id", "group_id", name="uq_teacher_group"),
+        ForeignKeyConstraint(
+            ["membership_id", "school_id"],
+            ["school_memberships.id", "school_memberships.school_id"],
+            ondelete="CASCADE",
+            name="fk_assignment_membership_school",
+        ),
+        ForeignKeyConstraint(
+            ["group_id", "school_id"],
+            ["school_groups.id", "school_groups.school_id"],
+            ondelete="RESTRICT",
+            name="fk_assignment_group_school",
+        ),
+        db.Index("ix_assignment_group", "group_id"),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    membership_id: Mapped[int] = mapped_column(nullable=False)
+    school_id: Mapped[int] = mapped_column(nullable=False)
+    group_id: Mapped[int] = mapped_column(nullable=False)
+    group: Mapped[SchoolGroup] = relationship(foreign_keys=[group_id, school_id])
+
+
+class RoutineCompletion(db.Model):
+    __tablename__ = "routine_completions"
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "routine_slug", "completed_on", name="uq_routine_daily"),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    routine_slug: Mapped[str] = mapped_column(String(60), nullable=False)
+    habit_id: Mapped[int] = mapped_column(
+        ForeignKey("habits.id", ondelete="RESTRICT"), index=True, nullable=False
+    )
+    completed_on: Mapped[date] = mapped_column(Date, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, nullable=False)
 
 
 @login_manager.user_loader

@@ -17,6 +17,14 @@ erDiagram
     USERS ||--o{ USER_GOALS : plans
     HABITS ||--o{ USER_GOALS : targets
     USERS ||--o{ DAILY_CHECKINS : reflects
+    USERS ||--o| SCHOOL_MEMBERSHIPS : requests
+    SCHOOLS ||--o{ SCHOOL_GROUPS : organizes
+    SCHOOLS ||--o{ SCHOOL_MEMBERSHIPS : receives
+    SCHOOL_GROUPS o|--o{ SCHOOL_MEMBERSHIPS : groups
+    SCHOOL_MEMBERSHIPS ||--o{ TEACHER_GROUP_ASSIGNMENTS : enables
+    SCHOOL_GROUPS ||--o{ TEACHER_GROUP_ASSIGNMENTS : assigns
+    USERS ||--o{ ROUTINE_COMPLETIONS : declares
+    HABITS ||--o{ ROUTINE_COMPLETIONS : links
 
     USERS {
         int id PK
@@ -36,6 +44,8 @@ erDiagram
         varchar institution_name
         varchar grade
         varchar timezone
+        varchar reference_sex
+        varchar movement_goal
         varchar privacy_version
         datetime privacy_accepted_at
     }
@@ -46,6 +56,10 @@ erDiagram
         numeric height_cm
         numeric bmi_snapshot
         date measured_on
+        int age_months
+        varchar reference_sex
+        varchar reference_source
+        numeric growth_percentile
     }
     HABITS {
         int id PK
@@ -108,6 +122,11 @@ No existe una tabla de saldos: puntos, nivel y racha se derivan de `habit_entrie
 | `audit_events` | Trazabilidad operativa | actor, acción, entidad | actor SET NULL |
 | `user_goals` | Frecuencia personal por hábito | usuario, hábito, objetivo 1–7 días | usuario CASCADE; hábito RESTRICT |
 | `daily_checkins` | Reflexión personal diaria | usuario, fecha, energía y enfoque 1–5 | usuario CASCADE |
+| `schools` | Catálogo institucional | código, nombre, activo | raíz; grupos/vínculos RESTRICT |
+| `school_groups` | Cohorte por colegio/año | colegio, nombre, año, activo | colegio RESTRICT |
+| `school_memberships` | Vinculación y aprobación | usuario único, colegio, grupo, rol, revisión, aporte | usuario CASCADE; colegio/grupo RESTRICT; revisor SET NULL |
+| `teacher_group_assignments` | Alcance docente | vinculación, colegio, grupo | vinculación CASCADE; grupo RESTRICT |
+| `routine_completions` | Rutina declarada por día | usuario, slug, hábito, fecha | usuario CASCADE; hábito RESTRICT |
 
 La retención legal/educativa debe aprobarse antes de Production. Las relaciones CASCADE eliminan perfil, medidas y cumplimientos cuando puede eliminarse el usuario; auditoría conserva el evento con actor nulo. Un autor con comunicados tiene RESTRICT y no se puede borrar sin resolver antes esas referencias. No existe todavía una ruta pública de eliminación de cuenta.
 
@@ -119,7 +138,11 @@ La retención legal/educativa debe aprobarse antes de Production. Las relaciones
 - `user_profiles.usage_mode`: `personal|institutional`, no nulo, valor por defecto `personal`.
 - `institution_name`: texto opcional de hasta 160 caracteres; `grade`: hasta 80. No son claves de membresía ni se usan para autorizar acceso.
 - `user_goals`: `UNIQUE(user_id, habit_id)`; `daily_checkins`: `UNIQUE(user_id, checked_on)`.
-- Peso: 20–500 kg; altura: 80–250 cm; IMC snapshot: 5–100.
+- Peso: 10–500 kg; altura: 50–250 cm; IMC snapshot: 5–100. Son límites técnicos, no rangos saludables.
+- Colegio/año/nombre de grupo únicos; una vinculación por usuario; roles solicitados student/teacher y estados pending/approved/rejected/revoked.
+- FK compuestas mantienen colegio coherente entre vinculación, grupo y asignación. El servidor exige además aprobación y autorización vigentes.
+- Rutina: UNIQUE usuario/slug/día. Su XP procede de la entrada única del hábito; no hay saldo adicional.
+- Referencia de crecimiento: femenina/masculina opcional; percentil entre 0 y 100 cuando procede; contexto almacenado en la medición.
 - Puntos de hábito: 1–100.
 - Estado de comunicado: `draft|published|archived`.
 - Todas las FK tienen conducta de borrado explícita.
@@ -143,6 +166,7 @@ Los índices responden a rutas existentes; en Production se revisarán con `EXPL
 | `208469fd48ef` | Índices de FK y rutas de consulta | ✅ aplicada |
 | `54e1c8bb7901` | Metas y bitácora personal | Ver guía 20 |
 | `7ca6e014b982` | Enfoque de perfil y nombre de institución | Ver guía 21 y CI del cambio |
+| `a903b5d7e214` | Cinco tablas escolares/rutinas y contexto de crecimiento; total catorce | Ver guías 22/23 y CI del cambio |
 
 `flask db check` no detectó deriva. El downgrade existe, pero una reversión destructiva en Production nunca se ejecuta sin backup, análisis de compatibilidad y aprobación.
 
@@ -194,3 +218,5 @@ WHERE u.id IS NULL OR h.id IS NULL;
 ## 10. Estado
 
 Modelo, migraciones y restauración aislada: ✅ validados sobre PostgreSQL 18 en CI. Backup operativo del proveedor y datos reales: 🟡/🔴 antes de Production.
+
+La extensión escolar conserva datos previos, no aprueba vinculaciones heredadas y amplía el ensayo CI a las catorce entidades. La web obtiene DML solo sobre sus tablas. La [guía 23](23_GUIA_ESCOLAR_Y_VALIDACION.md) detalla referencias OMS, supresión, autorizaciones y rollback de código conservando esquema; no ejecutar downgrade en la base compartida.

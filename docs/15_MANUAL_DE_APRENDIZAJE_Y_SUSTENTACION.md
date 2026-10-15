@@ -1,8 +1,8 @@
 # VitaliLab explicado desde cero
 
-Manual de aprendizaje, instalación, programación y sustentación. Edición del 13 de octubre de 2026.
+Manual de aprendizaje, instalación, programación y sustentación. Actualización escolar del 14 de octubre de 2026.
 
-Edición de producto ampliada: nueve entidades, tres migraciones, ocho hábitos y seis rutinas. El núcleo de siete entidades sigue explicado en el capítulo 6; la extensión está en 6.11. La [guía de funciones y QA](20_GUIA_DE_FUNCIONES_Y_QA_PREMIUM.md) desarrolla metas, bitácora, contratos y pruebas.
+Edición vigente: catorce entidades, cinco migraciones, ocho hábitos y nueve rutinas. El núcleo de siete entidades sigue explicado en el capítulo 6; metas y bitácora en 6.11. La [guía escolar desde cero](23_GUIA_ESCOLAR_Y_VALIDACION.md) amplía el aprendizaje con colegios, grupos, permisos, seguimiento, crecimiento OMS y rutinas sin duplicar XP. Los cortes anteriores conservan su evidencia histórica.
 
 Vas a aprender cómo funciona VitaliLab siguiendo el viaje de una acción sencilla: una persona entra, crea su cuenta y registra un hábito. Ese recorrido conecta la pantalla, el código del servidor y la base de datos. Al final podrás instalar la aplicación, explicar su estructura, hacer un cambio pequeño, comprobarlo y demostrar qué sucede con los datos.
 
@@ -212,10 +212,11 @@ El archivo SQLite quedará dentro de la carpeta `instance`. Es una base exclusiv
 ```powershell
 .\.venv\Scripts\python.exe -m flask --app wsgi:app db upgrade
 .\.venv\Scripts\python.exe -m flask --app wsgi:app seed-habits
+.\.venv\Scripts\python.exe -m flask --app wsgi:app seed-schools
 .\.venv\Scripts\python.exe -m flask --app wsgi:app db current
 ```
 
-La primera orden aplica las migraciones pendientes. La segunda crea o sincroniza ocho hábitos. La tercera muestra la revisión actual, `7ca6e014b982`, que incorpora los enfoques de perfil. El resultado del seed informa cuántos hábitos nuevos se crearon. Ejecutarlo nuevamente debe crear cero adicionales; actualiza el catálogo por su código único.
+La primera orden aplica las migraciones pendientes. La segunda crea o sincroniza ocho hábitos. La tercera crea únicamente colegios ausentes, sin aprobar docentes ni crear alumnos. La cuarta muestra la revisión actual, `a903b5d7e214`, que añade el módulo escolar. El resultado de cada seed informa cuántas opciones nuevas se crearon; repetirlos no las duplica.
 
 Si aparecen tablas inexistentes, revisa que aplicaste las migraciones a la misma `DATABASE_URL` con la que arrancarás. Si aparece rechazo de conexión a PostgreSQL, probablemente no estás usando la configuración SQLite de esta primera práctica.
 
@@ -414,6 +415,7 @@ El modelo describe el estado que queremos. La migración registra cómo pasar de
 | 208469fd48ef | Añade índices para claves foráneas y consultas |
 | 54e1c8bb7901 | Añade metas personales y bitácora diaria sin alterar las siete tablas originales |
 | 7ca6e014b982 | Añade enfoque personal/institucional y nombre de institución al perfil sin borrar grupos |
+| a903b5d7e214 | Añade cinco tablas para colegios, grupos, vinculaciones, asignaciones y rutinas, más contexto de crecimiento |
 
 `db upgrade` aplica cambios pendientes. `db check` compara modelo y esquema para detectar deriva. `db migrate` genera una propuesta: alguien debe leerla y revisarla antes de aplicarla. No editamos una migración que ya se ejecutó en un ambiente compartido.
 
@@ -734,7 +736,7 @@ La carpeta `/opt/labs/vitalilab/releases` guarda versiones por commit. `current`
 
 ### 11.4 Roles y conexiones de la base
 
-`DATABASE_URL` reúne servidor, usuario, contraseña y nombre de base. Es un secreto. `vitalilab_owner` administra únicamente la PostgreSQL independiente de este laboratorio y ejecuta migraciones. La web utiliza `vitalilab_app`, que puede consultar y modificar las nueve tablas de negocio, pero no crear bases, roles o tablas.
+`DATABASE_URL` reúne servidor, usuario, contraseña y nombre de base. Es un secreto. `vitalilab_owner` administra únicamente la PostgreSQL independiente de este laboratorio y ejecuta migraciones. La web utiliza `vitalilab_app`, que puede consultar y modificar las catorce tablas de negocio, pero no crear bases, roles o tablas.
 
 La conexión de la aplicación verifica el certificado y el nombre `db` con `sslmode=verify-full`. La comprobación real registró TLS 1.3. HTTPS del navegador y TLS de base son conexiones distintas: un candado en la página no prueba cómo se conectó PostgreSQL.
 
@@ -770,7 +772,7 @@ bash deploy/nexostack/deploy.sh SHA_COMPLETO_VERIFICADO
 
 `SHA_COMPLETO_VERIFICADO` representa los 40 caracteres del commit que pasó CI. No se copia literalmente esa palabra. El procedimiento se ejecuta como infraestructura confiable en la versión cargada del VPS, no en la terminal de un estudiante.
 
-El script valida Compose, construye la imagen, inicia su base, aplica las tres migraciones, sincroniza ocho hábitos y comprueba deriva. Después concede los permisos de negocio a la web y activa solo su contenedor. Las migraciones no se ejecutan al visitar una pantalla.
+El script valida Compose, construye la imagen, inicia su base, aplica las cinco migraciones, sincroniza ocho hábitos y crea colegios ausentes, y comprueba deriva. Después concede los permisos de negocio a la web y activa solo su contenedor. Las migraciones no se ejecutan al visitar una pantalla.
 
 La tarea de migración usa `--no-deps` después de verificar la base, para no recrear una dependencia saludable como efecto de la tarea puntual. Un bloqueo evita dos despliegues de VitaliLab simultáneos. Si hay una versión anterior, se respalda antes de la actualización.
 
@@ -803,7 +805,7 @@ La [guía de operación y accesos](18_NEXOSTACK_OPERACION_Y_ACCESOS.md) explica 
 
 El timer de VitaliLab produce un respaldo diario a las 02:30 de Colombia, con hasta cinco minutos de variación. Conserva 14 días en la carpeta privada del proyecto. El monitor comprueba `/ready` cada cinco minutos y registra fallos en systemd; esto no significa que ya envíe mensajes personales de alerta.
 
-Un respaldo se comprueba restaurando en otra base, comparando conteos y revisión Alembic y verificando deriva. El primer montaje comprobó las siete tablas originales y eliminó únicamente la base temporal. La evolución amplía la comparación a las nueve entidades; la evidencia de publicación debe registrar el nuevo ensayo y conservar la base activa y su dump.
+Un respaldo se comprueba restaurando en otra base, comparando conteos y revisión Alembic y verificando deriva. El primer montaje comprobó las siete tablas originales y eliminó únicamente la base temporal. La evolución escolar amplía la comparación CI a las catorce entidades; la evidencia de publicación debe registrar el nuevo ensayo y conservar la base activa y su dump.
 
 Un archivo en el mismo VPS no basta frente a pérdida del servidor. Se debe conservar una copia fuera del host mediante un canal protegido, definir retención y ensayar recuperación. Los objetivos propuestos para laboratorio son RPO de 24 horas y RTO de una hora; no son garantías de disponibilidad ni una prueba de recuperación de todo NexoStack.
 
@@ -861,7 +863,7 @@ En una rama local cambia un texto de ayuda y una medida CSS pequeña. Revisa esc
 
 ### 14.6 Laboratorio de modelo de datos
 
-Dibuja las siete entidades del núcleo y añade las dos nuevas con sus claves. Crea ejemplos ficticios en papel y predice si una combinación duplicada sería rechazada. Después compara con el caso de prueba. Para un cambio real de esquema, prepara una migración nueva en una base desechable con revisión del docente; no practiques `downgrade` sobre datos compartidos.
+Dibuja las siete entidades del núcleo, las dos de metas/bitácora y las cinco de la guía escolar, con sus claves. Crea ejemplos ficticios en papel y predice si una combinación duplicada sería rechazada. Después compara con el caso de prueba. Para un cambio real de esquema, prepara una migración nueva en una base desechable con revisión del docente; no practiques `downgrade` sobre datos compartidos.
 
 ### 14.7 Laboratorio de pruebas
 
@@ -892,7 +894,7 @@ Si el docente asigna menos tiempo, reduce la demostración y conserva el recorri
 
 Para cada respuesta usa problema, decisión y evidencia. Si preguntan por PostgreSQL, explica primero que la aplicación compartida necesita datos persistentes, después la elección del motor y al final la migración o el ensayo que lo demuestra.
 
-**Por qué nueve tablas.** Las siete del núcleo separan identidad, catálogo, historial y eventos. Las dos nuevas distinguen una meta ajustable de una percepción diaria. Muestra una relación y una restricción única específica.
+**Por qué catorce tablas.** Las siete del núcleo separan identidad, catálogo, historial y eventos. Dos distinguen una meta ajustable de una percepción diaria. Cinco separan colegios, grupos, vinculaciones, asignaciones y rutinas completadas. Muestra una relación y una restricción única específica; explica por qué solicitar Docente no concede acceso.
 
 **Cómo se evita duplicación.** La sesión identifica al usuario, la ruta valida y el servicio consulta. La combinación única de la base resuelve también solicitudes simultáneas.
 

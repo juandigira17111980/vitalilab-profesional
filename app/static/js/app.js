@@ -50,10 +50,7 @@ if (bmiForm) {
       return;
     }
     const bmi = weight / ((heightCm / 100) ** 2);
-    let label = "Por debajo del rango orientativo";
-    if (bmi >= 30) label = "Rango elevado: busca orientación profesional";
-    else if (bmi >= 25) label = "Por encima del rango orientativo";
-    else if (bmi >= 18.5) label = "Dentro del rango orientativo";
+    const label = "Dato descriptivo, no un diagnóstico. En menores se requiere una referencia por edad y sexo; este cálculo no la aplica.";
     result.innerHTML = `<strong>${bmi.toFixed(1)}</strong><span>${label}</span>`;
   });
 }
@@ -63,3 +60,23 @@ document.querySelectorAll("[data-bar-value]").forEach((bar) => {
   const value = Math.min(Number(bar.dataset.barValue || 0), maximum);
   bar.style.height = `${value / maximum * 100}%`;
 });
+
+const schoolJoin = document.querySelector("[data-school-join]");
+if (schoolJoin) {
+  const schools = schoolJoin.querySelector('[name="school_id"]');
+  const groups = schoolJoin.querySelector('[name="group_id"]');
+  const options = JSON.parse(schoolJoin.dataset.schoolMap || "[]");
+  const syncGroups = () => {
+    if (!schools || !groups) return;
+    Array.from(groups.options).forEach((option) => {
+      const group = options.find((item) => item.id === Number(option.value));
+      const allowed = Number(option.value) === 0 || (group && group.school === Number(schools.value));
+      option.hidden = !allowed;
+      option.disabled = !allowed;
+    });
+    if (groups.selectedOptions[0]?.disabled) groups.value = "0";
+  };
+  schools?.addEventListener("change", syncGroups);
+  window.addEventListener("pageshow", syncGroups);
+  syncGroups();
+}

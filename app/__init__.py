@@ -75,6 +75,7 @@ def _register_blueprints(app: Flask) -> None:
     from app.habits.routes import bp as habits_bp
     from app.main.routes import bp as main_bp
     from app.profile.routes import bp as profile_bp
+    from app.school.routes import bp as school_bp
     from app.wellness.routes import bp as wellness_bp
 
     app.register_blueprint(main_bp)
@@ -83,6 +84,7 @@ def _register_blueprints(app: Flask) -> None:
     app.register_blueprint(habits_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(wellness_bp)
+    app.register_blueprint(school_bp)
 
 
 def _register_errors(app: Flask) -> None:
@@ -127,6 +129,8 @@ def _register_security_headers(app: Flask) -> None:
                 "/bitacora",
                 "/progreso",
                 "/acceso",
+                "/colegios",
+                "/docentes",
             )
         ):
             response.headers.setdefault("Cache-Control", "no-store")

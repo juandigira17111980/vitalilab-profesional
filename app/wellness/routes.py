@@ -122,4 +122,35 @@ def routine(slug):
     habit = db.session.scalar(
         db.select(Habit).where(Habit.code == selected["habit_code"], Habit.active.is_(True))
     )
-    return render_template("wellness/routine.html", routine=selected, habit=habit)
+    from app.services.movement import routine_done_today
+
+    return render_template(
+        "wellness/routine.html",
+        routine=selected,
+        habit=habit,
+        completed=current_user.is_authenticated and routine_done_today(current_user, slug),
+    )
+
+
+@bp.post("/rutinas/<slug>/registrar")
+@login_required
+@limiter.limit("30 per minute")
+def complete_routine(slug):
+    from app.services.movement import register_routine
+
+    if not EmptyForm().validate_on_submit():
+        abort(400)
+    result = register_routine(current_user, slug)
+    if result is None:
+        abort(404)
+    if not result["created"]:
+        flash("Esta rutina ya está registrada hoy; no duplicamos puntos.", "info")
+    elif result["points"]:
+        flash(f"Rutina registrada. +{result['points']} XP por tu constancia.", "success")
+    else:
+        flash("Rutina registrada. El hábito asociado ya había sumado sus puntos hoy.", "success")
+    return redirect(
+        url_for("profile.edit")
+        if request.form.get("origin") == "profile"
+        else url_for("wellness.routine", slug=slug)
+    )

@@ -70,7 +70,7 @@ services:
       APP_ENV: staging
       SECRET_KEY: ${SECRET_KEY:?Set a generated secret}
       DATABASE_URL: postgresql://vitalilab_owner:${POSTGRES_ADMIN_PASSWORD}@db:5432/vitalilab_staging?sslmode=verify-full&sslrootcert=/run/secrets/postgres-ca.crt
-    command: [sh, -c, "flask --app wsgi:app db upgrade && flask --app wsgi:app seed-habits && flask --app wsgi:app db check"]
+    command: [sh, -c, "flask --app wsgi:app db upgrade && flask --app wsgi:app seed-habits && flask --app wsgi:app seed-schools && flask --app wsgi:app db check"]
     networks: [data]
     depends_on:
       db: {condition: service_healthy}

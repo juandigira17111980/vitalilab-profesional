@@ -97,6 +97,13 @@ def seed_habits() -> int:
 
 
 def register_commands(app) -> None:
+    @app.cli.command("seed-schools")
+    @with_appcontext
+    def seed_schools_command():
+        from app.services.school import seed_schools
+
+        click.echo(f"Colegios nuevos del catálogo de práctica: {seed_schools()}")
+
     @app.cli.command("seed-habits")
     @with_appcontext
     def seed_habits_command():

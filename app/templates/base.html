@@ -9,6 +9,7 @@
   <link rel="icon" href="{{ url_for('static', filename='img/brand-mark.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css', v=config.APP_VERSION) }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/premium.css', v=config.APP_VERSION) }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/school.css', v=config.APP_VERSION) }}">
   <script src="{{ url_for('static', filename='js/app.js', v=config.APP_VERSION) }}" defer></script>
   <script src="{{ url_for('static', filename='js/wellness.js', v=config.APP_VERSION) }}" defer></script>
 </head>
@@ -33,6 +34,9 @@
           <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}>{{ label }}</a>
           {% endfor %}
           <details class="account-menu"><summary>Mi cuenta</summary><div class="account-menu__content">
+          <a href="{{ url_for('school.account') }}">Mi colegio</a>
+          {% if has_teacher_access %}<a href="{{ url_for('school.teacher') }}">Panel docente</a>{% endif %}
+          <a href="{{ url_for('profile.tracking') }}">Mi seguimiento físico</a>
           <a href="{{ url_for('profile.edit') }}">Mi perfil</a>
           <a href="{{ url_for('wellness.checkin') }}">Mi bitácora</a>
           {% if current_user.is_admin %}<a href="{{ url_for('admin.dashboard') }}">Administración</a>{% endif %}

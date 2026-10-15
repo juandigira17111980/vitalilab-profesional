@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from app import create_app
 from app.extensions import db
-from app.models import User
+from app.models import SchoolMembership, User
 
 
 def test_register_hashes_password_and_opens_dashboard(client, app):
@@ -40,6 +40,27 @@ def test_registration_rejects_duplicate_email(client, user_factory):
     )
     assert response.status_code == 409
     assert "No fue posible crear la cuenta" in response.text
+
+
+def test_institutional_signup_requires_a_separate_verified_membership(client):
+    response = client.post(
+        "/acceso/registro",
+        data={
+            "display_name": "Docente de prueba",
+            "email": "institutional@example.com",
+            "password": "StrongPass123",
+            "confirm_password": "StrongPass123",
+            "privacy_accepted": "y",
+            "usage_mode": "institutional",
+            "role": "admin",
+            "requested_role": "teacher",
+        },
+    )
+    assert response.status_code == 302 and response.location.endswith("/colegios/")
+    user = db.session.scalar(db.select(User).where(User.email == "institutional@example.com"))
+    assert user.role == "user" and user.profile.usage_mode == "institutional"
+    assert db.session.scalar(db.select(SchoolMembership)) is None
+    assert client.get("/docentes/").status_code == 403
 
 
 def test_login_and_logout_use_safe_session_flow(client, user_factory, login):

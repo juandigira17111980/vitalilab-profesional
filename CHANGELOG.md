@@ -4,6 +4,18 @@ Los cambios relevantes de VitaliLab se documentan siguiendo una adaptación de K
 
 ## [Unreleased]
 
+### Bienestar personal y escolar (2026-10-14)
+
+- Registro personal/institucional con segundo paso de colegio, grupo y rol solicitado; selección sin privilegios automáticos.
+- Catálogo, grupos por año, vinculaciones pendientes, revisión administrativa y asignaciones docentes del mismo colegio.
+- Panel docente limitado a grupos propios, agregados mensuales con mínimo diez participantes por indicador, redondeo y aporte voluntario revocable.
+- Nueve rutinas, proyección limpia para clase y «Tu próximo paso» según objetivo funcional, no por IMC.
+- Seguimiento anual propio con gráfica y tabla; referencia OMS 2007 LMS por edad al medir y sexo de referencia opcional, sin etiquetas ni extrapolación extrema.
+- Registro transaccional de rutinas y hábito diario sin duplicar XP; restricciones y concurrencia verificadas en CI PostgreSQL.
+- Migración aditiva `a903b5d7e214`: catorce entidades; no convierte textos libres anteriores en permisos.
+- Permisos DML y backup/restore CI ampliados a las catorce entidades; Render y otros proyectos fuera del despliegue.
+- Guías 22 y 23 con modelo, código, prácticas, amenazas, operación y límites: laboratorio con datos ficticios, no autorización clínica ni institucional.
+
 ### Enfoque personal o institucional (2026-10-14)
 
 - Selector de enfoque en Mi perfil; institución y grado/grupo/área opcionales visibles solo en modo institucional con JavaScript.

@@ -35,16 +35,6 @@ def calculate_bmi(weight_kg: float, height_cm: float) -> float:
     return round(weight_kg / ((height_cm / 100) ** 2), 2)
 
 
-def bmi_label(value: float) -> str:
-    if value < 18.5:
-        return "Por debajo del rango orientativo"
-    if value < 25:
-        return "Dentro del rango orientativo"
-    if value < 30:
-        return "Por encima del rango orientativo"
-    return "Rango elevado: consulta a un profesional"
-
-
 def complete_habit(user: User, habit: Habit, completed_on: date | None = None) -> bool:
     day = completed_on or local_day(user)
     existing = db.session.scalar(
