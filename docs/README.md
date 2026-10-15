@@ -12,6 +12,8 @@ El [diccionario completo y mapa de rutas](27_DICCIONARIO_Y_RUTAS_GENERADAS.md) s
 
 El [informe de verificación y publicación](28_QA_Y_PUBLICACION_PERSONALIZACION.md) registra la versión activa de NexoStack, 150 pruebas, la restauración de las diecisiete entidades, la convivencia con los otros proyectos y las condiciones pendientes para operación institucional real.
 
+La [revisión visual móvil](29_REVISION_VISUAL_MOVIL.md) documenta el ajuste mínimo de menú, contraste y foco, con el código de negocio y la base sin cambios.
+
 ## Empieza aquí si eres estudiante
 
 Lee [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) antes de los documentos por especialidad. Está escrito para primeros fundamentos de programación: cada concepto se relaciona con un archivo, una práctica y una explicación de sustentación.

@@ -1,5 +1,11 @@
 # Changelog
 
+## Ajuste visual móvil — 2026-10-15
+
+- Menú móvil con altura acotada y desplazamiento interno en pantallas bajas y horizontales.
+- Bordes de campos y botones de contorno más distinguibles; foco de teclado uniforme y espacio de desplazamiento sobre la barra móvil.
+- Sin cambios de backend, plantillas, datos, permisos, puntos, rutinas o dependencias. Evidencia en la [revisión visual](docs/29_REVISION_VISUAL_MOVIL.md).
+
 ## Personalización y rutinas propias — 2026-10-15
 
 - Recorrido de medición, resultado, objetivo y biblioteca personalizada, completado una sola vez.

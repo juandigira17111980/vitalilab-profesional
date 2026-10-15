@@ -15,7 +15,7 @@ h1, h2, h3 { text-wrap: balance; }
 .button--small { min-height: 44px; }
 .button { line-height: 1.35; border-radius: 12px; }
 .button:hover { transform: translateY(-1px); }
-.button--ghost { border-color: #8b9c91; }
+.button--ghost { border-color: #7a8d80; }
 .text-link { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; }
 .lab-banner { font-size: .75rem; padding: 7px 16px; }
 .account-menu { position: relative; }
@@ -148,6 +148,8 @@ h1, h2, h3 { text-wrap: balance; }
 .habit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .field select { width: 100%; min-height: 48px; padding: .75rem .85rem; border: 1px solid #86988c; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; }
 .field select:focus-visible { outline: 3px solid #177b69; outline-offset: 2px; }
+.field input, .field textarea, .field select { border-color: #7a8d80; }
+.field input:focus-visible, .field textarea:focus-visible { outline: 3px solid #177b69; outline-offset: 2px; }
 .field--error select { border-color: var(--danger); }
 .library-search { display: flex; align-items: end; gap: .75rem; max-width: 680px; }
 .library-search .field { margin: 0; }
@@ -226,6 +228,14 @@ progress::-moz-progress-bar { border-radius: 8px; background: #62821e; }
 @media (max-width: 1000px) {
   .nav-toggle { display: block; }
   .primary-nav { position: absolute; top: 100%; right: 1rem; left: 1rem; display: none; padding: .8rem; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: var(--shadow); }
+  /* Keep every account action reachable on short phones and in landscape. */
+  .primary-nav {
+    max-height: calc(100vh - 6rem);
+    max-height: calc(100dvh - 6rem - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: .75rem;
+  }
   .primary-nav--open { display: grid; }
   .primary-nav > a, .account-menu summary { padding-inline: .6rem; }
   .account-menu__content { position: static; min-width: 0; box-shadow: none; }
@@ -236,6 +246,7 @@ progress::-moz-progress-bar { border-radius: 8px; background: #62821e; }
   .product-strip p { flex-basis: 100%; }
 }
 @media (max-width: 900px) {
+  html { scroll-padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
   .has-mobile-nav { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
   .mobile-dock { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: fixed; z-index: 90; right: 0; bottom: 0; left: 0; padding: .45rem .5rem calc(.45rem + env(safe-area-inset-bottom, 0px)); background: #fcfcf8; border-top: 1px solid #cbd6c8; }
   .mobile-dock a { display: grid; place-items: center; min-height: 56px; gap: .15rem; padding: .25rem; border-radius: 12px; text-decoration: none; color: #58655f; font-size: .65rem; }
