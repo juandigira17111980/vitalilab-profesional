@@ -11,6 +11,12 @@
 *.sqlite
 *.sqlite3
 *.sql
+!docs/dba/estructura_postgresql.sql
+!docs/dba/datos_ficticios.sql
+!docs/dba/consultas_sustentacion.sql
+!docs/dba/practicas_transacciones.sql
+!deploy/study/catalog.sql
+!deploy/study/roles.sql
 *.dump
 backups/
 
@@ -34,6 +40,8 @@ outputs/
 dist/
 build/
 public/static/
+/deploy/study/secrets/
+/deploy/study/tls/
 
 # Editors and operating systems
 .vscode/

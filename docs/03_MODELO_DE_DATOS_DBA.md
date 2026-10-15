@@ -4,7 +4,11 @@
 
 PostgreSQL 18 es el motor de Staging/Production. SQLite se reserva para desarrollo y pruebas. El esquema se gobierna con SQLAlchemy y Alembic; la aplicación nunca crea, elimina ni modifica tablas al arrancar.
 
-## 2. Diagrama vigente
+## 2. Modelo vigente y resumen histórico
+
+El modelo vigente tiene **17 tablas de negocio, 148 columnas y 22 restricciones FK**, más `alembic_version` como tabla técnica. Consultar el [modelo completo generado de PostgreSQL](dba/modelo_completo.svg), el [Mermaid editable](dba/modelo_completo.mmd), el [diccionario físico de todos los campos](dba/diccionario_postgresql.md) y la [guía de sustentación y acceso](dba/README.md). La revisión actual es `c842d6e190ab`.
+
+El siguiente bloque es un **resumen histórico parcial** de etapas anteriores. No representa el ERD completo vigente: no incluye todas las columnas ni las tres entidades de la ampliación de rutinas propias. Para una sustentación usar el modelo completo enlazado arriba, que también incluye FK de revisores y claves compuestas reales.
 
 ```mermaid
 erDiagram
@@ -167,6 +171,7 @@ Los índices responden a rutas existentes; en Production se revisarán con `EXPL
 | `54e1c8bb7901` | Metas y bitácora personal | Ver guía 20 |
 | `7ca6e014b982` | Enfoque de perfil y nombre de institución | Ver guía 21 y CI del cambio |
 | `a903b5d7e214` | Cinco tablas escolares/rutinas y contexto de crecimiento; total catorce | Ver guías 22/23 y CI del cambio |
+| `c842d6e190ab` | Solicitudes manuales, rutinas propias, detalle y personalización; total diecisiete | Ver guía 25 y catálogo físico `docs/dba` |
 
 `flask db check` no detectó deriva. El downgrade existe, pero una reversión destructiva en Production nunca se ejecuta sin backup, análisis de compatibilidad y aprobación.
 

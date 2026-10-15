@@ -4,6 +4,8 @@ VitaliLab reúne hábitos, metas, bitácora, seguimiento y rutinas para bienesta
 
 El [manual integral del sistema](docs/26_MANUAL_INTEGRAL_DEL_SISTEMA.md) es el punto de entrada para estudiar arquitectura, datos, backend, frontend, Git e infraestructura. La [especificación de personalización](docs/25_PERSONALIZACION_Y_RUTINAS.md) documenta esta ampliación y sus criterios de aceptación.
 
+La [guía DBA para estudiar y sustentar](docs/dba/README.md) añade el esquema físico completo de PostgreSQL, las 17 tablas y 148 campos, diagrama de 22 FK, SQL sin datos personales, ejemplos ficticios y prácticas reversibles. Distingue el acceso de GitHub del acceso de base de datos y documenta la activación individual pendiente de llave pública.
+
 ## Estado verificable
 
 | Componente | Resultado |
