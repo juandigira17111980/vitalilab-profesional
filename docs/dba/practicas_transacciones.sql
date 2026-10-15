@@ -42,7 +42,7 @@ DO $$ BEGIN
   BEGIN
     DELETE FROM habits WHERE id=1;
     RAISE EXCEPTION 'FALLO: permitio borrar un habito referenciado';
-  EXCEPTION WHEN foreign_key_violation THEN
+  EXCEPTION WHEN restrict_violation OR foreign_key_violation THEN
     RAISE NOTICE 'OK: RESTRICT conserva las referencias del habito';
   END;
   BEGIN
