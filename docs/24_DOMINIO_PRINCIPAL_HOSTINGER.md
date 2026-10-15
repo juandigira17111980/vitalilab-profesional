@@ -19,7 +19,7 @@ Un dominio es una dirección, no una copia de archivos. DNS dirige el navegador 
 3. Busca **CNAME**, nombre **www**, contenido **vitalilab.onrender.com**.
 4. Pulsa el lápiz y cambia **solo el contenido/destino** a **vitalilab.lab.nexostack.app**, sin `https://` ni `/`.
 5. Conserva tipo CNAME, nombre www y TTL 14400. Guarda.
-6. **No cambies** `ALIAS @ → www.vitalilab.space`. Ese alias hace que la raíz siga el nuevo destino de www. No agregues un registro A para el mismo nombre www: entraría en conflicto con el CNAME.
+6. En la configuración final comprobada, conserva **ALIAS**, nombre **@**, contenido **vitalilab.lab.nexostack.app**. El alias de raíz apunta directamente al destino de NexoStack. No escribas ese destino en el campo Nombre. No agregues un registro A para el mismo nombre www: entraría en conflicto con el CNAME.
 7. No cambies nameservers, MX, TXT, SPF, DKIM, DMARC, CAA o registros de otros servicios. No uses «restablecer zona».
 8. Avisa al responsable de infraestructura cuando guardes. Un registro actualizado en pantalla no prueba propagación global ni emisión de HTTPS.
 
@@ -61,11 +61,11 @@ Los cookies de sesión son por host. Una persona puede tener que iniciar sesión
 - Conectado: registros públicos apuntan al VPS y ambas direcciones muestran el commit esperado con certificado válido.
 - Validado: flujos autenticados y coexistencia comprobados; resultado registrado en el PR de la entrega.
 
-Hasta completar las tres etapas no debe afirmarse «dominio funcionando». Conservar el banner académico y las limitaciones de la guía 23. Publicar con una dirección comercial no certifica seguridad, privacidad o adecuación médica.
+Las tres etapas se completaron para el commit `56cee00` y la evidencia quedó en el PR 11. Las tres direcciones sirven la misma aplicación de NexoStack. Cada release posterior debe volver a comprobar versión, TLS y flujos. La edición del 15 de octubre retira el banner académico por solicitud del propietario; no elimina las salvaguardas ni certifica adecuación médica por utilizar un dominio comercial.
 
 ## 6. Reversión
 
-Para devolver la dirección pública al sitio anterior, editar únicamente el CNAME www y restaurar `vitalilab.onrender.com`. Conservar el ALIAS de raíz. La caché también afecta al regreso. Render, su base y el proyecto original permanecen disponibles; no se han eliminado ni migrado.
+Para devolver ambas direcciones al sitio anterior, restaurar el CNAME `www → vitalilab.onrender.com` y el ALIAS `@ → www.vitalilab.space`, según la captura original. La configuración actual de raíz apunta directamente a NexoStack: cambiar solo www dejaría los dos nombres en servidores distintos. La caché también afecta al regreso. No ejecutar esta reversión sin autorización del propietario. Render, su base y el proyecto original se conservan separados.
 
 Un rollback de configuración de NexoStack se realiza con la versión anterior verificada y solo su web. No ejecutar `down -v`, borrar volúmenes, restaurar una base sobre la activa ni reiniciar el VPS/proxy. Los respaldos quedan conservados en el directorio privado del proyecto.
 

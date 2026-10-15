@@ -1,9 +1,13 @@
 {% macro field(input, autocomplete=None, hint=None) %}
   <div class="field{% if input.errors %} field--error{% endif %}">
     {{ input.label }}
-    {{ input(autocomplete=autocomplete, **kwargs) }}
-    {% if hint %}<p class="field-hint">{{ hint }}</p>{% endif %}
-    {% for error in input.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% set attributes = kwargs.copy() %}
+    {% if autocomplete %}{% set _ = attributes.update({'autocomplete': autocomplete}) %}{% endif %}
+    {% if input.errors %}{% set _ = attributes.update({'aria-invalid': 'true'}) %}{% endif %}
+    {% if hint or input.errors %}{% set _ = attributes.update({'aria-describedby': input.id ~ '-help'}) %}{% endif %}
+    {{ input(**attributes) }}
+    {% if hint or input.errors %}<div id="{{ input.id }}-help">{% if hint %}<p class="field-hint">{{ hint }}</p>{% endif %}
+    {% for error in input.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>{% endif %}
   </div>
 {% endmacro %}
 

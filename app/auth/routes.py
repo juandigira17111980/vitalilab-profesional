@@ -77,6 +77,10 @@ def login():
             record_event("session.login", "user", user.id, user.id)
             db.session.commit()
             login_user(user, remember=form.remember.data)
+            from app.services.personalization import student_setup_required
+
+            if student_setup_required(user):
+                return redirect(url_for("profile.setup_measurement"))
             next_url = request.args.get("next")
             flash("Bienvenido de nuevo.", "success")
             return redirect(next_url if _safe_next(next_url) else url_for("main.dashboard"))

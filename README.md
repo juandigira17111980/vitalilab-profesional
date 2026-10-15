@@ -1,33 +1,37 @@
 # VitaliLab Profesional
 
-VitaliLab es una aplicación web educativa para registrar hábitos saludables, consultar progreso y presentar indicadores de bienestar con contexto. Esta reconstrucción transforma el prototipo original en un monolito modular Flask, con seguridad, migraciones, pruebas, experiencia responsive y despliegue reproducible.
+VitaliLab reúne hábitos, metas, bitácora, seguimiento y rutinas para bienestar personal y escolar. Está construido como un monolito modular Flask, con PostgreSQL, permisos, migraciones, pruebas y despliegue reproducible. El IMC es descriptivo: no diagnostica ni prescribe ejercicios.
+
+El [manual integral del sistema](docs/26_MANUAL_INTEGRAL_DEL_SISTEMA.md) es el punto de entrada para estudiar arquitectura, datos, backend, frontend, Git e infraestructura. La [especificación de personalización](docs/25_PERSONALIZACION_Y_RUTINAS.md) documenta esta ampliación y sus criterios de aceptación.
 
 ## Estado verificable
 
 | Componente | Resultado |
 |---|---|
 | Aplicación y backend | Monolito modular con bienestar personal y módulo escolar; consultar CI y guía 23 para estado de publicación |
-| Modelo de datos | 14 tablas de negocio, 5 migraciones Alembic, integridad e índices |
+| Modelo de datos | 17 tablas de negocio, 6 migraciones Alembic, integridad e índices |
 | Seguridad | Hash scrypt, CSRF, autorización, bloqueo temporal, rate limits y cabeceras |
 | Frontend | Responsive, navegación móvil, formularios accesibles y estados controlados |
 | Calidad | Suite ampliada para permisos escolares, crecimiento y XP; evidencia de este cambio en guía 23 y CI del PR |
 | Base de datos | Migración, deriva, backup y restauración aislada aprobados en PostgreSQL 18 CI |
-| Staging | Copia académica en NexoStack; evidencia en docs/18 |
-| Production | Congelada; no se ha modificado |
+| NexoStack | Servicio aislado accesible por vitalilab.space, www y el nombre de NexoStack; comprobar SHA publicado en /health |
+| Render original | Servicio separado y sin modificar por esta entrega |
 
-La copia es un laboratorio, no un reemplazo productivo de Render. SMTP real, accesibilidad formal, alertas personales, operación offsite y privacidad institucional siguen requiriendo validación. No se declara una calificación 100/100 por publicar contenedores. Consulte [Informe QA y readiness](docs/13_INFORME_QA_Y_READINESS.md) y [evidencia NexoStack](docs/18_NEXOSTACK_OPERACION_Y_ACCESOS.md).
+La presentación profesional no certifica preparación legal, clínica ni operativa. SMTP real, evaluación formal de accesibilidad, alertas externas, recuperación fuera del VPS y condiciones institucionales requieren evidencia propia. No se declara una calificación 100/100 por publicar contenedores. Las guías históricas conservan sus resultados con fecha; esta edición se describe en el manual 26 y el informe de su entrega.
 
 ## Funciones
 
-- Ocho hábitos, metas personales, bitácora diaria, actividad de 28 días y nueve rutinas públicas con temporizador.
-- Enfoque personal/institucional, catálogo de colegios, grupos por año, solicitudes verificadas y asignaciones docentes del mismo colegio.
+- Ocho hábitos, metas personales, bitácora diaria, actividad de 28 días y quince rutinas públicas con temporizador.
+- Rutinas propias privadas con ejercicios, series, repeticiones, segundos, descansos y guías visuales; edición versionada y archivo sin pérdida de puntos.
+- Personalización una vez: medición y resultado → objetivo y preferencia → rutinas. No se exige pesarse en cada inicio de sesión.
+- Enfoque personal/institucional, colegio y grupo escritos manualmente, revisión contra catálogo verificado y asignaciones docentes del mismo colegio.
 - Panel docente con reportes agregados, supresión de grupos pequeños y rutinas para proyectar sin datos individuales.
 - Seguimiento anual propio, referencia de crecimiento OMS cuando procede y «Tu próximo paso» por objetivo funcional; nunca por categoría corporal.
 - Registro de rutinas y hábito asociado sin duplicar XP diario, incluso con solicitudes simultáneas comprobadas en CI PostgreSQL.
 - Logo SVG propio, portada de producto, navegación compacta y móvil con accesos rápidos.
-- La calculadora IMC continúa en Indicadores educativos; privacidad y consentimiento permanecen activos.
+- La calculadora IMC, privacidad y consentimiento permanecen activos. Guardar mediciones escolares exige una vinculación verificada y autorizada.
 - [Diseño y auditoría UX](docs/19_EVOLUCION_DE_PRODUCTO_Y_AUDITORIA_UX.md) y [guía de funciones, datos y QA](docs/20_GUIA_DE_FUNCIONES_Y_QA_PREMIUM.md).
-- [Guía escolar paso a paso, arquitectura y validación](docs/23_GUIA_ESCOLAR_Y_VALIDACION.md). El laboratorio no está habilitado para datos reales de menores.
+- [Guía escolar histórica](docs/23_GUIA_ESCOLAR_Y_VALIDACION.md) y [manual actual](docs/26_MANUAL_INTEGRAL_DEL_SISTEMA.md). El uso con menores necesita verificación institucional real, no solo una casilla.
 
 - Registro, login, logout, bloqueo temporal y recuperación de contraseña.
 - Perfil propio y medidas opcionales con IMC educativo.

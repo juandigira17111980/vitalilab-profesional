@@ -9,6 +9,7 @@ from app.models import Announcement, Habit, HabitEntry
 from app.services.clock import local_day
 from app.services.progress import progress_for
 from app.services.wellness import goals_for
+from app.wellness.catalog import ROUTINES
 
 bp = Blueprint("main", __name__)
 
@@ -83,7 +84,9 @@ def home():
             .limit(3)
         )
     )
-    return render_template("main/home.html", announcements=announcements)
+    return render_template(
+        "main/home.html", announcements=announcements, routine_count=len(ROUTINES)
+    )
 
 
 @bp.get("/contenido/<slug>")

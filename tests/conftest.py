@@ -3,7 +3,7 @@ import pytest
 from app import create_app
 from app.commands import seed_habits
 from app.extensions import db
-from app.models import User, UserProfile
+from app.models import School, SchoolGroup, SchoolMembership, User, UserProfile, utcnow
 
 
 @pytest.fixture()
@@ -56,3 +56,30 @@ def login(client):
         )
 
     return perform
+
+
+@pytest.fixture()
+def student_authorization(user_factory):
+    def authorize(user):
+        reviewer = user_factory(email="authorization-reviewer@example.com", role="admin")
+        school = School(code="authorized-fixture", name="Institución autorizada de prueba")
+        db.session.add(school)
+        db.session.flush()
+        group = SchoolGroup(school_id=school.id, name="Grupo de prueba", academic_year=2026)
+        db.session.add(group)
+        db.session.flush()
+        member = SchoolMembership(
+            user_id=user.id,
+            school_id=school.id,
+            group_id=group.id,
+            requested_role="student",
+            status="approved",
+            authorization_confirmed=True,
+            reviewed_at=utcnow(),
+            reviewed_by_user_id=reviewer.id,
+        )
+        db.session.add(member)
+        db.session.commit()
+        return member
+
+    return authorize

@@ -5,6 +5,42 @@ from wtforms import BooleanField, IntegerField, SelectField, StringField, Submit
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Regexp
 
 
+def clean_name(value):
+    return " ".join(value.split()) if value else value
+
+
+class ManualSchoolJoinForm(FlaskForm):
+    school_name = StringField(
+        "Nombre de tu colegio",
+        filters=[clean_name],
+        validators=[DataRequired(), Length(min=3, max=160)],
+    )
+    group_name = StringField(
+        "Grado, grupo o área",
+        filters=[clean_name],
+        validators=[DataRequired(), Length(min=1, max=80)],
+    )
+    requested_role = SelectField(
+        "Mi rol solicitado",
+        choices=[("student", "Estudiante"), ("teacher", "Docente")],
+        validators=[DataRequired()],
+    )
+    submit = SubmitField("Enviar mi solicitud")
+
+
+class ManualEnrollmentReviewForm(FlaskForm):
+    school_id = SelectField("Colegio verificado", coerce=int, validators=[InputRequired()])
+    group_id = SelectField("Grupo verificado (obligatorio para estudiantes)", coerce=int, default=0)
+    decision = SelectField(
+        "Decisión", choices=[("approved", "Aprobar vinculación"), ("rejected", "No aprobar")]
+    )
+    verified = BooleanField(
+        "He comprobado identidad, pertenencia y las autorizaciones aplicables, "
+        "incluidas las del representante cuando corresponda."
+    )
+    submit = SubmitField("Guardar revisión")
+
+
 class SchoolJoinForm(FlaskForm):
     school_id = SelectField("Colegio", coerce=int, validators=[InputRequired()])
     group_id = SelectField("Grupo (si está disponible)", coerce=int, default=0)

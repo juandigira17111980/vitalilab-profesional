@@ -6,6 +6,7 @@ from app.extensions import db
 from app.models import Habit, HabitEntry, RoutineCompletion
 from app.services.audit import record_event
 from app.services.clock import local_day
+from app.services.personal_routines import owned_routine
 from app.wellness.catalog import ROUTINES
 
 GOAL_ROUTINES = {
@@ -35,6 +36,11 @@ def routine_done_today(user, slug):
 
 def register_routine(user, slug):
     routine = next((item for item in ROUTINES if item["slug"] == slug), None)
+    if slug.startswith("personal-") and slug[9:].isdigit() and len(slug) <= 25:
+        personal = owned_routine(user, int(slug[9:]), lock=True)
+        if personal:
+            routine = {"habit_code": "gentle-movement"}
+            slug = personal.slug
     if routine is None:
         return None
     habit = db.session.scalar(

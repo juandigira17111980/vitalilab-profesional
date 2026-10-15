@@ -1,13 +1,21 @@
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
 
 from app.admin.routes import admin_required
 from app.extensions import db, limiter
 from app.forms import EmptyForm
-from app.models import School, SchoolGroup, SchoolMembership, TeacherGroupAssignment
+from app.models import (
+    School,
+    SchoolEnrollmentRequest,
+    SchoolGroup,
+    SchoolMembership,
+    TeacherGroupAssignment,
+)
 from app.school.forms import (
     AggregateConsentForm,
+    ManualEnrollmentReviewForm,
+    ManualSchoolJoinForm,
     ReviewMembershipForm,
     SchoolForm,
     SchoolGroupForm,
@@ -15,6 +23,12 @@ from app.school.forms import (
     TeacherAssignmentForm,
 )
 from app.services.audit import record_event
+from app.services.enrollment import (
+    cancel_manual_enrollment,
+    enrollment_for,
+    request_manual_enrollment,
+    review_manual_enrollment,
+)
 from app.services.school import (
     assign_teacher,
     configure_join_form,
@@ -37,13 +51,28 @@ bp = Blueprint("school", __name__)
 @login_required
 @limiter.limit("20 per hour", methods=["POST"])
 def account():
-    form = SchoolJoinForm()
-    _, groups = configure_join_form(form)
+    # Compatibility for previously opened forms; new UI always uses manual input.
+    legacy = (
+        request.method == "POST"
+        and "school_id" in request.form
+        and "school_name" not in request.form
+    )
+    form = SchoolJoinForm() if legacy else ManualSchoolJoinForm()
+    if legacy:
+        configure_join_form(form)
     if form.validate_on_submit():
         try:
-            request_membership(
-                current_user, form.school_id.data, form.group_id.data, form.requested_role.data
-            )
+            if legacy:
+                request_membership(
+                    current_user, form.school_id.data, form.group_id.data, form.requested_role.data
+                )
+            else:
+                request_manual_enrollment(
+                    current_user,
+                    form.school_name.data,
+                    form.group_name.data,
+                    form.requested_role.data,
+                )
         except ValueError as error:
             flash(str(error), "error")
         else:
@@ -54,7 +83,9 @@ def account():
             )
             return redirect(url_for("school.account"))
     elif form.is_submitted():
-        flash("Selecciona un colegio, un grupo compatible y un rol válidos.", "error")
+        flash("Revisa el colegio, el grupo y el rol solicitado.", "error")
+    if legacy:
+        form = ManualSchoolJoinForm(formdata=None)
     member = membership_for(current_user)
     consent = AggregateConsentForm(allow_aggregate=member.allow_aggregate if member else False)
     return render_template(
@@ -63,7 +94,7 @@ def account():
         member=member,
         consent=consent,
         action_form=EmptyForm(),
-        group_options=[{"id": group.id, "school": group.school_id} for group in groups],
+        enrollment=enrollment_for(current_user),
     )
 
 
@@ -73,6 +104,7 @@ def withdraw():
     if not EmptyForm().validate_on_submit():
         abort(400)
     withdraw_membership(current_user)
+    cancel_manual_enrollment(current_user)
     flash(
         "Vinculación retirada. Tus datos personales e historial se conservan "
         "y ya no aportan al reporte del grupo.",
@@ -181,7 +213,51 @@ def admin_index():
         ),
         assignments=list(db.session.scalars(db.select(TeacherGroupAssignment))),
         action_form=EmptyForm(),
+        enrollments=db.paginate(
+            db.select(SchoolEnrollmentRequest)
+            .where(SchoolEnrollmentRequest.status == "pending")
+            .order_by(SchoolEnrollmentRequest.created_at),
+            page=request.args.get("requests_page", 1, type=int),
+            per_page=20,
+            error_out=False,
+        ),
     )
+
+
+@bp.route("/admin/colegios/altas/<int:request_id>", methods=["GET", "POST"])
+@admin_required
+def review_enrollment(request_id):
+    if request_id > 2_147_483_647:
+        abort(404)
+    item = db.get_or_404(SchoolEnrollmentRequest, request_id)
+    form = ManualEnrollmentReviewForm()
+    schools, groups = school_choices()
+    form.school_id.choices = [(0, "Elegir colegio verificado")] + [
+        (school.id, school.name) for school in schools
+    ]
+    form.group_id.choices = [(0, "Sin grupo")] + [
+        (group.id, f"{group.school.name} · {group.name} · {group.academic_year}")
+        for group in groups
+    ]
+    if form.validate_on_submit():
+        try:
+            review_manual_enrollment(
+                current_user,
+                item.id,
+                form.school_id.data,
+                form.group_id.data,
+                form.decision.data,
+                form.verified.data,
+            )
+        except ValueError as error:
+            flash(str(error), "error")
+        else:
+            flash(
+                "Revisión guardada. Asigna grupos por separado si se trata de un docente.",
+                "success",
+            )
+            return redirect(url_for("school.admin_index"))
+    return render_template("school/review_enrollment.html", enrollment=item, form=form)
 
 
 @bp.post("/admin/colegios/crear")

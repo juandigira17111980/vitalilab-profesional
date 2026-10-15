@@ -67,7 +67,7 @@ class RegisterForm(FlaskForm):
         validators=[InputRequired(), EqualTo("password", message="Las contraseñas no coinciden.")],
     )
     privacy_accepted = BooleanField(
-        "Acepto la política de privacidad y el uso educativo de mis datos.",
+        "Acepto la política de privacidad y el tratamiento de mis datos para usar VitaliLab.",
         validators=[DataRequired(message="Debes aceptar la política para crear la cuenta.")],
     )
     submit = SubmitField("Crear mi cuenta")
@@ -148,6 +148,9 @@ class ProfileForm(FlaskForm):
         "Altura actual (cm)",
         validators=[Optional(), finite_decimal, NumberRange(min=50, max=250)],
         places=2,
+    )
+    measurement_consent = BooleanField(
+        "Quiero guardar estas mediciones para mi seguimiento personal."
     )
     submit = SubmitField("Guardar cambios")
 

@@ -131,7 +131,11 @@ def _register_security_headers(app: Flask) -> None:
                 "/acceso",
                 "/colegios",
                 "/docentes",
+                "/mis-rutinas",
             )
         ):
+            response.headers.setdefault("Cache-Control", "no-store")
+        if request.path.startswith("/rutinas"):
+            # The library now contains owner-specific routines and preferences.
             response.headers.setdefault("Cache-Control", "no-store")
         return response
