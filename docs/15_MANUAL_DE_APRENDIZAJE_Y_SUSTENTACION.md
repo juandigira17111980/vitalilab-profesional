@@ -215,7 +215,7 @@ El archivo SQLite quedará dentro de la carpeta `instance`. Es una base exclusiv
 .\.venv\Scripts\python.exe -m flask --app wsgi:app db current
 ```
 
-La primera orden aplica las migraciones pendientes. La segunda crea o sincroniza ocho hábitos. La tercera muestra la revisión actual, `54e1c8bb7901`. El resultado del seed informa cuántos hábitos nuevos se crearon. Ejecutarlo nuevamente debe crear cero adicionales; actualiza el catálogo por su código único.
+La primera orden aplica las migraciones pendientes. La segunda crea o sincroniza ocho hábitos. La tercera muestra la revisión actual, `7ca6e014b982`, que incorpora los enfoques de perfil. El resultado del seed informa cuántos hábitos nuevos se crearon. Ejecutarlo nuevamente debe crear cero adicionales; actualiza el catálogo por su código único.
 
 Si aparecen tablas inexistentes, revisa que aplicaste las migraciones a la misma `DATABASE_URL` con la que arrancarás. Si aparece rechazo de conexión a PostgreSQL, probablemente no estás usando la configuración SQLite de esta primera práctica.
 
@@ -358,7 +358,7 @@ Separamos identidad, perfil, medidas, catálogo, cumplimientos, comunicados y ev
 | failed_login_count y locked_until | Control de intentos y bloqueo temporal |
 | created_at y updated_at | Fechas de creación y modificación |
 
-`user_profiles` utiliza `user_id` como clave primaria y foránea a la vez. Eso impide crear dos perfiles para el mismo usuario. Contiene `display_name`, `birth_date`, `grade`, `timezone`, `privacy_version`, `privacy_accepted_at` y las fechas de creación y modificación. La fecha de nacimiento y el grado son opcionales.
+`user_profiles` utiliza `user_id` como clave primaria y foránea a la vez. Eso impide crear dos perfiles para el mismo usuario. Contiene `display_name`, `birth_date`, `usage_mode`, `institution_name`, `grade`, `timezone`, `privacy_version`, `privacy_accepted_at` y las fechas de creación y modificación. La fecha de nacimiento, institución y grado son opcionales. `usage_mode` distingue uso personal e institucional, pero no cambia roles ni concede permisos. La [guía 21](21_ENFOQUES_PERSONAL_E_INSTITUCIONAL.md) explica el recorrido completo.
 
 El campo `timezone` se utiliza mediante `app/services/clock.py`. El día de hábitos, metas, bitácora y nuevas mediciones se calcula en la zona del perfil, con retorno a America/Bogota si no se encuentra. No se reescriben fechas históricas. Una prueba compara el mismo instante UTC en Bogotá y Tokio para explicar por qué «hoy» puede ser diferente.
 
@@ -413,6 +413,7 @@ El modelo describe el estado que queremos. La migración registra cómo pasar de
 | 0380d5595f5e | Crea las siete tablas con relaciones y restricciones |
 | 208469fd48ef | Añade índices para claves foráneas y consultas |
 | 54e1c8bb7901 | Añade metas personales y bitácora diaria sin alterar las siete tablas originales |
+| 7ca6e014b982 | Añade enfoque personal/institucional y nombre de institución al perfil sin borrar grupos |
 
 `db upgrade` aplica cambios pendientes. `db check` compara modelo y esquema para detectar deriva. `db migrate` genera una propuesta: alguien debe leerla y revisarla antes de aplicarla. No editamos una migración que ya se ejecutó en un ambiente compartido.
 

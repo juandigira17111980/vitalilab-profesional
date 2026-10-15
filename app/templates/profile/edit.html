@@ -1,8 +1,56 @@
 {% extends "base.html" %}{% from "macros/forms.html" import field, submit_button %}
 {% block title %}Mi perfil · VitaliLab{% endblock %}
 {% block content %}
-<section class="page-hero page-hero--compact"><div class="shell shell--narrow"><p class="eyebrow">Tu información</p><h1>Un perfil útil, sin pedir de más</h1><p>Nombre, fecha y grado personalizan la experiencia. Las medidas son opcionales.</p></div></section>
-<section class="section shell profile-grid"><div class="form-card form-card--wide"><h2>Datos personales</h2><form method="post" novalidate>{{ form.hidden_tag() }}<div class="field-row">{{ field(form.display_name, autocomplete="name", placeholder="Tu nombre visible") }}{{ field(form.grade, autocomplete="organization-title", placeholder="Ej. 10° A") }}</div>{{ field(form.birth_date, autocomplete="bday") }}<hr><h2>Medición opcional</h2><p class="form-section-copy">Guardamos un historial para que puedas observar cambios. No es un diagnóstico.</p><div class="field-row">{{ field(form.weight_kg, autocomplete="off", placeholder="Ej. 62.5") }}{{ field(form.height_cm, autocomplete="off", placeholder="Ej. 168") }}</div>{{ submit_button(form.submit) }}</form></div>
-  <aside class="profile-side"><div class="bmi-card"><p class="eyebrow">Última medición</p>{% if latest %}<strong>{{ latest.bmi_snapshot }}</strong><span>IMC orientativo</span><p>{{ bmi_status }}</p><small>{{ latest.measured_on.strftime('%d/%m/%Y') }}</small>{% else %}<strong>—</strong><span>Sin mediciones</span><p>Puedes usar VitaliLab sin compartir peso o altura.</p>{% endif %}</div><div class="notice"><strong>Tu decisión importa</strong><p>No compartas medidas si no son necesarias para tu experiencia. Solicita orientación profesional ante cualquier inquietud de salud.</p></div></aside>
+<section class="page-hero page-hero--compact">
+  <div class="shell shell--narrow">
+    <p class="eyebrow">Tu información</p>
+    <h1>Tu bienestar, a tu manera</h1>
+    <p>Elige un enfoque personal o institucional. Tus hábitos, metas y progreso siguen contigo.</p>
+  </div>
+</section>
+<section class="section shell profile-grid">
+  <div class="form-card form-card--wide">
+    <form method="post" novalidate data-profile-form>
+      {{ form.hidden_tag() }}
+      <fieldset class="profile-mode" aria-describedby="usage-mode-hint{% if form.usage_mode.errors %} usage-mode-error{% endif %}">
+        <legend>{{ form.usage_mode.label.text }}</legend>
+        <div class="profile-mode__choices">
+          {% for option in form.usage_mode %}
+          <label class="profile-mode__choice" for="{{ option.id }}">
+            {{ option(aria_controls="institution-fields") }}
+            <span><strong>{{ option.label.text }}</strong><small>{% if option.data == 'personal' %}Para cuidar mis hábitos, metas y rutinas.{% else %}Para identificar mi perfil dentro de una institución.{% endif %}</small></span>
+          </label>
+          {% endfor %}
+        </div>
+        <p class="field-hint" id="usage-mode-hint">Puedes cambiar de enfoque cuando quieras, sin perder tu progreso.</p>
+        {% if form.usage_mode.errors %}<div id="usage-mode-error">{% for error in form.usage_mode.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>{% endif %}
+      </fieldset>
+      <h2>Datos personales</h2>
+      <div class="field-row">
+        {{ field(form.display_name, autocomplete="name", placeholder="Tu nombre visible") }}
+        {{ field(form.birth_date, autocomplete="bday", hint="Opcional") }}
+      </div>
+      <fieldset class="institution-fields" id="institution-fields" data-institution-fields>
+        <legend>Tu contexto institucional</legend>
+        <p class="field-hint">Solo se utiliza con el enfoque institucional. Estos datos no crean una vinculación ni conceden permisos de administración.</p>
+        <div class="field-row">
+          {{ field(form.institution_name, autocomplete="organization", placeholder="Nombre de tu institución") }}
+          {{ field(form.grade, autocomplete="organization-title", placeholder="Ej. 10° A, bienestar o equipo") }}
+        </div>
+      </fieldset>
+      <hr>
+      <h2>Medición opcional</h2>
+      <p class="form-section-copy">Guardamos un historial para que puedas observar cambios. No es un diagnóstico.</p>
+      <div class="field-row">
+        {{ field(form.weight_kg, autocomplete="off", placeholder="Ej. 62.5") }}
+        {{ field(form.height_cm, autocomplete="off", placeholder="Ej. 168") }}
+      </div>
+      {{ submit_button(form.submit) }}
+    </form>
+  </div>
+  <aside class="profile-side">
+    <div class="bmi-card"><p class="eyebrow">Última medición</p>{% if latest %}<strong>{{ latest.bmi_snapshot }}</strong><span>IMC orientativo</span><p>{{ bmi_status }}</p><small>{{ latest.measured_on.strftime('%d/%m/%Y') }}</small>{% else %}<strong>—</strong><span>Sin mediciones</span><p>Puedes usar VitaliLab sin compartir peso o altura.</p>{% endif %}</div>
+    <div class="notice"><strong>Tu decisión importa</strong><p>No compartas medidas si no son necesarias para tu experiencia. Solicita orientación profesional ante cualquier inquietud de salud.</p></div>
+  </aside>
 </section>
 {% endblock %}

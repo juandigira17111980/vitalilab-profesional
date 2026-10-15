@@ -14,6 +14,9 @@ erDiagram
     HABITS ||--o{ HABIT_ENTRIES : receives
     USERS ||--o{ ANNOUNCEMENTS : authors
     USERS ||--o{ AUDIT_EVENTS : acts
+    USERS ||--o{ USER_GOALS : plans
+    HABITS ||--o{ USER_GOALS : targets
+    USERS ||--o{ DAILY_CHECKINS : reflects
 
     USERS {
         int id PK
@@ -29,6 +32,8 @@ erDiagram
         int user_id PK,FK
         varchar display_name
         date birth_date
+        varchar usage_mode
+        varchar institution_name
         varchar grade
         varchar timezone
         varchar privacy_version
@@ -73,21 +78,36 @@ erDiagram
         json metadata_redacted
         datetime created_at
     }
+    USER_GOALS {
+        int id PK
+        int user_id FK
+        int habit_id FK
+        int target_days
+    }
+    DAILY_CHECKINS {
+        int id PK
+        int user_id FK
+        date checked_on
+        int energy
+        int focus
+    }
 ```
 
-No existe una tabla de saldos ni `daily_checkins`: puntos, nivel y racha se derivan de `habit_entries`. Es una decisión de consistencia, no una omisión.
+No existe una tabla de saldos: puntos, nivel y racha se derivan de `habit_entries`. `daily_checkins` registra energía y enfoque, no puntos. Las metas se guardan en `user_goals`.
 
 ## 3. Diccionario y retención
 
 | Tabla | Finalidad | Datos clave | Eliminación FK |
 |---|---|---|---|
 | `users` | Identidad y control de acceso | correo, hash, rol, bloqueo | Raíz |
-| `user_profiles` | Presentación y consentimiento | nombre, fecha/grado opcional | CASCADE con usuario |
+| `user_profiles` | Presentación, enfoque y consentimiento | nombre, modo personal/institucional, institución/grupo opcionales | CASCADE con usuario |
 | `health_measurements` | Historial opcional | peso, altura, IMC, fecha | CASCADE con usuario |
 | `habits` | Catálogo controlado | código, puntos, estado | RESTRICT desde entradas |
 | `habit_entries` | Evidencia diaria | usuario, hábito, fecha | usuario CASCADE; hábito RESTRICT |
 | `announcements` | Comunicación administrativa | autor, contenido, estado | autor RESTRICT |
 | `audit_events` | Trazabilidad operativa | actor, acción, entidad | actor SET NULL |
+| `user_goals` | Frecuencia personal por hábito | usuario, hábito, objetivo 1–7 días | usuario CASCADE; hábito RESTRICT |
+| `daily_checkins` | Reflexión personal diaria | usuario, fecha, energía y enfoque 1–5 | usuario CASCADE |
 
 La retención legal/educativa debe aprobarse antes de Production. Las relaciones CASCADE eliminan perfil, medidas y cumplimientos cuando puede eliminarse el usuario; auditoría conserva el evento con actor nulo. Un autor con comunicados tiene RESTRICT y no se puede borrar sin resolver antes esas referencias. No existe todavía una ruta pública de eliminación de cuenta.
 
@@ -96,6 +116,9 @@ La retención legal/educativa debe aprobarse antes de Production. Las relaciones
 - `users.email`: único, normalizado y no nulo.
 - `users.role`: `user|admin`; `status`: `active|inactive`.
 - `habit_entries`: `UNIQUE(user_id, habit_id, completed_on)`.
+- `user_profiles.usage_mode`: `personal|institutional`, no nulo, valor por defecto `personal`.
+- `institution_name`: texto opcional de hasta 160 caracteres; `grade`: hasta 80. No son claves de membresía ni se usan para autorizar acceso.
+- `user_goals`: `UNIQUE(user_id, habit_id)`; `daily_checkins`: `UNIQUE(user_id, checked_on)`.
 - Peso: 20–500 kg; altura: 80–250 cm; IMC snapshot: 5–100.
 - Puntos de hábito: 1–100.
 - Estado de comunicado: `draft|published|archived`.
@@ -118,8 +141,12 @@ Los índices responden a rutas existentes; en Production se revisarán con `EXPL
 |---|---|---|
 | `0380d5595f5e` | Esquema profesional inicial | ✅ aplicada |
 | `208469fd48ef` | Índices de FK y rutas de consulta | ✅ aplicada |
+| `54e1c8bb7901` | Metas y bitácora personal | Ver guía 20 |
+| `7ca6e014b982` | Enfoque de perfil y nombre de institución | Ver guía 21 y CI del cambio |
 
 `flask db check` no detectó deriva. El downgrade existe, pero una reversión destructiva en Production nunca se ejecuta sin backup, análisis de compatibilidad y aprobación.
+
+La revisión de enfoques preserva el grado anterior: si no está vacío propone `institutional`; en los demás perfiles propone `personal`. No verifica afiliación. El usuario puede modificar la elección. No añadimos un índice de modo: es una preferencia de baja cardinalidad leída por la PK del perfil. [Detalle y práctica](21_ENFOQUES_PERSONAL_E_INSTITUCIONAL.md).
 
 ## 7. Migración desde el prototipo
 

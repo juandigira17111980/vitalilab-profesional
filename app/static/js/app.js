@@ -23,6 +23,22 @@ document.querySelectorAll("[data-dismiss-flash]").forEach((button) => {
 });
 
 const bmiForm = document.querySelector("[data-bmi-form]");
+const profileForm = document.querySelector("[data-profile-form]");
+if (profileForm) {
+  const institutionalFields = profileForm.querySelector("[data-institution-fields]");
+  const syncProfileMode = () => {
+    if (!institutionalFields) return;
+    const institutional = profileForm.querySelector('[name="usage_mode"]:checked')?.value === "institutional";
+    institutionalFields.hidden = !institutional;
+    institutionalFields.disabled = !institutional;
+  };
+  profileForm.querySelectorAll('[name="usage_mode"]').forEach((radio) => {
+    radio.addEventListener("change", syncProfileMode);
+  });
+  window.addEventListener("pageshow", syncProfileMode);
+  syncProfileMode();
+}
+
 if (bmiForm) {
   bmiForm.addEventListener("submit", (event) => {
     event.preventDefault();
