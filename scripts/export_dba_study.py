@@ -1,6 +1,7 @@
 """Read PostgreSQL catalogs and produce a non-sensitive, reproducible DBA study kit."""
 
 import argparse
+import copy
 import html
 import json
 import re
@@ -175,6 +176,34 @@ def validate(data: dict) -> None:
                 raise ValueError(f"Missing explanation: {table['name']}.{column['name']}")
 
 
+def comparable_catalog(data: dict) -> dict:
+    """Canonicalize ONLY PostgreSQL's equivalent constant-array cast spellings.
+
+    Dump/restore can move varchar-to-text casts from an array to each constant.
+    Keep every key, name, type, default, column and other CHECK expression exact.
+    """
+    result = copy.deepcopy(data)
+    patterns = (
+        (r"ANY \(\(ARRAY\[(.*?)\]\)::text\[\]\)", r"'([a-z_]+)'::character varying"),
+        (r"ANY \(ARRAY\[(.*?)\]\)", r"\('([a-z_]+)'::character varying\)::text"),
+    )
+    for table in result["tables"]:
+        for key in table["constraints"]:
+            if key["kind"] != "c":
+                continue
+            for array_pattern, constant_pattern in patterns:
+
+                def replace(match, constant_pattern=constant_pattern):
+                    parts = match[1].split(", ")
+                    constants = [re.fullmatch(constant_pattern, part) for part in parts]
+                    if not all(constants):
+                        return match[0]
+                    return "ANY_ENUM(" + ",".join(item[1] for item in constants) + ")"
+
+                key["definition"] = re.sub(array_pattern, replace, key["definition"])
+    return result
+
+
 def dictionary(data: dict) -> str:
     lines = [
         "# Diccionario fisico completo de PostgreSQL",
@@ -206,7 +235,16 @@ def dictionary(data: dict) -> str:
             "No hay DEFAULT SQL en esta tabla."
         ]
         lines += ["", "### Claves, relaciones y restricciones", ""]
-        lines += [f"- `{item['name']}`: `{item['definition']}`" for item in table["constraints"]]
+        lines += [
+            "NOT NULL se representa campo por campo en la columna Nulo. "
+            "Sus nombres físicos también están en el catálogo JSON y el DDL completos.",
+            "",
+        ]
+        lines += [
+            f"- `{item['name']}`: `{item['definition']}`"
+            for item in table["constraints"]
+            if item["kind"] != "n"
+        ]
         lines += ["", "### Indices fisicos", ""]
         lines += [f"- `{item['definition']}`" for item in table["indexes"]]
         lines += [""]

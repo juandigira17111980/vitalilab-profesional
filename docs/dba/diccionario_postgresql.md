@@ -25,13 +25,8 @@ Comunicados, autor y estado de publicación.
 
 ### Claves, relaciones y restricciones
 
-- `announcements_author_user_id_not_null`: `NOT NULL author_user_id`
-- `announcements_body_not_null`: `NOT NULL body`
-- `announcements_created_at_not_null`: `NOT NULL created_at`
-- `announcements_id_not_null`: `NOT NULL id`
-- `announcements_status_not_null`: `NOT NULL status`
-- `announcements_title_not_null`: `NOT NULL title`
-- `announcements_updated_at_not_null`: `NOT NULL updated_at`
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_announcements_valid_status`: `CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying, 'archived'::character varying])::text[])))`
 - `fk_announcements_author_user_id_users`: `FOREIGN KEY (author_user_id) REFERENCES users(id) ON DELETE RESTRICT`
 - `pk_announcements`: `PRIMARY KEY (id)`
@@ -64,11 +59,8 @@ Eventos técnicos con metadatos redactados, no un historial médico.
 
 ### Claves, relaciones y restricciones
 
-- `audit_events_action_not_null`: `NOT NULL action`
-- `audit_events_created_at_not_null`: `NOT NULL created_at`
-- `audit_events_entity_type_not_null`: `NOT NULL entity_type`
-- `audit_events_id_not_null`: `NOT NULL id`
-- `audit_events_metadata_redacted_not_null`: `NOT NULL metadata_redacted`
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `fk_audit_events_actor_user_id_users`: `FOREIGN KEY (actor_user_id) REFERENCES users(id) ON DELETE SET NULL`
 - `pk_audit_events`: `PRIMARY KEY (id)`
 
@@ -99,15 +91,10 @@ Bitácora de energía y enfoque por fecha.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_daily_checkins_valid_energy`: `CHECK (((energy >= 1) AND (energy <= 5)))`
 - `ck_daily_checkins_valid_focus`: `CHECK (((focus >= 1) AND (focus <= 5)))`
-- `daily_checkins_checked_on_not_null`: `NOT NULL checked_on`
-- `daily_checkins_created_at_not_null`: `NOT NULL created_at`
-- `daily_checkins_energy_not_null`: `NOT NULL energy`
-- `daily_checkins_focus_not_null`: `NOT NULL focus`
-- `daily_checkins_id_not_null`: `NOT NULL id`
-- `daily_checkins_updated_at_not_null`: `NOT NULL updated_at`
-- `daily_checkins_user_id_not_null`: `NOT NULL user_id`
 - `fk_daily_checkins_user_id_users`: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
 - `pk_daily_checkins`: `PRIMARY KEY (id)`
 - `uq_user_daily_checkin`: `UNIQUE (user_id, checked_on)`
@@ -135,13 +122,10 @@ Cumplimiento diario de cada hábito por usuario.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `fk_habit_entries_habit_id_habits`: `FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE RESTRICT`
 - `fk_habit_entries_user_id_users`: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
-- `habit_entries_completed_on_not_null`: `NOT NULL completed_on`
-- `habit_entries_created_at_not_null`: `NOT NULL created_at`
-- `habit_entries_habit_id_not_null`: `NOT NULL habit_id`
-- `habit_entries_id_not_null`: `NOT NULL id`
-- `habit_entries_user_id_not_null`: `NOT NULL user_id`
 - `pk_habit_entries`: `PRIMARY KEY (id)`
 - `uq_habit_daily`: `UNIQUE (user_id, habit_id, completed_on)`
 
@@ -178,18 +162,9 @@ Catálogo de hábitos y puntos por cumplimiento.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_habits_valid_points`: `CHECK (((points >= 1) AND (points <= 100)))`
-- `habits_active_not_null`: `NOT NULL active`
-- `habits_category_not_null`: `NOT NULL category`
-- `habits_code_not_null`: `NOT NULL code`
-- `habits_created_at_not_null`: `NOT NULL created_at`
-- `habits_description_not_null`: `NOT NULL description`
-- `habits_icon_not_null`: `NOT NULL icon`
-- `habits_id_not_null`: `NOT NULL id`
-- `habits_name_not_null`: `NOT NULL name`
-- `habits_points_not_null`: `NOT NULL points`
-- `habits_sort_order_not_null`: `NOT NULL sort_order`
-- `habits_updated_at_not_null`: `NOT NULL updated_at`
 - `pk_habits`: `PRIMARY KEY (id)`
 - `uq_habits_code`: `UNIQUE (code)`
 
@@ -222,19 +197,14 @@ Historial de mediciones con el contexto del momento registrado.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_health_measurements_valid_bmi`: `CHECK (((bmi_snapshot >= (5)::numeric) AND (bmi_snapshot <= (100)::numeric)))`
 - `ck_health_measurements_valid_growth_percentile`: `CHECK (((growth_percentile IS NULL) OR ((growth_percentile >= (0)::numeric) AND (growth_percentile <= (100)::numeric))))`
 - `ck_health_measurements_valid_height`: `CHECK (((height_cm >= (50)::numeric) AND (height_cm <= (250)::numeric)))`
 - `ck_health_measurements_valid_measurement_reference_sex`: `CHECK (((reference_sex IS NULL) OR ((reference_sex)::text = ANY ((ARRAY['male'::character varying, 'female'::character varying])::text[]))))`
 - `ck_health_measurements_valid_weight`: `CHECK (((weight_kg >= (10)::numeric) AND (weight_kg <= (500)::numeric)))`
 - `fk_health_measurements_user_id_users`: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
-- `health_measurements_bmi_snapshot_not_null`: `NOT NULL bmi_snapshot`
-- `health_measurements_created_at_not_null`: `NOT NULL created_at`
-- `health_measurements_height_cm_not_null`: `NOT NULL height_cm`
-- `health_measurements_id_not_null`: `NOT NULL id`
-- `health_measurements_measured_on_not_null`: `NOT NULL measured_on`
-- `health_measurements_user_id_not_null`: `NOT NULL user_id`
-- `health_measurements_weight_kg_not_null`: `NOT NULL weight_kg`
 - `pk_health_measurements`: `PRIMARY KEY (id)`
 
 ### Indices fisicos
@@ -266,18 +236,11 @@ Cabecera privada de una rutina y control de su revisión.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_personal_routines_valid_routine_goal`: `CHECK (((goal)::text = ANY ((ARRAY['center'::character varying, 'energy'::character varying, 'strength'::character varying])::text[])))`
 - `ck_personal_routines_valid_routine_revision`: `CHECK ((revision >= 1))`
 - `fk_personal_routines_user_id_users`: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
-- `personal_routines_active_not_null`: `NOT NULL active`
-- `personal_routines_created_at_not_null`: `NOT NULL created_at`
-- `personal_routines_description_not_null`: `NOT NULL description`
-- `personal_routines_goal_not_null`: `NOT NULL goal`
-- `personal_routines_id_not_null`: `NOT NULL id`
-- `personal_routines_name_not_null`: `NOT NULL name`
-- `personal_routines_revision_not_null`: `NOT NULL revision`
-- `personal_routines_updated_at_not_null`: `NOT NULL updated_at`
-- `personal_routines_user_id_not_null`: `NOT NULL user_id`
 - `pk_personal_routines`: `PRIMARY KEY (id)`
 
 ### Indices fisicos
@@ -304,15 +267,11 @@ Actividad declarada por usuario, identificador de rutina y día.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `fk_routine_completions_habit_id_habits`: `FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE RESTRICT`
 - `fk_routine_completions_user_id_users`: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
 - `pk_routine_completions`: `PRIMARY KEY (id)`
-- `routine_completions_completed_on_not_null`: `NOT NULL completed_on`
-- `routine_completions_created_at_not_null`: `NOT NULL created_at`
-- `routine_completions_habit_id_not_null`: `NOT NULL habit_id`
-- `routine_completions_id_not_null`: `NOT NULL id`
-- `routine_completions_routine_slug_not_null`: `NOT NULL routine_slug`
-- `routine_completions_user_id_not_null`: `NOT NULL user_id`
 - `uq_routine_daily`: `UNIQUE (user_id, routine_slug, completed_on)`
 
 ### Indices fisicos
@@ -345,6 +304,8 @@ Ejercicios ordenados de una rutina, con dosis y descansos.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_routine_exercises_exercise_has_dose`: `CHECK (((repetitions IS NOT NULL) OR (duration_seconds IS NOT NULL)))`
 - `ck_routine_exercises_valid_exercise_duration`: `CHECK (((duration_seconds IS NULL) OR ((duration_seconds >= 5) AND (duration_seconds <= 3600))))`
 - `ck_routine_exercises_valid_exercise_position`: `CHECK ((("position" >= 0) AND ("position" <= 11)))`
@@ -354,14 +315,6 @@ Ejercicios ordenados de una rutina, con dosis y descansos.
 - `ck_routine_exercises_valid_exercise_visual`: `CHECK (((visual)::text = ANY ((ARRAY['posture'::character varying, 'march'::character varying, 'palms'::character varying, 'shoulders'::character varying, 'wall'::character varying, 'walk'::character varying, 'breathing'::character varying, 'custom'::character varying])::text[])))`
 - `fk_routine_exercises_routine_id_personal_routines`: `FOREIGN KEY (routine_id) REFERENCES personal_routines(id) ON DELETE CASCADE`
 - `pk_routine_exercises`: `PRIMARY KEY (id)`
-- `routine_exercises_id_not_null`: `NOT NULL id`
-- `routine_exercises_instructions_not_null`: `NOT NULL instructions`
-- `routine_exercises_name_not_null`: `NOT NULL name`
-- `routine_exercises_position_not_null`: `NOT NULL "position"`
-- `routine_exercises_rest_seconds_not_null`: `NOT NULL rest_seconds`
-- `routine_exercises_routine_id_not_null`: `NOT NULL routine_id`
-- `routine_exercises_sets_not_null`: `NOT NULL sets`
-- `routine_exercises_visual_not_null`: `NOT NULL visual`
 - `uq_routine_exercise_position`: `UNIQUE (routine_id, "position")`
 
 ### Indices fisicos
@@ -392,19 +345,13 @@ Solicitud escrita que no concede permisos institucionales.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_school_enrollment_requests_valid_enrollment_status`: `CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'resolved'::character varying, 'rejected'::character varying, 'cancelled'::character varying])::text[])))`
 - `ck_school_enrollment_requests_valid_requested_role`: `CHECK (((requested_role)::text = ANY ((ARRAY['student'::character varying, 'teacher'::character varying])::text[])))`
 - `fk_school_enrollment_requests_reviewed_by_user_id_users`: `FOREIGN KEY (reviewed_by_user_id) REFERENCES users(id) ON DELETE SET NULL`
 - `fk_school_enrollment_requests_user_id_users`: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
 - `pk_school_enrollment_requests`: `PRIMARY KEY (id)`
-- `school_enrollment_requests_created_at_not_null`: `NOT NULL created_at`
-- `school_enrollment_requests_group_name_not_null`: `NOT NULL group_name`
-- `school_enrollment_requests_id_not_null`: `NOT NULL id`
-- `school_enrollment_requests_requested_role_not_null`: `NOT NULL requested_role`
-- `school_enrollment_requests_school_name_not_null`: `NOT NULL school_name`
-- `school_enrollment_requests_status_not_null`: `NOT NULL status`
-- `school_enrollment_requests_updated_at_not_null`: `NOT NULL updated_at`
-- `school_enrollment_requests_user_id_not_null`: `NOT NULL user_id`
 - `uq_school_enrollment_requests_user_id`: `UNIQUE (user_id)`
 
 ### Indices fisicos
@@ -434,16 +381,11 @@ Grupos de un colegio y un año académico.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_school_groups_valid_academic_year`: `CHECK (((academic_year >= 2020) AND (academic_year <= 2100)))`
 - `fk_school_groups_school_id_schools`: `FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE RESTRICT`
 - `pk_school_groups`: `PRIMARY KEY (id)`
-- `school_groups_academic_year_not_null`: `NOT NULL academic_year`
-- `school_groups_active_not_null`: `NOT NULL active`
-- `school_groups_created_at_not_null`: `NOT NULL created_at`
-- `school_groups_id_not_null`: `NOT NULL id`
-- `school_groups_name_not_null`: `NOT NULL name`
-- `school_groups_school_id_not_null`: `NOT NULL school_id`
-- `school_groups_updated_at_not_null`: `NOT NULL updated_at`
 - `uq_school_group_id_school`: `UNIQUE (id, school_id)`
 - `uq_school_group_year_name`: `UNIQUE (school_id, academic_year, name)`
 
@@ -480,6 +422,8 @@ Vinculación revisada de una cuenta con una institución.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_school_memberships_valid_membership_status`: `CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying, 'revoked'::character varying])::text[])))`
 - `ck_school_memberships_valid_school_role`: `CHECK (((requested_role)::text = ANY ((ARRAY['student'::character varying, 'teacher'::character varying])::text[])))`
 - `fk_school_membership_group_school`: `FOREIGN KEY (group_id, school_id) REFERENCES school_groups(id, school_id) ON DELETE RESTRICT`
@@ -487,15 +431,6 @@ Vinculación revisada de una cuenta con una institución.
 - `fk_school_memberships_school_id_schools`: `FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE RESTRICT`
 - `fk_school_memberships_user_id_users`: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
 - `pk_school_memberships`: `PRIMARY KEY (id)`
-- `school_memberships_allow_aggregate_not_null`: `NOT NULL allow_aggregate`
-- `school_memberships_authorization_confirmed_not_null`: `NOT NULL authorization_confirmed`
-- `school_memberships_created_at_not_null`: `NOT NULL created_at`
-- `school_memberships_id_not_null`: `NOT NULL id`
-- `school_memberships_requested_role_not_null`: `NOT NULL requested_role`
-- `school_memberships_school_id_not_null`: `NOT NULL school_id`
-- `school_memberships_status_not_null`: `NOT NULL status`
-- `school_memberships_updated_at_not_null`: `NOT NULL updated_at`
-- `school_memberships_user_id_not_null`: `NOT NULL user_id`
 - `uq_school_membership_id_school`: `UNIQUE (id, school_id)`
 - `uq_school_memberships_user_id`: `UNIQUE (user_id)`
 
@@ -527,13 +462,9 @@ Catálogo institucional gestionado por administración.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `pk_schools`: `PRIMARY KEY (id)`
-- `schools_active_not_null`: `NOT NULL active`
-- `schools_code_not_null`: `NOT NULL code`
-- `schools_created_at_not_null`: `NOT NULL created_at`
-- `schools_id_not_null`: `NOT NULL id`
-- `schools_name_not_null`: `NOT NULL name`
-- `schools_updated_at_not_null`: `NOT NULL updated_at`
 - `uq_schools_code`: `UNIQUE (code)`
 
 ### Indices fisicos
@@ -560,15 +491,11 @@ Asignación docente a grupos del mismo colegio.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `fk_assignment_group_school`: `FOREIGN KEY (group_id, school_id) REFERENCES school_groups(id, school_id) ON DELETE RESTRICT`
 - `fk_assignment_membership_school`: `FOREIGN KEY (membership_id, school_id) REFERENCES school_memberships(id, school_id) ON DELETE CASCADE`
 - `pk_teacher_group_assignments`: `PRIMARY KEY (id)`
-- `teacher_group_assignments_created_at_not_null`: `NOT NULL created_at`
-- `teacher_group_assignments_group_id_not_null`: `NOT NULL group_id`
-- `teacher_group_assignments_id_not_null`: `NOT NULL id`
-- `teacher_group_assignments_membership_id_not_null`: `NOT NULL membership_id`
-- `teacher_group_assignments_school_id_not_null`: `NOT NULL school_id`
-- `teacher_group_assignments_updated_at_not_null`: `NOT NULL updated_at`
 - `uq_teacher_group`: `UNIQUE (membership_id, group_id)`
 
 ### Indices fisicos
@@ -596,17 +523,13 @@ Meta semanal del usuario para un hábito concreto.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_user_goals_valid_target_days`: `CHECK (((target_days >= 1) AND (target_days <= 7)))`
 - `fk_user_goals_habit_id_habits`: `FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE RESTRICT`
 - `fk_user_goals_user_id_users`: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
 - `pk_user_goals`: `PRIMARY KEY (id)`
 - `uq_user_goal_habit`: `UNIQUE (user_id, habit_id)`
-- `user_goals_created_at_not_null`: `NOT NULL created_at`
-- `user_goals_habit_id_not_null`: `NOT NULL habit_id`
-- `user_goals_id_not_null`: `NOT NULL id`
-- `user_goals_target_days_not_null`: `NOT NULL target_days`
-- `user_goals_updated_at_not_null`: `NOT NULL updated_at`
-- `user_goals_user_id_not_null`: `NOT NULL user_id`
 
 ### Indices fisicos
 
@@ -645,23 +568,14 @@ Perfil, preferencias, contexto y confirmaciones de privacidad.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_user_profiles_valid_movement_goal`: `CHECK (((movement_goal)::text = ANY ((ARRAY['center'::character varying, 'energy'::character varying, 'strength'::character varying])::text[])))`
 - `ck_user_profiles_valid_movement_preference`: `CHECK (((movement_preference)::text = ANY ((ARRAY['adaptable'::character varying, 'seated'::character varying, 'supported'::character varying, 'standing'::character varying])::text[])))`
 - `ck_user_profiles_valid_reference_sex`: `CHECK (((reference_sex)::text = ANY ((ARRAY['unspecified'::character varying, 'female'::character varying, 'male'::character varying])::text[])))`
 - `ck_user_profiles_valid_usage_mode`: `CHECK (((usage_mode)::text = ANY ((ARRAY['personal'::character varying, 'institutional'::character varying])::text[])))`
 - `fk_user_profiles_user_id_users`: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
 - `pk_user_profiles`: `PRIMARY KEY (user_id)`
-- `user_profiles_created_at_not_null`: `NOT NULL created_at`
-- `user_profiles_display_name_not_null`: `NOT NULL display_name`
-- `user_profiles_movement_goal_not_null`: `NOT NULL movement_goal`
-- `user_profiles_movement_preference_not_null`: `NOT NULL movement_preference`
-- `user_profiles_privacy_accepted_at_not_null`: `NOT NULL privacy_accepted_at`
-- `user_profiles_privacy_version_not_null`: `NOT NULL privacy_version`
-- `user_profiles_reference_sex_not_null`: `NOT NULL reference_sex`
-- `user_profiles_timezone_not_null`: `NOT NULL timezone`
-- `user_profiles_updated_at_not_null`: `NOT NULL updated_at`
-- `user_profiles_usage_mode_not_null`: `NOT NULL usage_mode`
-- `user_profiles_user_id_not_null`: `NOT NULL user_id`
 
 ### Indices fisicos
 
@@ -690,17 +604,11 @@ Identidad de la cuenta, autenticación y estado de acceso.
 
 ### Claves, relaciones y restricciones
 
+NOT NULL se representa campo por campo en la columna Nulo. Sus nombres físicos también están en el catálogo JSON y el DDL completos.
+
 - `ck_users_valid_role`: `CHECK (((role)::text = ANY ((ARRAY['user'::character varying, 'admin'::character varying])::text[])))`
 - `ck_users_valid_status`: `CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying])::text[])))`
 - `pk_users`: `PRIMARY KEY (id)`
-- `users_created_at_not_null`: `NOT NULL created_at`
-- `users_email_not_null`: `NOT NULL email`
-- `users_failed_login_count_not_null`: `NOT NULL failed_login_count`
-- `users_id_not_null`: `NOT NULL id`
-- `users_password_hash_not_null`: `NOT NULL password_hash`
-- `users_role_not_null`: `NOT NULL role`
-- `users_status_not_null`: `NOT NULL status`
-- `users_updated_at_not_null`: `NOT NULL updated_at`
 
 ### Indices fisicos
 

@@ -8,6 +8,7 @@ import pytest
 from app.extensions import db
 from scripts.export_dba_study import (
     PURPOSES,
+    comparable_catalog,
     dictionary,
     graphviz,
     mermaid,
@@ -58,6 +59,29 @@ def test_unknown_schema_is_rejected(catalog):
     catalog["migration_revision"] = "unknown"
     with pytest.raises(ValueError, match="Unexpected schema"):
         validate(catalog)
+
+
+def test_compare_only_equivalent_literal_array_casts(catalog):
+    original = comparable_catalog(catalog)
+    key = next(k for k in catalog["tables"][0]["constraints"] if k["kind"] == "c")
+    key["definition"] = (
+        "CHECK (((status)::text = ANY (ARRAY[('draft'::character varying)::text, "
+        "('published'::character varying)::text, ('archived'::character varying)::text])))"
+    )
+    assert comparable_catalog(catalog) == original
+    key["definition"] = key["definition"].replace("'archived'", "'deleted'")
+    assert comparable_catalog(catalog) != original
+
+
+def test_compare_does_not_ignore_check_numeric_or_column_changes(catalog):
+    original = comparable_catalog(catalog)
+    catalog["tables"][0]["columns"][0]["nullable"] = True
+    assert comparable_catalog(catalog) != original
+    catalog["tables"][0]["columns"][0]["nullable"] = False
+    table = next(t for t in catalog["tables"] if t["name"] == "habits")
+    key = next(k for k in table["constraints"] if k["kind"] == "c")
+    key["definition"] = key["definition"].replace("100", "101")
+    assert comparable_catalog(catalog) != original
 
 
 def test_physical_relationships_not_invented(catalog):
