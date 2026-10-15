@@ -6,6 +6,7 @@ def test_documented_reference_is_derived_from_models_and_routes():
     assert len(data["tables"]) == 17
     assert "routine_exercises" in {table["name"] for table in data["tables"]}
     assert "/mis-rutinas/<int:routine_id>/registrar" in {route["path"] for route in data["routes"]}
+    assert "/google758e0558a7bc12dd.html" in {route["path"] for route in data["routes"]}
     content = markdown(data)
     assert "measurement_consent_at" in content
     assert "personalization_completed_at" in content

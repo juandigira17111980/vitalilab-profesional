@@ -462,6 +462,7 @@ Este mapa muestra direcciones y funciones reales. No representa una API pública
 | `/docentes/` | GET | `school.teacher` | `app/school/routes.py` |
 | `/docentes/grupos/<int:group_id>` | GET | `school.group_report` | `app/school/routes.py` |
 | `/docentes/rutinas/<slug>/proyectar` | GET | `school.project_routine` | `app/school/routes.py` |
+| `/google758e0558a7bc12dd.html` | GET | `main.google_site_verification` | `app/main/routes.py` |
 | `/habitos/` | GET | `habits.index` | `app/habits/routes.py` |
 | `/habitos/<int:habit_id>/completar` | POST | `habits.complete` | `app/habits/routes.py` |
 | `/health` | GET | `main.health` | `app/main/routes.py` |

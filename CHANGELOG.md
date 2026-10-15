@@ -1,5 +1,12 @@
 # Changelog
 
+## Comprobante de propiedad para Google — 2026-10-15
+
+- Ruta exacta y pública de Search Console, con contenido idéntico al archivo entregado por el propietario; sin inicio de sesión, plantilla ni acceso a la base.
+- Comprobante marcado `noindex` sin afectar la portada; no incorpora analítica, cookies, formularios ni lectura genérica de archivos.
+- Pruebas de contenido, acceso por ambos nombres, método HEAD, independencia de PostgreSQL y rechazo de rutas o escrituras no previstas.
+- Manual actualizado para distinguir DNS, verificación e indexación. No cambia Render, Hostinger, reglas de dominio ni esquema.
+
 ## Limpieza del montaje y explicación de referencias — 2026-10-15
 
 - Retirada la configuración de un proveedor no utilizado, su script de copia de estáticos y la detección específica en la fábrica Flask.
