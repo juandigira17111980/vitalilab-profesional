@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from flask import Blueprint, flash, render_template
+from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
 from app.extensions import db
@@ -27,7 +27,10 @@ def edit():
     if form.validate_on_submit():
         profile.display_name = form.display_name.data.strip()
         profile.birth_date = form.birth_date.data
-        profile.grade = form.grade.data.strip() if form.grade.data else None
+        profile.usage_mode = form.usage_mode.data
+        if profile.usage_mode == "institutional":
+            profile.institution_name = form.institution_name.data or None
+            profile.grade = form.grade.data or None
         if form.weight_kg.data and form.height_cm.data:
             weight = Decimal(form.weight_kg.data)
             height = Decimal(form.height_cm.data)
@@ -41,9 +44,16 @@ def edit():
                     measured_on=local_day(current_user),
                 )
                 db.session.add(latest)
-        record_event("profile.updated", "user_profile", current_user.id, current_user.id)
+        record_event(
+            "profile.updated",
+            "user_profile",
+            current_user.id,
+            current_user.id,
+            metadata={"usage_mode": profile.usage_mode},
+        )
         db.session.commit()
         flash("Perfil actualizado.", "success")
+        return redirect(url_for("profile.edit"))
     elif form.is_submitted():
         flash("Revisa los campos marcados.", "error")
     elif latest:

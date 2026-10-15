@@ -109,12 +109,19 @@ class User(UserMixin, TimestampMixin, db.Model):
 
 class UserProfile(TimestampMixin, db.Model):
     __tablename__ = "user_profiles"
+    __table_args__ = (
+        CheckConstraint("usage_mode IN ('personal', 'institutional')", name="valid_usage_mode"),
+    )
 
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
     display_name: Mapped[str] = mapped_column(String(80), nullable=False)
     birth_date: Mapped[date | None] = mapped_column(Date)
+    usage_mode: Mapped[str] = mapped_column(
+        String(20), default="personal", server_default="personal", nullable=False
+    )
+    institution_name: Mapped[str | None] = mapped_column(String(160))
     grade: Mapped[str | None] = mapped_column(String(80))
     timezone: Mapped[str] = mapped_column(String(50), default="America/Bogota", nullable=False)
     privacy_version: Mapped[str] = mapped_column(String(20), default="2026-09", nullable=False)

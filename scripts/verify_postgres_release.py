@@ -22,6 +22,17 @@ def verify():
         user.profile = UserProfile(display_name="Fixture CI")
         db.session.add(user)
         db.session.commit()
+        assert user.profile.usage_mode == "personal"
+        user.profile.usage_mode = "institutional"
+        user.profile.institution_name = "Institución ficticia CI"
+        user.profile.grade = "Grupo CI"
+        db.session.commit()
+        db.session.expire_all()
+        assert user.profile.usage_mode == "institutional"
+        assert user.profile.institution_name == "Institución ficticia CI"
+        user.profile.usage_mode = "admin"
+        _expect_constraint_error()
+        assert user.profile.usage_mode == "institutional"
         habit = db.session.scalar(db.select(Habit).order_by(Habit.id))
         assert save_goal(user, habit, 3)
         assert save_checkin(user, 2, 4)
@@ -31,7 +42,9 @@ def verify():
         _expect_constraint_error()
         db.session.add(DailyCheckIn(user_id=user.id, checked_on=local_day(user), energy=9, focus=2))
         _expect_constraint_error()
-        print("PostgreSQL: nine entities, constraints, idempotent reflection and goal verified.")
+        print(
+            "PostgreSQL: nine entities, profile modes, constraints, reflection and goal verified."
+        )
 
 
 def _expect_constraint_error():

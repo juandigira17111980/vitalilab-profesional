@@ -7,6 +7,7 @@ from wtforms import (
     DecimalField,
     EmailField,
     PasswordField,
+    RadioField,
     SelectField,
     StringField,
     SubmitField,
@@ -92,7 +93,22 @@ class ResetPasswordForm(FlaskForm):
 class ProfileForm(FlaskForm):
     display_name = StringField("Nombre o apodo", validators=[DataRequired(), Length(min=2, max=80)])
     birth_date = DateField("Fecha de nacimiento", validators=[Optional()])
-    grade = StringField("Grado o grupo", validators=[Optional(), Length(max=80)])
+    usage_mode = RadioField(
+        "¿Cómo quieres usar VitaliLab?",
+        choices=[("personal", "Uso personal"), ("institutional", "Uso institucional")],
+        default="personal",
+        validators=[DataRequired(message="Elige cómo quieres usar VitaliLab.")],
+    )
+    institution_name = StringField(
+        "Institución (opcional)",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[Optional(), Length(max=160)],
+    )
+    grade = StringField(
+        "Grado, grupo o área (opcional)",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[Optional(), Length(max=80)],
+    )
     weight_kg = DecimalField(
         "Peso actual (kg)", validators=[Optional(), NumberRange(min=20, max=500)], places=2
     )

@@ -2,7 +2,7 @@
 
 Fuente de verdad técnica y académica del proyecto. Los documentos separan cuatro estados: implementado localmente, verificado por pruebas, validado en Staging y promovido a Production.
 
-Fecha de actualización documental: **13 de octubre de 2026**. Las pruebas y auditorías históricas conservan su fecha de ejecución.
+Fecha de actualización documental: **14 de octubre de 2026**. Las pruebas y auditorías históricas conservan su fecha de ejecución.
 
 ## Empieza aquí si eres estudiante
 
@@ -39,7 +39,7 @@ La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md
 18. [Guía del docente y evidencias](17_GUIA_DEL_DOCENTE_Y_EVIDENCIAS.md)
 19. [NexoStack operación y accesos](18_NEXOSTACK_OPERACION_Y_ACCESOS.md)
 
-## Resultado actual
+## Resultado del montaje inicial (histórico)
 
 - ✅ Repositorio privado, estrategia de ramas y PR documental.
 - ✅ Monolito modular Flask reconstruido.
@@ -61,6 +61,12 @@ La [guía de publicación de la copia](16_PUBLICACION_DE_LA_COPIA_DE_PRACTICA.md
 21. [Guía de funciones y QA premium](20_GUIA_DE_FUNCIONES_Y_QA_PREMIUM.md)
 
 Este corte amplía la base original de siete entidades con metas y bitácora: nueve tablas de negocio, tres revisiones, ocho hábitos, seis rutinas y 42 pruebas locales con 91,75 % de cobertura. Los resultados de siete entidades y 28 pruebas anteriores se conservan como evidencia histórica. La guía nueva explica la extensión; la publicación requiere CI y comprobación remota del commit.
+
+## Enfoques de perfil: personal e institucional
+
+22. [Cómo funcionan los dos enfoques de perfil](21_ENFOQUES_PERSONAL_E_INSTITUCIONAL.md)
+
+La cuarta revisión, `7ca6e014b982`, añade dos columnas al perfil sin crear tablas nuevas: siguen siendo nueve entidades. Esta selección personaliza el formulario; no implementa membresías, organizaciones multiusuario ni permisos institucionales.
 
 ## Regla de evidencia
 

@@ -4,6 +4,14 @@ Los cambios relevantes de VitaliLab se documentan siguiendo una adaptación de K
 
 ## [Unreleased]
 
+### Enfoque personal o institucional (2026-10-14)
+
+- Selector de enfoque en Mi perfil; institución y grado/grupo/área opcionales visibles solo en modo institucional con JavaScript.
+- Elección persistida y validada en servidor y base de datos, independiente de roles y permisos.
+- Migración aditiva `7ca6e014b982`: conserva grupos existentes y propone enfoque institucional cuando ya había un grupo no vacío.
+- Cambiar a personal conserva el contexto anterior; desde institucional se puede editar o vaciar explícitamente.
+- Pruebas de persistencia, autorización, CSRF, límites y migración con datos; guía de aprendizaje 21.
+
 ### Limpieza del pie de página (2026-10-14)
 
 - Retirados el eslogan, el bloque «Explora» con sus enlaces y la línea de copyright/aviso educativo, según solicitud visual.

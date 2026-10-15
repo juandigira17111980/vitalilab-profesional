@@ -27,6 +27,19 @@ h1, h2, h3 { text-wrap: balance; }
 .mobile-dock { display: none; }
 .flash { box-shadow: none; }
 .flash button { flex-shrink: 0; min-width: 44px; min-height: 44px; }
+.profile-mode, .institution-fields { min-width: 0; margin: 0 0 1.5rem; padding: 0; border: 0; }
+.profile-mode legend, .institution-fields legend { padding: 0; margin-bottom: .75rem; font-size: 1.1rem; font-weight: 800; color: var(--forest); }
+.profile-mode__choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-bottom: .65rem; }
+.profile-mode__choice { display: flex; align-items: flex-start; gap: .65rem; padding: 1rem; border: 1px solid #bdcbc0; border-radius: 14px; cursor: pointer; background: #fff; }
+.profile-mode__choice:has(input:checked) { border-color: var(--forest); background: #eef3df; box-shadow: inset 0 0 0 1px var(--forest); }
+.profile-mode__choice:focus-within { outline: 3px solid #177b69; outline-offset: 3px; }
+.profile-mode__choice input { flex: 0 0 20px; width: 20px; height: 20px; margin: .2rem 0 0; accent-color: var(--forest); }
+.profile-mode__choice strong, .profile-mode__choice small { display: block; }
+.profile-mode__choice strong { font-size: .92rem; }
+.profile-mode__choice small { margin-top: .25rem; color: var(--muted); font-size: .79rem; line-height: 1.5; }
+.institution-fields { padding: 1rem; border: 1px solid var(--line); border-radius: 14px; background: #f6f8f0; }
+.institution-fields[hidden] { display: none; }
+.institution-fields legend { margin: 0; padding-inline: .4rem; font-size: 1rem; }
 .product-hero { padding: clamp(2.8rem, 6vw, 5.5rem) 0; background: radial-gradient(ellipse at 80% 45%, #e8edda, transparent 55%), var(--paper); }
 .product-hero__grid { display: grid; grid-template-columns: 1.08fr 1fr; align-items: center; gap: clamp(2rem, 5vw, 5rem); }
 .product-kicker { display: flex; align-items: center; gap: .5rem; color: #53622f; font-weight: 650; font-size: .82rem; margin: 0 0 1.3rem; }
@@ -239,6 +252,7 @@ progress::-moz-progress-bar { border-radius: 8px; background: #62821e; }
   .routine-finish .button { white-space: normal; }
 }
 @media (max-width: 600px) {
+  .profile-mode__choices { grid-template-columns: 1fr; }
   .product-hero h1 { font-size: clamp(2.15rem, 8.6vw, 2.9rem); line-height: 1.12; letter-spacing: -.035em; }
   .hero-lead { font-size: .95rem; margin: 1.1rem 0 1.4rem; }
   .product-hero { padding-block: 2.5rem; }
