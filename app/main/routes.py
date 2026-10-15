@@ -1,6 +1,6 @@
 from datetime import date
 
-from flask import Blueprint, current_app, jsonify, render_template
+from flask import Blueprint, Response, current_app, jsonify, render_template
 from flask_login import current_user, login_required
 from sqlalchemy import text
 
@@ -100,6 +100,16 @@ def content(slug: str):
 @bp.get("/privacidad")
 def privacy():
     return render_template("main/privacy.html")
+
+
+@bp.get("/google758e0558a7bc12dd.html")
+def google_site_verification():
+    # This public ownership proof must stay available without login or database access.
+    return Response(
+        "google-site-verification: google758e0558a7bc12dd.html",
+        mimetype="text/html",
+        headers={"Cache-Control": "public, max-age=300", "X-Robots-Tag": "noindex"},
+    )
 
 
 @bp.get("/panel")

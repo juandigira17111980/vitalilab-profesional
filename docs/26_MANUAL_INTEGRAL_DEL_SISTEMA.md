@@ -358,6 +358,18 @@ La configuración DNS esperada utiliza CNAME `www` hacia `vitalilab.lab.nexostac
 
 Antes de emitir un certificado se comprueba la resolución pública y la ausencia de destinos incompatibles. Las reglas Traefik de estos nombres apuntan a la web de VitaliLab. Se verifica el certificado con validación de nombre y cadena, no desactivando la seguridad del cliente. La configuración de DNS y HTTPS se amplía en la guía 24.
 
+### Verificar el sitio en Google sin cambiar el alojamiento
+
+DNS, propiedad en Search Console e indexación son cosas distintas. DNS dirige una visita al servidor; Search Console comprueba quién administra la web; Google decide cuándo vuelve a procesar el contenido y cómo lo presenta en una búsqueda.
+
+El propietario proporcionó el archivo `google758e0558a7bc12dd.html`. La ruta pública con ese nombre devuelve exactamente su contenido de verificación mediante `main.google_site_verification`, sin plantilla, inicio de sesión ni consulta a PostgreSQL. No ofrece una ruta genérica para leer archivos. Su cabecera `noindex` se aplica únicamente al comprobante, no a la página de inicio.
+
+Se comprueba respuesta 200 y contenido idéntico en `https://vitalilab.space/google758e0558a7bc12dd.html` y en la variante `www`, sin redirección ni autenticación. Después el propietario pulsa «Verificar» en la propiedad correspondiente de Search Console. Este método verifica propiedades de prefijo de URL; la opción de propiedad de dominio requiere verificación DNS. No se modifican los registros de Hostinger para publicar este comprobante.
+
+El comprobante debe conservarse mientras se use ese método de verificación. Una respuesta 200 no demuestra por sí sola que Google ya haya confirmado la propiedad. Tras confirmarla, se inspeccionan tanto la portada principal como `www` y se solicita una nueva indexación. Un resultado antiguo puede persistir mientras Google vuelve a rastrear y procesar la página; no se promete un plazo ni una posición. Sitemap y consolidación del dominio son ajustes SEO separados de este cambio mínimo.
+
+Fuente: [verificación de propiedad de Search Console](https://support.google.com/webmasters/answer/9008080?hl=es).
+
 ## Desplegar sin afectar otros proyectos
 
 Solo el administrador de infraestructura autorizado realiza este procedimiento. Primero registra el SHA vigente, la revisión de migración, el estado de salud y las identidades de los contenedores. Confirma espacio y memoria disponibles. Genera el archivo de un commit comprobado y verifica su integridad antes de extraerlo como una nueva carpeta de release.
