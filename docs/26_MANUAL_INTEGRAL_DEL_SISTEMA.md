@@ -8,6 +8,8 @@ La plataforma reúne bienestar personal y escolar. Permite organizar hábitos, m
 
 El código, las migraciones y las pruebas son las fuentes técnicas. Los resultados y la versión publicados deben consultarse en el informe de la entrega, no deducirse de que una función aparezca descrita aquí. Los documentos anteriores conservan cortes históricos de siete, nueve o catorce entidades; el modelo de esta edición tiene diecisiete tablas de negocio y una tabla de control de migraciones.
 
+Esta edición incorpora también el cierre visual móvil publicado como `815b6e2` el 15 de octubre de 2026. Explica el problema del menú en pantallas bajas, los cambios de contraste y foco, y cómo se publicaron sin alterar el backend ni la base. La versión PDF reúne este manual y el diccionario completo de columnas, restricciones y rutas para que pueda estudiarse sin depender de GitHub.
+
 ## Cómo estudiar el proyecto
 
 Primero utiliza la aplicación con una cuenta de práctica local. Registra un hábito y observa qué cambia. Después identifica la ruta que recibe esa acción, el servicio que aplica la regla y la tabla que guarda el resultado. Este recorrido ayuda a relacionar una pantalla con el código sin intentar memorizar todas las carpetas.
@@ -177,6 +179,64 @@ CSS usa rejillas flexibles y columnas que permiten encogerse sin desbordar. Los 
 
 Las demostraciones son SVG propios alojados con el sitio. No descargan imágenes de usuarios ni ejecutan código externo. Una figura de detalle tiene descripción alternativa y texto de apoyo. La ilustración es esquemática: no acredita una técnica clínica ni debe asociarse a un ejercicio que el usuario escribió si no corresponde.
 
+## Últimos ajustes móviles, explicados desde cero
+
+El último cambio fue de presentación, no de funciones. Se conservaron logo, paleta, textos, tarjetas y recorridos porque el análisis no justificó reemplazarlos. El único archivo de aplicación que cambió fue `app/static/css/premium.css`. Python, plantillas, JavaScript, cálculos, puntos, permisos y migraciones quedaron iguales. Documentar también lo que no se cambia ayuda a demostrar que se respetó el alcance.
+
+### Qué problema tenía el menú
+
+En una pantalla de 568 píxeles de alto, el menú desplegado con «Mi cuenta» llegaba aproximadamente hasta el píxel 734. Las últimas opciones quedaban fuera del área visible. Reducir el tamaño del texto o quitar opciones habría escondido el problema. La solución fue limitar la altura del panel y permitir desplazarse dentro de él.
+
+El viewport es el área que el navegador tiene disponible para mostrar la página. Una media query es una condición de CSS que aplica estilos según características como el ancho. Así, un menú puede tener una presentación para escritorio y otra para una pantalla pequeña sin cambiar las direcciones ni los permisos de sus opciones.
+
+Este fragmento reproduce las reglas principales del menú en pantallas de hasta 1000 píxeles de ancho:
+
+```css
+@media (max-width: 1000px) {
+  .primary-nav {
+    max-height: calc(100vh - 6rem);
+    max-height: calc(100dvh - 6rem - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: .75rem;
+  }
+}
+```
+
+`max-height` indica un máximo, no obliga a que todos los menús midan lo mismo. `vh` relaciona la medida con la altura del viewport; `dvh` utiliza su altura dinámica y responde al espacio visible que cambia, por ejemplo, con las barras del navegador. Se dejan las dos declaraciones para que un navegador que no reconozca la segunda conserve la primera. Eso se llama alternativa de compatibilidad o fallback.
+
+`rem` es una unidad relativa al tamaño de letra raíz: con una raíz de 16 píxeles, 6 rem equivalen a 96 píxeles. Esa resta reserva espacio para el encabezado y los márgenes. `env(safe-area-inset-bottom, 0px)` contempla la zona segura inferior que el dispositivo comunique, usando cero cuando no haya un valor disponible. No es un cálculo de edad, medidas corporales ni puntos: solo controla espacio visual.
+
+`overflow-y: auto` muestra desplazamiento vertical cuando el contenido lo necesita. `overscroll-behavior: contain` evita propagar ese desplazamiento al fondo cuando se llega al extremo del panel, en navegadores compatibles. `scroll-padding-block` reserva margen al llevar contenido a la vista. Las opciones siguen siendo las mismas; ahora pueden alcanzarse dentro de una ventana acotada.
+
+En el ensayo, el borde inferior quedó en 548 píxeles dentro de una pantalla de 568, y en 370 dentro de una pantalla horizontal de 390 píxeles de alto. Se comprobó la última acción del menú y el cierre con Escape. El menú de escritorio conserva su presentación habitual.
+
+### Por qué se reforzaron bordes y foco
+
+El contraste expresa cuánto se distinguen dos colores. No basta con que un borde se vea bien en el monitor de quien programa: puede resultar demasiado tenue en otra pantalla. El borde anterior de los campos tenía una relación de 1,51:1 sobre blanco. El nuevo color `#7a8d80` alcanza 3,53:1 en esa combinación. No se sustituyó la identidad verde de VitaliLab; se reforzó un detalle de los controles.
+
+El foco indica qué elemento recibirá la próxima acción del teclado. Al pulsar Tab se recorre la página; Enter o Espacio permiten activar controles según su tipo. Un contorno visible ayuda a saber dónde se está. Inputs y áreas de texto ahora usan un contorno de 3 píxeles, separado 2 píxeles del control, con el color `#177b69`, que alcanza 5,16:1 sobre blanco.
+
+Estas cifras corresponden a combinaciones concretas de colores, no certifican toda la accesibilidad de la página. También importan las etiquetas, el orden de tabulación, los mensajes de error, los tamaños y las tecnologías de asistencia. Se conservaron los nombres y asociaciones de los campos; no se cambiaron sus valores aceptados ni su validación.
+
+### Cómo se convive con la barra inferior
+
+La navegación móvil permanece fija en la parte baja. El contenido debe poder desplazarse sin dejar una acción corta oculta bajo esa barra. Para pantallas de hasta 900 píxeles se añadió una reserva inferior de desplazamiento de 88 píxeles más la zona segura disponible. Es una indicación para el navegador, no un elemento nuevo ni un cambio de datos.
+
+Esto ayuda a la navegación por teclado, pero no demuestra por sí solo que todos los teclados virtuales y áreas de texto altas funcionen igual en cada teléfono. Esa parte se completa probando dispositivos físicos. No debe confundirse un viewport de móvil en el computador con una prueba completa de Safari o de todos los equipos Android.
+
+### Práctica guiada de revisión móvil
+
+1. Abre una cuenta local de práctica. No utilices mediciones reales de estudiantes para aprender estos conceptos.
+2. En el navegador de escritorio abre las herramientas de desarrollo con F12 y activa su vista de dispositivos. Configura primero 320 por 568 píxeles y luego 844 por 390 para comparar vertical y horizontal.
+3. Entra al panel, abre el menú y «Mi cuenta». Desplázate dentro del menú hasta «Salir», sin pulsarlo si quieres continuar. Comprueba que no desaparecieron opciones.
+4. Pulsa Escape y observa que el menú se cierra. Usa Tab para volver al botón del menú y abrirlo con el teclado.
+5. Abre el editor de una rutina y recorre sus campos con Tab. Observa el contorno, las etiquetas y los números separados. No es necesario guardar una rutina para estudiar sus estilos.
+6. Solo en local, desactiva temporalmente `max-height` y `overflow-y` desde el panel de estilos del navegador. Compara el resultado y vuelve a activar ambas reglas. No edites el servidor para hacer este experimento.
+7. Anota el tamaño probado, la acción, el resultado esperado y el observado. Repite en un teléfono real si está disponible y registra por separado ese resultado.
+
+Una respuesta útil para sustentar es: «No eliminamos opciones ni reducimos la letra para que cupieran. Limitamos la altura del menú según el espacio visible y permitimos desplazamiento interno. Después comprobamos la última acción, el cierre por teclado y que las demás funciones siguieran iguales».
+
 ## Seguridad y privacidad
 
 Las contraseñas se guardan mediante hash scrypt, no en texto legible. El acceso utiliza sesiones de Flask con cookies configuradas como HttpOnly y SameSite Lax; en HTTPS se activa Secure. El servicio no se convierte en un sistema JWT por añadir perfiles escolares: cambiar de mecanismo sin necesidad introduciría riesgo y complejidad.
@@ -296,6 +356,28 @@ El sistema tiene un respaldo diario y un monitor periódico de disponibilidad. E
 
 SMTP, alertas externas, responsable del tratamiento y validación institucional son tareas de operación que necesitan configuración y evidencia. No se presentan como resueltas por retirar mensajes académicos. Antes de incorporar alumnado real, el responsable debe comprobarlas y registrar la decisión de uso con sus condiciones.
 
+## Versión publicada y qué demuestran las pruebas
+
+El último cierre comprobado corresponde al commit `815b6e2fd2291aabc559a6eabdc8336094c368b3`, publicado en `https://vitalilab.space` sobre NexoStack. La dirección con `www` y el nombre de NexoStack mostraron la misma versión. La base conserva la revisión `c842d6e190ab`; un cambio de estilos no requiere crear otra migración.
+
+El [PR 14](https://github.com/juandigira17111980/vitalilab-profesional/pull/14) relaciona el cambio con su revisión. La [ejecución CI del release](https://github.com/juandigira17111980/vitalilab-profesional/actions/runs/38695247152) aprobó sus tres trabajos. El [comentario de publicación](https://github.com/juandigira17111980/vitalilab-profesional/pull/14#issuecomment-6186372145) registra los resultados del sitio real. Son enlaces de consulta; los conceptos y resultados esenciales también están explicados en este documento para lectura sin conexión.
+
+| Comprobación | Resultado de este corte | Lo que no debe deducirse |
+|---|---|---|
+| Pruebas funcionales | 150 aprobadas, cobertura 94,89 % | Que se probaron todos los comportamientos posibles |
+| Recorrido local completo | 37 combinaciones de pantalla, estado y ancho, con cuentas ficticias | Que el entorno local es el servidor público |
+| Revisión visual ampliada | 54 combinaciones: nueve pantallas por seis anchos | Que se usaron 54 teléfonos físicos |
+| Revisión pública posterior | 18 combinaciones de tamaño, más ingreso, salida, menú y foco | Que hubo una certificación de accesibilidad o un pentest |
+| Convivencia | PostgreSQL y otros 29 contenedores conservaron ID, arranque y reinicios | Que se probó disponibilidad continua o recuperación de todo el VPS |
+
+Los seis anchos de la revisión visual fueron 320, 360, 390, 430, 768 y 1440 píxeles. Se comprobaron desbordes, cifras recortadas, controles táctiles evaluados y reglas automáticas de accesibilidad. Las cantidades de la tabla describen ensayos diferentes; no conviene sumarlas y llamarlas «teléfonos probados».
+
+En el servidor se compararon los archivos entre versiones. Fuera de documentación, solo cambió la hoja de estilos. También coincidió el inventario de versiones de dependencias. Se construyó la imagen, se conservó un respaldo previo y se sustituyó únicamente la web, sin ejecutar migraciones, sincronizaciones de catálogos ni cambios de permisos. El dominio y Render permanecieron sin modificaciones.
+
+Una prueba de regresión comprueba que algo que funcionaba antes no se rompió después. Aquí, además del ajuste visual, se repitieron el recorrido de personalización, las rutinas propias, el temporizador, el registro sin duplicar puntos y los rechazos de acceso sin permiso. El código de esas reglas quedó idéntico. Las pruebas sirven para comprobar conservación, no para justificar cambios de negocio fuera de lo solicitado.
+
+El corte técnico no elimina pendientes operativos: correo de recuperación, recepción de alertas, copias externas, responsables y autorizaciones institucionales necesitan su propia configuración y evidencia. No se presenta el PDF como una garantía de «100/100». Su propósito es enseñar qué se construyó, por qué y con qué pruebas se sostiene cada afirmación.
+
 ## Prácticas para aprender sin riesgo
 
 Práctica de hábitos: utiliza dos cuentas locales. Registra el mismo hábito dos veces con una cuenta y comprueba que la otra conserva cero registros. Explica por qué un campo oculto con el identificador de otra persona no debe cambiar el propietario.
@@ -315,6 +397,8 @@ Práctica de datos: en una base descartable aplica las migraciones, inspecciona 
 ¿Por qué no se eligen abdominales según IMC? Porque ese dato no determina capacidad ni una pauta individual, especialmente en menores. ¿Por qué se guarda la referencia en la medición? Para conservar el contexto histórico. ¿Por qué el docente ve agregados y no fichas individuales? Para limitar exposición y respetar el propósito definido.
 
 ¿Qué diferencia hay entre una copia de seguridad y alta disponibilidad? Una copia permite recuperar datos; alta disponibilidad mantiene o restablece servicio con otra instancia. Este montaje no se declara un clúster de alta disponibilidad. ¿Qué prueba que una versión está publicada? La correspondencia entre commit verificado, configuración, `/health`, pruebas del sitio y registro de despliegue.
+
+¿Por qué una mejora móvil pudo publicarse sin migración? Porque solo cambió CSS, no la estructura guardada. ¿Por qué no se redujo el menú quitando opciones? Porque eso habría alterado el acceso a funciones. ¿Qué diferencia hay entre viewport y dispositivo físico? El primero es el área de visualización; el segundo también incorpora navegador, teclado virtual, sistema y forma de interacción propios.
 
 ## Cómo seguir ampliando el sistema
 
