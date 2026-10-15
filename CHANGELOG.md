@@ -7,6 +7,8 @@
 - Pruebas de contenido, acceso por ambos nombres, método HEAD, independencia de PostgreSQL y rechazo de rutas o escrituras no previstas.
 - Manual actualizado para distinguir DNS, verificación e indexación. No cambia Render, Hostinger, reglas de dominio ni esquema.
 
+Publicado en NexoStack como `6ac329e`, con 154 pruebas locales, cobertura 94,90 % y CI del PR 17 aprobado. Comprobado por HTTPS en ambos nombres con contenido idéntico al archivo recibido. PostgreSQL y otros 29 contenedores conservaron su identidad y estado. La confirmación del propietario en Search Console y la actualización de Google siguen pendientes de evidencia.
+
 ## Limpieza del montaje y explicación de referencias — 2026-10-15
 
 - Retirada la configuración de un proveedor no utilizado, su script de copia de estáticos y la detección específica en la fábrica Flask.
