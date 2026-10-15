@@ -207,8 +207,7 @@ progress::-moz-progress-bar { border-radius: 8px; background: #62821e; }
 .quick-link small { color: var(--muted); font-size: .75rem; }
 .quote-card { padding: 1.5rem; }
 .quote-card p { font-size: 1rem; }
-.site-footer { padding-block: 2.5rem; }
-.footer-grid > div:nth-child(2) a { min-height: 44px; display: flex; align-items: center; }
+.site-footer { padding-block: 1.5rem; }
 .bmi-card strong { font-size: clamp(2.7rem, 6vw, 4rem); line-height: 1.2; font-variant-numeric: tabular-nums; }
 .head-score strong { font-variant-numeric: tabular-nums; line-height: 1.25; }
 @media (max-width: 1000px) {

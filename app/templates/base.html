@@ -66,21 +66,10 @@
 
   <footer class="site-footer">
     <div class="shell footer-grid">
-      <div>
-        <a class="brand brand--footer" href="{{ url_for('main.home') }}">
-          <img src="{{ url_for('static', filename='img/brand-mark.svg') }}" alt="" width="38" height="38">
-          <span>Vitali<span>Lab</span></span>
-        </a>
-        <p>Haz espacio para lo que te hace bien.</p>
-      </div>
-      <div>
-        <h2>Explora</h2>
-        <a href="{{ url_for('wellness.library') }}">Rutinas guiadas</a>
-        <a href="{{ url_for('main.content', slug='imc') }}">Indicadores educativos</a>
-        <a href="{{ url_for('main.content', slug='fundamentos') }}">Cómo funciona</a>
-        <a href="{{ url_for('main.privacy') }}">Privacidad</a>
-      </div>
-      <p class="footer-note">© {{ current_year }} VitaliLab. Proyecto educativo; no sustituye orientación médica.</p>
+      <a class="brand brand--footer" href="{{ url_for('main.home') }}" aria-label="VitaliLab, inicio">
+        <img src="{{ url_for('static', filename='img/brand-mark.svg') }}" alt="" width="38" height="38">
+        <span>Vitali<span>Lab</span></span>
+      </a>
     </div>
   </footer>
   {% if current_user.is_authenticated %}

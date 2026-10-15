@@ -138,7 +138,7 @@ img { max-width: 100%; }
 
 .error-page { min-height: 65vh; display: grid; place-items: center; padding: 3rem 1rem; text-align: center; background: var(--cream); }.error-page > div { max-width: 620px; }.error-page > div > span { color: #b4c85f; font-size: 7rem; font-weight: 950; line-height: 1; }.error-page h1 { margin: .7rem 0; color: var(--forest); font-size: 2.3rem; }.error-page p { color: var(--muted); }
 
-.site-footer { padding: 3rem 0; border-top: 1px solid var(--line); background: #f4f3ec; }.footer-grid { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; }.brand--footer { margin-bottom: .7rem; }.footer-grid h2 { margin: 0 0 .6rem; font-size: .85rem; }.footer-grid > div:nth-child(2) { display: grid; gap: .25rem; }.footer-grid > div:nth-child(2) a { color: var(--muted); font-size: .86rem; }.footer-note { grid-column: 1 / -1; margin: 0; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
+.site-footer { padding: 1.5rem 0; border-top: 1px solid var(--line); background: #f4f3ec; }.footer-grid { display: flex; align-items: center; }.brand--footer { margin: 0; }
 
 @media (max-width: 900px) {
   .nav-toggle { display: block; }
@@ -151,7 +151,7 @@ img { max-width: 100%; }
 
 @media (max-width: 720px) {
   .header-inner { min-height: 70px; }.hero { padding-top: 3.5rem; }.hero h1 { font-size: 3rem; }.hero-visual { min-height: 390px; }.orbit--one { width: 360px; height: 360px; }.orbit--two { width: 280px; height: 280px; }.floating-note--streak { left: 0; }.floating-note--calm { right: 0; }
-  .feature-grid, .announcement-grid, .metric-grid, .habit-grid, .admin-grid, .event-list { grid-template-columns: 1fr; }.feature-card--accent { transform: none; }.split-grid { grid-template-columns: 1fr; }.cta-panel, .dashboard-head > .shell { align-items: flex-start; flex-direction: column; }.field-row { display: block; }.dashboard-side { grid-template-columns: 1fr; }.admin-events { grid-column: auto; }.week-chart { gap: .3rem; }.footer-grid { grid-template-columns: 1fr; }.footer-note { grid-column: auto; }
+  .feature-grid, .announcement-grid, .metric-grid, .habit-grid, .admin-grid, .event-list { grid-template-columns: 1fr; }.feature-card--accent { transform: none; }.split-grid { grid-template-columns: 1fr; }.cta-panel, .dashboard-head > .shell { align-items: flex-start; flex-direction: column; }.field-row { display: block; }.dashboard-side { grid-template-columns: 1fr; }.admin-events { grid-column: auto; }.week-chart { gap: .3rem; }
 }
 
 @media (max-width: 440px) {
