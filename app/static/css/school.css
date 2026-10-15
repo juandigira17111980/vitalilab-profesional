@@ -12,6 +12,7 @@
 .next-step-card .field-hint { font-size: .76rem; }
 .bmi-card .button { margin-top: 1rem; }
 .table-scroll { width: 100%; max-width: 100%; overflow-x: auto; margin-block: 1rem; }
+.table-scroll:focus-visible { outline: 3px solid var(--forest); outline-offset: 4px; border-radius: 4px; }
 .school-table { border-collapse: collapse; width: 100%; font-size: .88rem; }
 .school-table caption { text-align: left; padding-bottom: .8rem; font-weight: 700; }
 .school-table th, .school-table td { padding: .8rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; min-width: 100px; }

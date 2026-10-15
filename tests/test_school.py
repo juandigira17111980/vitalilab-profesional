@@ -415,6 +415,9 @@ def test_aggregates_suppress_each_month_and_respect_opt_out_and_old_rows(
     login(email=teacher.email)
     response = client.get(f"/docentes/grupos/{school_world['groups'][0].id}")
     assert "Promedio aproximado" in response.text
+    assert (
+        'tabindex="0" role="region" aria-label="Indicadores mensuales del grupo"' in response.text
+    )
     assert "Nombre privado" not in response.text
     assert "cohort-" not in response.text
     # One historical/nonconsented measurement must suppress the metric, not expose nine.

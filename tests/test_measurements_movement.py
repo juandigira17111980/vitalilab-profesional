@@ -143,6 +143,7 @@ def test_tracking_is_private_year_scoped_and_has_accessible_table(client, user_f
         "22.22" in response.text and "33.33" not in response.text and "21.11" not in response.text
     )
     assert "<svg" in response.text and "<caption>Detalle" in response.text
+    assert 'tabindex="0" role="region" aria-label="Mis mediciones del año"' in response.text
     assert "21.11" in client.get(f"/perfil/seguimiento?year={today.year - 1}").text
     assert client.get("/perfil/seguimiento?year=abc").status_code == 200
     assert client.get("/perfil/seguimiento?year=99999").status_code == 200
