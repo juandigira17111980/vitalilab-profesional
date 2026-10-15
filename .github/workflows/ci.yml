@@ -37,6 +37,8 @@ jobs:
           docker compose -f deploy/nexostack/compose.yaml config --quiet
           docker compose -f deploy/nexostack/compose.yaml -f deploy/nexostack/domain-https.yaml config --quiet
           sudo visudo -c -f deploy/nexostack/vitalilab.sudoers
+          for script in deploy/study/*.sh; do bash -n "$script"; done
+          docker compose -f deploy/study/compose.yaml config --quiet
 
   postgres-migration:
     runs-on: ubuntu-latest
@@ -101,6 +103,17 @@ jobs:
         env:
           DATABASE_URL: postgresql://vitalilab:test-only-password@localhost:5432/vitalilab_restore
         run: python -m flask --app wsgi:app db check
+      - name: Verify isolated DBA study schema, seed and least privileges
+        shell: bash
+        run: |
+          PG="$(docker ps --filter 'ancestor=postgres:18-alpine' --format '{{.ID}}' | head -n 1)"
+          test -n "$PG"
+          docker exec "$PG" createdb -U vitalilab vitalilab_estudio_ega1026
+          for file in docs/dba/estructura_postgresql.sql docs/dba/datos_ficticios.sql deploy/study/roles.sql docs/dba/practicas_transacciones.sql; do
+            docker exec -i "$PG" psql -X -U vitalilab -d vitalilab_estudio_ega1026 -v ON_ERROR_STOP=1 -f - < "$file"
+          done
+          test "$(docker exec "$PG" psql -X -U vitalilab -d vitalilab_estudio_ega1026 -Atc 'SELECT count(*) FROM users')" = 5
+          test "$(docker exec "$PG" psql -X -U vitalilab -d vitalilab_estudio_ega1026 -Atc 'SELECT count(*) FROM routine_exercises')" = 2
 
   container-build:
     runs-on: ubuntu-latest

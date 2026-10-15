@@ -6,6 +6,8 @@ Fecha de actualización documental: **15 de octubre de 2026**. Las pruebas y aud
 
 ## Edición actual
 
+Para estudiar específicamente PostgreSQL, consultar la [guía DBA y de sustentación](dba/README.md), el [diccionario físico de 148 campos](dba/diccionario_postgresql.md), el [modelo completo](dba/modelo_completo.svg) y su [evidencia de validación](dba/VALIDACION.md). El paquete incluye SQL de estructura, datos inventados y ejercicios; no comparte la base publicada. El acceso individual se activa tras recibir la llave pública del compañero.
+
 Empieza por el [manual integral del sistema](26_MANUAL_INTEGRAL_DEL_SISTEMA.md): explicación progresiva de todo el proyecto, modelo de diecisiete entidades, backend, frontend, seguridad, Git, DNS, infraestructura y prácticas de sustentación. La [especificación de personalización y rutinas propias](25_PERSONALIZACION_Y_RUTINAS.md) relaciona los cambios con sus criterios de aceptación. Las guías anteriores siguen siendo útiles, pero describen los cortes históricos identificados en cada una.
 
 El [diccionario completo y mapa de rutas](27_DICCIONARIO_Y_RUTAS_GENERADAS.md) se genera desde los modelos y direcciones reales; no consulta ni exporta datos del servidor.

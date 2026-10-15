@@ -1,0 +1,3668 @@
+{
+  "tables": [
+    {
+      "name": "announcements",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('announcements_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "author_user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "title",
+          "type": "character varying(150)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "status",
+          "type": "character varying(20)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "published_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_announcements_author_user_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_announcements_author_user_id ON public.announcements USING btree (author_user_id)"
+        },
+        {
+          "name": "ix_announcements_published_at",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_announcements_published_at ON public.announcements USING btree (published_at)"
+        },
+        {
+          "name": "ix_announcements_status",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_announcements_status ON public.announcements USING btree (status)"
+        },
+        {
+          "name": "ix_announcements_status_published_at",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_announcements_status_published_at ON public.announcements USING btree (status, published_at)"
+        },
+        {
+          "name": "pk_announcements",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_announcements ON public.announcements USING btree (id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "name": "announcements_author_user_id_not_null",
+          "columns": [
+            "author_user_id"
+          ],
+          "definition": "NOT NULL author_user_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "announcements_body_not_null",
+          "columns": [
+            "body"
+          ],
+          "definition": "NOT NULL body",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "announcements_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "announcements_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "announcements_status_not_null",
+          "columns": [
+            "status"
+          ],
+          "definition": "NOT NULL status",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "announcements_title_not_null",
+          "columns": [
+            "title"
+          ],
+          "definition": "NOT NULL title",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "announcements_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_announcements_valid_status",
+          "columns": [
+            "status"
+          ],
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying, 'archived'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_announcements_author_user_id_users",
+          "columns": [
+            "author_user_id"
+          ],
+          "definition": "FOREIGN KEY (author_user_id) REFERENCES users(id) ON DELETE RESTRICT",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_announcements",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "audit_events",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('audit_events_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "actor_user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "action",
+          "type": "character varying(80)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "entity_type",
+          "type": "character varying(50)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "entity_id",
+          "type": "character varying(80)",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "metadata_redacted",
+          "type": "json",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_audit_events_action",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_audit_events_action ON public.audit_events USING btree (action)"
+        },
+        {
+          "name": "ix_audit_events_actor_user_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_audit_events_actor_user_id ON public.audit_events USING btree (actor_user_id)"
+        },
+        {
+          "name": "ix_audit_events_created_at",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_audit_events_created_at ON public.audit_events USING btree (created_at)"
+        },
+        {
+          "name": "pk_audit_events",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_audit_events ON public.audit_events USING btree (id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "name": "audit_events_action_not_null",
+          "columns": [
+            "action"
+          ],
+          "definition": "NOT NULL action",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "audit_events_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "audit_events_entity_type_not_null",
+          "columns": [
+            "entity_type"
+          ],
+          "definition": "NOT NULL entity_type",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "audit_events_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "audit_events_metadata_redacted_not_null",
+          "columns": [
+            "metadata_redacted"
+          ],
+          "definition": "NOT NULL metadata_redacted",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_audit_events_actor_user_id_users",
+          "columns": [
+            "actor_user_id"
+          ],
+          "definition": "FOREIGN KEY (actor_user_id) REFERENCES users(id) ON DELETE SET NULL",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_audit_events",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "daily_checkins",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('daily_checkins_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "checked_on",
+          "type": "date",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "energy",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "focus",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "pk_daily_checkins",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_daily_checkins ON public.daily_checkins USING btree (id)"
+        },
+        {
+          "name": "uq_user_daily_checkin",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_user_daily_checkin ON public.daily_checkins USING btree (user_id, checked_on)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_daily_checkins_valid_energy",
+          "columns": [
+            "energy"
+          ],
+          "definition": "CHECK (((energy >= 1) AND (energy <= 5)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_daily_checkins_valid_focus",
+          "columns": [
+            "focus"
+          ],
+          "definition": "CHECK (((focus >= 1) AND (focus <= 5)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "daily_checkins_checked_on_not_null",
+          "columns": [
+            "checked_on"
+          ],
+          "definition": "NOT NULL checked_on",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "daily_checkins_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "daily_checkins_energy_not_null",
+          "columns": [
+            "energy"
+          ],
+          "definition": "NOT NULL energy",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "daily_checkins_focus_not_null",
+          "columns": [
+            "focus"
+          ],
+          "definition": "NOT NULL focus",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "daily_checkins_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "daily_checkins_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "daily_checkins_user_id_not_null",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "NOT NULL user_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_daily_checkins_user_id_users",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_daily_checkins",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_user_daily_checkin",
+          "columns": [
+            "user_id",
+            "checked_on"
+          ],
+          "definition": "UNIQUE (user_id, checked_on)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "habit_entries",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('habit_entries_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "habit_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "completed_on",
+          "type": "date",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_habit_entries_completed_on",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_habit_entries_completed_on ON public.habit_entries USING btree (completed_on)"
+        },
+        {
+          "name": "ix_habit_entries_habit_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_habit_entries_habit_id ON public.habit_entries USING btree (habit_id)"
+        },
+        {
+          "name": "ix_habit_entries_user_completed_on",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_habit_entries_user_completed_on ON public.habit_entries USING btree (user_id, completed_on)"
+        },
+        {
+          "name": "ix_habit_entries_user_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_habit_entries_user_id ON public.habit_entries USING btree (user_id)"
+        },
+        {
+          "name": "pk_habit_entries",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_habit_entries ON public.habit_entries USING btree (id)"
+        },
+        {
+          "name": "uq_habit_daily",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_habit_daily ON public.habit_entries USING btree (user_id, habit_id, completed_on)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "fk_habit_entries_habit_id_habits",
+          "columns": [
+            "habit_id"
+          ],
+          "definition": "FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE RESTRICT",
+          "target_table": "habits",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "name": "fk_habit_entries_user_id_users",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "name": "habit_entries_completed_on_not_null",
+          "columns": [
+            "completed_on"
+          ],
+          "definition": "NOT NULL completed_on",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habit_entries_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habit_entries_habit_id_not_null",
+          "columns": [
+            "habit_id"
+          ],
+          "definition": "NOT NULL habit_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habit_entries_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habit_entries_user_id_not_null",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "NOT NULL user_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "p",
+          "name": "pk_habit_entries",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_habit_daily",
+          "columns": [
+            "user_id",
+            "habit_id",
+            "completed_on"
+          ],
+          "definition": "UNIQUE (user_id, habit_id, completed_on)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "habits",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('habits_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "code",
+          "type": "character varying(50)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "name",
+          "type": "character varying(100)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "description",
+          "type": "character varying(280)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "category",
+          "type": "character varying(50)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "icon",
+          "type": "character varying(20)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "points",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "sort_order",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "pk_habits",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_habits ON public.habits USING btree (id)"
+        },
+        {
+          "name": "uq_habits_code",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_habits_code ON public.habits USING btree (code)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_habits_valid_points",
+          "columns": [
+            "points"
+          ],
+          "definition": "CHECK (((points >= 1) AND (points <= 100)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_active_not_null",
+          "columns": [
+            "active"
+          ],
+          "definition": "NOT NULL active",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_category_not_null",
+          "columns": [
+            "category"
+          ],
+          "definition": "NOT NULL category",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_code_not_null",
+          "columns": [
+            "code"
+          ],
+          "definition": "NOT NULL code",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_description_not_null",
+          "columns": [
+            "description"
+          ],
+          "definition": "NOT NULL description",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_icon_not_null",
+          "columns": [
+            "icon"
+          ],
+          "definition": "NOT NULL icon",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_name_not_null",
+          "columns": [
+            "name"
+          ],
+          "definition": "NOT NULL name",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_points_not_null",
+          "columns": [
+            "points"
+          ],
+          "definition": "NOT NULL points",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_sort_order_not_null",
+          "columns": [
+            "sort_order"
+          ],
+          "definition": "NOT NULL sort_order",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "habits_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "p",
+          "name": "pk_habits",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_habits_code",
+          "columns": [
+            "code"
+          ],
+          "definition": "UNIQUE (code)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "health_measurements",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('health_measurements_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "weight_kg",
+          "type": "numeric(5,2)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "height_cm",
+          "type": "numeric(5,2)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "bmi_snapshot",
+          "type": "numeric(5,2)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "measured_on",
+          "type": "date",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "age_months",
+          "type": "integer",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "reference_sex",
+          "type": "character varying(12)",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "reference_source",
+          "type": "character varying(32)",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "growth_percentile",
+          "type": "numeric(5,2)",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_health_measurements_measured_on",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_health_measurements_measured_on ON public.health_measurements USING btree (measured_on)"
+        },
+        {
+          "name": "ix_health_measurements_user_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_health_measurements_user_id ON public.health_measurements USING btree (user_id)"
+        },
+        {
+          "name": "ix_health_measurements_user_measured_on",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_health_measurements_user_measured_on ON public.health_measurements USING btree (user_id, measured_on)"
+        },
+        {
+          "name": "pk_health_measurements",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_health_measurements ON public.health_measurements USING btree (id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_health_measurements_valid_bmi",
+          "columns": [
+            "bmi_snapshot"
+          ],
+          "definition": "CHECK (((bmi_snapshot >= (5)::numeric) AND (bmi_snapshot <= (100)::numeric)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_health_measurements_valid_growth_percentile",
+          "columns": [
+            "growth_percentile"
+          ],
+          "definition": "CHECK (((growth_percentile IS NULL) OR ((growth_percentile >= (0)::numeric) AND (growth_percentile <= (100)::numeric))))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_health_measurements_valid_height",
+          "columns": [
+            "height_cm"
+          ],
+          "definition": "CHECK (((height_cm >= (50)::numeric) AND (height_cm <= (250)::numeric)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_health_measurements_valid_measurement_reference_sex",
+          "columns": [
+            "reference_sex"
+          ],
+          "definition": "CHECK (((reference_sex IS NULL) OR ((reference_sex)::text = ANY ((ARRAY['male'::character varying, 'female'::character varying])::text[]))))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_health_measurements_valid_weight",
+          "columns": [
+            "weight_kg"
+          ],
+          "definition": "CHECK (((weight_kg >= (10)::numeric) AND (weight_kg <= (500)::numeric)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_health_measurements_user_id_users",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "name": "health_measurements_bmi_snapshot_not_null",
+          "columns": [
+            "bmi_snapshot"
+          ],
+          "definition": "NOT NULL bmi_snapshot",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "health_measurements_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "health_measurements_height_cm_not_null",
+          "columns": [
+            "height_cm"
+          ],
+          "definition": "NOT NULL height_cm",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "health_measurements_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "health_measurements_measured_on_not_null",
+          "columns": [
+            "measured_on"
+          ],
+          "definition": "NOT NULL measured_on",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "health_measurements_user_id_not_null",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "NOT NULL user_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "health_measurements_weight_kg_not_null",
+          "columns": [
+            "weight_kg"
+          ],
+          "definition": "NOT NULL weight_kg",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "p",
+          "name": "pk_health_measurements",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "personal_routines",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('personal_routines_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "name",
+          "type": "character varying(80)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "description",
+          "type": "character varying(500)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "goal",
+          "type": "character varying(12)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "revision",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_personal_routines_user_active",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_personal_routines_user_active ON public.personal_routines USING btree (user_id, active)"
+        },
+        {
+          "name": "pk_personal_routines",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_personal_routines ON public.personal_routines USING btree (id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_personal_routines_valid_routine_goal",
+          "columns": [
+            "goal"
+          ],
+          "definition": "CHECK (((goal)::text = ANY ((ARRAY['center'::character varying, 'energy'::character varying, 'strength'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_personal_routines_valid_routine_revision",
+          "columns": [
+            "revision"
+          ],
+          "definition": "CHECK ((revision >= 1))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_personal_routines_user_id_users",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "name": "personal_routines_active_not_null",
+          "columns": [
+            "active"
+          ],
+          "definition": "NOT NULL active",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "personal_routines_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "personal_routines_description_not_null",
+          "columns": [
+            "description"
+          ],
+          "definition": "NOT NULL description",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "personal_routines_goal_not_null",
+          "columns": [
+            "goal"
+          ],
+          "definition": "NOT NULL goal",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "personal_routines_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "personal_routines_name_not_null",
+          "columns": [
+            "name"
+          ],
+          "definition": "NOT NULL name",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "personal_routines_revision_not_null",
+          "columns": [
+            "revision"
+          ],
+          "definition": "NOT NULL revision",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "personal_routines_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "personal_routines_user_id_not_null",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "NOT NULL user_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "p",
+          "name": "pk_personal_routines",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "routine_completions",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('routine_completions_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "routine_slug",
+          "type": "character varying(60)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "habit_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "completed_on",
+          "type": "date",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_routine_completions_habit_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_routine_completions_habit_id ON public.routine_completions USING btree (habit_id)"
+        },
+        {
+          "name": "ix_routine_completions_user_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_routine_completions_user_id ON public.routine_completions USING btree (user_id)"
+        },
+        {
+          "name": "pk_routine_completions",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_routine_completions ON public.routine_completions USING btree (id)"
+        },
+        {
+          "name": "uq_routine_daily",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_routine_daily ON public.routine_completions USING btree (user_id, routine_slug, completed_on)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "fk_routine_completions_habit_id_habits",
+          "columns": [
+            "habit_id"
+          ],
+          "definition": "FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE RESTRICT",
+          "target_table": "habits",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "name": "fk_routine_completions_user_id_users",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_routine_completions",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_completions_completed_on_not_null",
+          "columns": [
+            "completed_on"
+          ],
+          "definition": "NOT NULL completed_on",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_completions_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_completions_habit_id_not_null",
+          "columns": [
+            "habit_id"
+          ],
+          "definition": "NOT NULL habit_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_completions_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_completions_routine_slug_not_null",
+          "columns": [
+            "routine_slug"
+          ],
+          "definition": "NOT NULL routine_slug",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_completions_user_id_not_null",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "NOT NULL user_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_routine_daily",
+          "columns": [
+            "user_id",
+            "routine_slug",
+            "completed_on"
+          ],
+          "definition": "UNIQUE (user_id, routine_slug, completed_on)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "routine_exercises",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('routine_exercises_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "routine_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "name",
+          "type": "character varying(80)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "sets",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "repetitions",
+          "type": "integer",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "duration_seconds",
+          "type": "integer",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "rest_seconds",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "instructions",
+          "type": "character varying(280)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "visual",
+          "type": "character varying(12)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "pk_routine_exercises",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_routine_exercises ON public.routine_exercises USING btree (id)"
+        },
+        {
+          "name": "uq_routine_exercise_position",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_routine_exercise_position ON public.routine_exercises USING btree (routine_id, \"position\")"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_routine_exercises_exercise_has_dose",
+          "columns": [
+            "repetitions",
+            "duration_seconds"
+          ],
+          "definition": "CHECK (((repetitions IS NOT NULL) OR (duration_seconds IS NOT NULL)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_routine_exercises_valid_exercise_duration",
+          "columns": [
+            "duration_seconds"
+          ],
+          "definition": "CHECK (((duration_seconds IS NULL) OR ((duration_seconds >= 5) AND (duration_seconds <= 3600))))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_routine_exercises_valid_exercise_position",
+          "columns": [
+            "position"
+          ],
+          "definition": "CHECK (((\"position\" >= 0) AND (\"position\" <= 11)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_routine_exercises_valid_exercise_reps",
+          "columns": [
+            "repetitions"
+          ],
+          "definition": "CHECK (((repetitions IS NULL) OR ((repetitions >= 1) AND (repetitions <= 200))))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_routine_exercises_valid_exercise_rest",
+          "columns": [
+            "rest_seconds"
+          ],
+          "definition": "CHECK (((rest_seconds >= 0) AND (rest_seconds <= 600)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_routine_exercises_valid_exercise_sets",
+          "columns": [
+            "sets"
+          ],
+          "definition": "CHECK (((sets >= 1) AND (sets <= 20)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_routine_exercises_valid_exercise_visual",
+          "columns": [
+            "visual"
+          ],
+          "definition": "CHECK (((visual)::text = ANY ((ARRAY['posture'::character varying, 'march'::character varying, 'palms'::character varying, 'shoulders'::character varying, 'wall'::character varying, 'walk'::character varying, 'breathing'::character varying, 'custom'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_routine_exercises_routine_id_personal_routines",
+          "columns": [
+            "routine_id"
+          ],
+          "definition": "FOREIGN KEY (routine_id) REFERENCES personal_routines(id) ON DELETE CASCADE",
+          "target_table": "personal_routines",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_routine_exercises",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_exercises_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_exercises_instructions_not_null",
+          "columns": [
+            "instructions"
+          ],
+          "definition": "NOT NULL instructions",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_exercises_name_not_null",
+          "columns": [
+            "name"
+          ],
+          "definition": "NOT NULL name",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_exercises_position_not_null",
+          "columns": [
+            "position"
+          ],
+          "definition": "NOT NULL \"position\"",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_exercises_rest_seconds_not_null",
+          "columns": [
+            "rest_seconds"
+          ],
+          "definition": "NOT NULL rest_seconds",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_exercises_routine_id_not_null",
+          "columns": [
+            "routine_id"
+          ],
+          "definition": "NOT NULL routine_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_exercises_sets_not_null",
+          "columns": [
+            "sets"
+          ],
+          "definition": "NOT NULL sets",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "routine_exercises_visual_not_null",
+          "columns": [
+            "visual"
+          ],
+          "definition": "NOT NULL visual",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_routine_exercise_position",
+          "columns": [
+            "routine_id",
+            "position"
+          ],
+          "definition": "UNIQUE (routine_id, \"position\")",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "school_enrollment_requests",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('school_enrollment_requests_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "school_name",
+          "type": "character varying(160)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "group_name",
+          "type": "character varying(80)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "requested_role",
+          "type": "character varying(12)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "status",
+          "type": "character varying(12)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "reviewed_by_user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_enrollment_status_created",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_enrollment_status_created ON public.school_enrollment_requests USING btree (status, created_at)"
+        },
+        {
+          "name": "ix_school_enrollment_requests_reviewed_by_user_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_school_enrollment_requests_reviewed_by_user_id ON public.school_enrollment_requests USING btree (reviewed_by_user_id)"
+        },
+        {
+          "name": "pk_school_enrollment_requests",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_school_enrollment_requests ON public.school_enrollment_requests USING btree (id)"
+        },
+        {
+          "name": "uq_school_enrollment_requests_user_id",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_school_enrollment_requests_user_id ON public.school_enrollment_requests USING btree (user_id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_school_enrollment_requests_valid_enrollment_status",
+          "columns": [
+            "status"
+          ],
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'resolved'::character varying, 'rejected'::character varying, 'cancelled'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_school_enrollment_requests_valid_requested_role",
+          "columns": [
+            "requested_role"
+          ],
+          "definition": "CHECK (((requested_role)::text = ANY ((ARRAY['student'::character varying, 'teacher'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_school_enrollment_requests_reviewed_by_user_id_users",
+          "columns": [
+            "reviewed_by_user_id"
+          ],
+          "definition": "FOREIGN KEY (reviewed_by_user_id) REFERENCES users(id) ON DELETE SET NULL",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "name": "fk_school_enrollment_requests_user_id_users",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_school_enrollment_requests",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_enrollment_requests_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_enrollment_requests_group_name_not_null",
+          "columns": [
+            "group_name"
+          ],
+          "definition": "NOT NULL group_name",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_enrollment_requests_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_enrollment_requests_requested_role_not_null",
+          "columns": [
+            "requested_role"
+          ],
+          "definition": "NOT NULL requested_role",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_enrollment_requests_school_name_not_null",
+          "columns": [
+            "school_name"
+          ],
+          "definition": "NOT NULL school_name",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_enrollment_requests_status_not_null",
+          "columns": [
+            "status"
+          ],
+          "definition": "NOT NULL status",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_enrollment_requests_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_enrollment_requests_user_id_not_null",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "NOT NULL user_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_school_enrollment_requests_user_id",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "UNIQUE (user_id)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "school_groups",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('school_groups_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "school_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "name",
+          "type": "character varying(80)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "academic_year",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_school_groups_school_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_school_groups_school_id ON public.school_groups USING btree (school_id)"
+        },
+        {
+          "name": "pk_school_groups",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_school_groups ON public.school_groups USING btree (id)"
+        },
+        {
+          "name": "uq_school_group_id_school",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_school_group_id_school ON public.school_groups USING btree (id, school_id)"
+        },
+        {
+          "name": "uq_school_group_year_name",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_school_group_year_name ON public.school_groups USING btree (school_id, academic_year, name)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_school_groups_valid_academic_year",
+          "columns": [
+            "academic_year"
+          ],
+          "definition": "CHECK (((academic_year >= 2020) AND (academic_year <= 2100)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_school_groups_school_id_schools",
+          "columns": [
+            "school_id"
+          ],
+          "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE RESTRICT",
+          "target_table": "schools",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_school_groups",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_groups_academic_year_not_null",
+          "columns": [
+            "academic_year"
+          ],
+          "definition": "NOT NULL academic_year",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_groups_active_not_null",
+          "columns": [
+            "active"
+          ],
+          "definition": "NOT NULL active",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_groups_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_groups_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_groups_name_not_null",
+          "columns": [
+            "name"
+          ],
+          "definition": "NOT NULL name",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_groups_school_id_not_null",
+          "columns": [
+            "school_id"
+          ],
+          "definition": "NOT NULL school_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_groups_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_school_group_id_school",
+          "columns": [
+            "id",
+            "school_id"
+          ],
+          "definition": "UNIQUE (id, school_id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_school_group_year_name",
+          "columns": [
+            "school_id",
+            "academic_year",
+            "name"
+          ],
+          "definition": "UNIQUE (school_id, academic_year, name)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "school_memberships",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('school_memberships_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "school_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "group_id",
+          "type": "integer",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "requested_role",
+          "type": "character varying(12)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "status",
+          "type": "character varying(12)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "allow_aggregate",
+          "type": "boolean",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "aggregate_since",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "reviewed_by_user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "authorization_confirmed",
+          "type": "boolean",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_membership_group_status",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_membership_group_status ON public.school_memberships USING btree (group_id, status)"
+        },
+        {
+          "name": "ix_school_memberships_reviewed_by_user_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_school_memberships_reviewed_by_user_id ON public.school_memberships USING btree (reviewed_by_user_id)"
+        },
+        {
+          "name": "ix_school_memberships_school_id",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_school_memberships_school_id ON public.school_memberships USING btree (school_id)"
+        },
+        {
+          "name": "pk_school_memberships",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_school_memberships ON public.school_memberships USING btree (id)"
+        },
+        {
+          "name": "uq_school_membership_id_school",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_school_membership_id_school ON public.school_memberships USING btree (id, school_id)"
+        },
+        {
+          "name": "uq_school_memberships_user_id",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_school_memberships_user_id ON public.school_memberships USING btree (user_id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_school_memberships_valid_membership_status",
+          "columns": [
+            "status"
+          ],
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying, 'revoked'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_school_memberships_valid_school_role",
+          "columns": [
+            "requested_role"
+          ],
+          "definition": "CHECK (((requested_role)::text = ANY ((ARRAY['student'::character varying, 'teacher'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_school_membership_group_school",
+          "columns": [
+            "group_id",
+            "school_id"
+          ],
+          "definition": "FOREIGN KEY (group_id, school_id) REFERENCES school_groups(id, school_id) ON DELETE RESTRICT",
+          "target_table": "school_groups",
+          "target_columns": [
+            "id",
+            "school_id"
+          ]
+        },
+        {
+          "kind": "f",
+          "name": "fk_school_memberships_reviewed_by_user_id_users",
+          "columns": [
+            "reviewed_by_user_id"
+          ],
+          "definition": "FOREIGN KEY (reviewed_by_user_id) REFERENCES users(id) ON DELETE SET NULL",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "name": "fk_school_memberships_school_id_schools",
+          "columns": [
+            "school_id"
+          ],
+          "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE RESTRICT",
+          "target_table": "schools",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "name": "fk_school_memberships_user_id_users",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_school_memberships",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_memberships_allow_aggregate_not_null",
+          "columns": [
+            "allow_aggregate"
+          ],
+          "definition": "NOT NULL allow_aggregate",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_memberships_authorization_confirmed_not_null",
+          "columns": [
+            "authorization_confirmed"
+          ],
+          "definition": "NOT NULL authorization_confirmed",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_memberships_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_memberships_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_memberships_requested_role_not_null",
+          "columns": [
+            "requested_role"
+          ],
+          "definition": "NOT NULL requested_role",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_memberships_school_id_not_null",
+          "columns": [
+            "school_id"
+          ],
+          "definition": "NOT NULL school_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_memberships_status_not_null",
+          "columns": [
+            "status"
+          ],
+          "definition": "NOT NULL status",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_memberships_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "school_memberships_user_id_not_null",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "NOT NULL user_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_school_membership_id_school",
+          "columns": [
+            "id",
+            "school_id"
+          ],
+          "definition": "UNIQUE (id, school_id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_school_memberships_user_id",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "UNIQUE (user_id)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "schools",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('schools_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "code",
+          "type": "character varying(60)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "name",
+          "type": "character varying(160)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "pk_schools",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_schools ON public.schools USING btree (id)"
+        },
+        {
+          "name": "uq_schools_code",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_schools_code ON public.schools USING btree (code)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "name": "pk_schools",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "schools_active_not_null",
+          "columns": [
+            "active"
+          ],
+          "definition": "NOT NULL active",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "schools_code_not_null",
+          "columns": [
+            "code"
+          ],
+          "definition": "NOT NULL code",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "schools_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "schools_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "schools_name_not_null",
+          "columns": [
+            "name"
+          ],
+          "definition": "NOT NULL name",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "schools_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_schools_code",
+          "columns": [
+            "code"
+          ],
+          "definition": "UNIQUE (code)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "teacher_group_assignments",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('teacher_group_assignments_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "membership_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "school_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "group_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_assignment_group",
+          "unique": false,
+          "primary": false,
+          "definition": "CREATE INDEX ix_assignment_group ON public.teacher_group_assignments USING btree (group_id)"
+        },
+        {
+          "name": "pk_teacher_group_assignments",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_teacher_group_assignments ON public.teacher_group_assignments USING btree (id)"
+        },
+        {
+          "name": "uq_teacher_group",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_teacher_group ON public.teacher_group_assignments USING btree (membership_id, group_id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "name": "fk_assignment_group_school",
+          "columns": [
+            "group_id",
+            "school_id"
+          ],
+          "definition": "FOREIGN KEY (group_id, school_id) REFERENCES school_groups(id, school_id) ON DELETE RESTRICT",
+          "target_table": "school_groups",
+          "target_columns": [
+            "id",
+            "school_id"
+          ]
+        },
+        {
+          "kind": "f",
+          "name": "fk_assignment_membership_school",
+          "columns": [
+            "membership_id",
+            "school_id"
+          ],
+          "definition": "FOREIGN KEY (membership_id, school_id) REFERENCES school_memberships(id, school_id) ON DELETE CASCADE",
+          "target_table": "school_memberships",
+          "target_columns": [
+            "id",
+            "school_id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_teacher_group_assignments",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "teacher_group_assignments_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "teacher_group_assignments_group_id_not_null",
+          "columns": [
+            "group_id"
+          ],
+          "definition": "NOT NULL group_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "teacher_group_assignments_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "teacher_group_assignments_membership_id_not_null",
+          "columns": [
+            "membership_id"
+          ],
+          "definition": "NOT NULL membership_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "teacher_group_assignments_school_id_not_null",
+          "columns": [
+            "school_id"
+          ],
+          "definition": "NOT NULL school_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "teacher_group_assignments_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_teacher_group",
+          "columns": [
+            "membership_id",
+            "group_id"
+          ],
+          "definition": "UNIQUE (membership_id, group_id)",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "user_goals",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('user_goals_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "habit_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "target_days",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "pk_user_goals",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_user_goals ON public.user_goals USING btree (id)"
+        },
+        {
+          "name": "uq_user_goal_habit",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX uq_user_goal_habit ON public.user_goals USING btree (user_id, habit_id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_user_goals_valid_target_days",
+          "columns": [
+            "target_days"
+          ],
+          "definition": "CHECK (((target_days >= 1) AND (target_days <= 7)))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_user_goals_habit_id_habits",
+          "columns": [
+            "habit_id"
+          ],
+          "definition": "FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE RESTRICT",
+          "target_table": "habits",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "name": "fk_user_goals_user_id_users",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_user_goals",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "u",
+          "name": "uq_user_goal_habit",
+          "columns": [
+            "user_id",
+            "habit_id"
+          ],
+          "definition": "UNIQUE (user_id, habit_id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_goals_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_goals_habit_id_not_null",
+          "columns": [
+            "habit_id"
+          ],
+          "definition": "NOT NULL habit_id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_goals_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_goals_target_days_not_null",
+          "columns": [
+            "target_days"
+          ],
+          "definition": "NOT NULL target_days",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_goals_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_goals_user_id_not_null",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "NOT NULL user_id",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "user_profiles",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "display_name",
+          "type": "character varying(80)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "birth_date",
+          "type": "date",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "grade",
+          "type": "character varying(80)",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "timezone",
+          "type": "character varying(50)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "privacy_version",
+          "type": "character varying(20)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "privacy_accepted_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "usage_mode",
+          "type": "character varying(20)",
+          "default": "'personal'::character varying",
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "institution_name",
+          "type": "character varying(160)",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "reference_sex",
+          "type": "character varying(12)",
+          "default": "'unspecified'::character varying",
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "movement_goal",
+          "type": "character varying(12)",
+          "default": "'energy'::character varying",
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "movement_preference",
+          "type": "character varying(12)",
+          "default": "'adaptable'::character varying",
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "personalization_completed_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "measurement_consent_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "pk_user_profiles",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_user_profiles ON public.user_profiles USING btree (user_id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_user_profiles_valid_movement_goal",
+          "columns": [
+            "movement_goal"
+          ],
+          "definition": "CHECK (((movement_goal)::text = ANY ((ARRAY['center'::character varying, 'energy'::character varying, 'strength'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_user_profiles_valid_movement_preference",
+          "columns": [
+            "movement_preference"
+          ],
+          "definition": "CHECK (((movement_preference)::text = ANY ((ARRAY['adaptable'::character varying, 'seated'::character varying, 'supported'::character varying, 'standing'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_user_profiles_valid_reference_sex",
+          "columns": [
+            "reference_sex"
+          ],
+          "definition": "CHECK (((reference_sex)::text = ANY ((ARRAY['unspecified'::character varying, 'female'::character varying, 'male'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_user_profiles_valid_usage_mode",
+          "columns": [
+            "usage_mode"
+          ],
+          "definition": "CHECK (((usage_mode)::text = ANY ((ARRAY['personal'::character varying, 'institutional'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "f",
+          "name": "fk_user_profiles_user_id_users",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+          "target_table": "users",
+          "target_columns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "p",
+          "name": "pk_user_profiles",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "PRIMARY KEY (user_id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_display_name_not_null",
+          "columns": [
+            "display_name"
+          ],
+          "definition": "NOT NULL display_name",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_movement_goal_not_null",
+          "columns": [
+            "movement_goal"
+          ],
+          "definition": "NOT NULL movement_goal",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_movement_preference_not_null",
+          "columns": [
+            "movement_preference"
+          ],
+          "definition": "NOT NULL movement_preference",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_privacy_accepted_at_not_null",
+          "columns": [
+            "privacy_accepted_at"
+          ],
+          "definition": "NOT NULL privacy_accepted_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_privacy_version_not_null",
+          "columns": [
+            "privacy_version"
+          ],
+          "definition": "NOT NULL privacy_version",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_reference_sex_not_null",
+          "columns": [
+            "reference_sex"
+          ],
+          "definition": "NOT NULL reference_sex",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_timezone_not_null",
+          "columns": [
+            "timezone"
+          ],
+          "definition": "NOT NULL timezone",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_usage_mode_not_null",
+          "columns": [
+            "usage_mode"
+          ],
+          "definition": "NOT NULL usage_mode",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "user_profiles_user_id_not_null",
+          "columns": [
+            "user_id"
+          ],
+          "definition": "NOT NULL user_id",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "default": "nextval('users_id_seq'::regclass)",
+          "nullable": false,
+          "primary_key": true
+        },
+        {
+          "name": "email",
+          "type": "character varying(254)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "password_hash",
+          "type": "character varying(255)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "role",
+          "type": "character varying(20)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "status",
+          "type": "character varying(20)",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "last_login_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "failed_login_count",
+          "type": "integer",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "locked_until",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": true,
+          "primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "default": null,
+          "nullable": false,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_users_email",
+          "unique": true,
+          "primary": false,
+          "definition": "CREATE UNIQUE INDEX ix_users_email ON public.users USING btree (email)"
+        },
+        {
+          "name": "pk_users",
+          "unique": true,
+          "primary": true,
+          "definition": "CREATE UNIQUE INDEX pk_users ON public.users USING btree (id)"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "name": "ck_users_valid_role",
+          "columns": [
+            "role"
+          ],
+          "definition": "CHECK (((role)::text = ANY ((ARRAY['user'::character varying, 'admin'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "c",
+          "name": "ck_users_valid_status",
+          "columns": [
+            "status"
+          ],
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying])::text[])))",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "p",
+          "name": "pk_users",
+          "columns": [
+            "id"
+          ],
+          "definition": "PRIMARY KEY (id)",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "users_created_at_not_null",
+          "columns": [
+            "created_at"
+          ],
+          "definition": "NOT NULL created_at",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "users_email_not_null",
+          "columns": [
+            "email"
+          ],
+          "definition": "NOT NULL email",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "users_failed_login_count_not_null",
+          "columns": [
+            "failed_login_count"
+          ],
+          "definition": "NOT NULL failed_login_count",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "users_id_not_null",
+          "columns": [
+            "id"
+          ],
+          "definition": "NOT NULL id",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "users_password_hash_not_null",
+          "columns": [
+            "password_hash"
+          ],
+          "definition": "NOT NULL password_hash",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "users_role_not_null",
+          "columns": [
+            "role"
+          ],
+          "definition": "NOT NULL role",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "users_status_not_null",
+          "columns": [
+            "status"
+          ],
+          "definition": "NOT NULL status",
+          "target_table": null,
+          "target_columns": null
+        },
+        {
+          "kind": "n",
+          "name": "users_updated_at_not_null",
+          "columns": [
+            "updated_at"
+          ],
+          "definition": "NOT NULL updated_at",
+          "target_table": null,
+          "target_columns": null
+        }
+      ]
+    }
+  ],
+  "postgres_version": "18.6",
+  "migration_revision": "c842d6e190ab"
+}

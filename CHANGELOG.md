@@ -1,5 +1,14 @@
 # Changelog
 
+## Paquete DBA de estudio y sustentación — 2026-10-15
+
+- Inventario físico PostgreSQL 18.6: 17 entidades, 148 campos y 22 FK, sin exportar filas del sitio.
+- Diccionario exhaustivo, diagrama editable, DDL sin datos, semilla inventada y prácticas SQL reversibles.
+- Guía desde cero para conexiones, DBeaver, relaciones, integridad, permisos, transacciones y sustentación.
+- Configuración de instancia de estudio separada; rol inicialmente NOLOGIN hasta recibir llave pública y completar la activación privada. Evidencia y pendientes en `docs/dba/VALIDACION.md`.
+- Instancia sintética creada y verificada: TLS, esquema completo, consultas, permisos limitados, ROLLBACK y backup/restore de las 17 entidades. Sin activar el acceso personal ni cambiar la web.
+- No modifica el código de la aplicación, el esquema publicado, Render ni los accesos de otros proyectos.
+
 ## Comprobante de propiedad para Google — 2026-10-15
 
 - Ruta exacta y pública de Search Console, con contenido idéntico al archivo entregado por el propietario; sin inicio de sesión, plantilla ni acceso a la base.

@@ -1,0 +1,205 @@
+erDiagram
+    announcements {
+        integer id PK
+        integer author_user_id FK
+        character_varying_150_ title
+        text body
+        character_varying_20_ status
+        timestamp_without_time_zone published_at
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    audit_events {
+        integer id PK
+        integer actor_user_id FK
+        character_varying_80_ action
+        character_varying_50_ entity_type
+        character_varying_80_ entity_id
+        json metadata_redacted
+        timestamp_without_time_zone created_at
+    }
+    daily_checkins {
+        integer id PK
+        integer user_id FK
+        date checked_on
+        integer energy
+        integer focus
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    habit_entries {
+        integer id PK
+        integer user_id FK
+        integer habit_id FK
+        date completed_on
+        timestamp_without_time_zone created_at
+    }
+    habits {
+        integer id PK
+        character_varying_50_ code
+        character_varying_100_ name
+        character_varying_280_ description
+        character_varying_50_ category
+        character_varying_20_ icon
+        integer points
+        boolean active
+        integer sort_order
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    health_measurements {
+        integer id PK
+        integer user_id FK
+        numeric_5_2_ weight_kg
+        numeric_5_2_ height_cm
+        numeric_5_2_ bmi_snapshot
+        date measured_on
+        timestamp_without_time_zone created_at
+        integer age_months
+        character_varying_12_ reference_sex
+        character_varying_32_ reference_source
+        numeric_5_2_ growth_percentile
+    }
+    personal_routines {
+        integer id PK
+        integer user_id FK
+        character_varying_80_ name
+        character_varying_500_ description
+        character_varying_12_ goal
+        boolean active
+        integer revision
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    routine_completions {
+        integer id PK
+        integer user_id FK
+        character_varying_60_ routine_slug
+        integer habit_id FK
+        date completed_on
+        timestamp_without_time_zone created_at
+    }
+    routine_exercises {
+        integer id PK
+        integer routine_id FK
+        integer position
+        character_varying_80_ name
+        integer sets
+        integer repetitions
+        integer duration_seconds
+        integer rest_seconds
+        character_varying_280_ instructions
+        character_varying_12_ visual
+    }
+    school_enrollment_requests {
+        integer id PK
+        integer user_id FK
+        character_varying_160_ school_name
+        character_varying_80_ group_name
+        character_varying_12_ requested_role
+        character_varying_12_ status
+        timestamp_without_time_zone reviewed_at
+        integer reviewed_by_user_id FK
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    school_groups {
+        integer id PK
+        integer school_id FK
+        character_varying_80_ name
+        integer academic_year
+        boolean active
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    school_memberships {
+        integer id PK
+        integer user_id FK
+        integer school_id FK
+        integer group_id FK
+        character_varying_12_ requested_role
+        character_varying_12_ status
+        boolean allow_aggregate
+        timestamp_without_time_zone aggregate_since
+        timestamp_without_time_zone reviewed_at
+        integer reviewed_by_user_id FK
+        boolean authorization_confirmed
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    schools {
+        integer id PK
+        character_varying_60_ code
+        character_varying_160_ name
+        boolean active
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    teacher_group_assignments {
+        integer id PK
+        integer membership_id FK
+        integer school_id FK
+        integer group_id FK
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    user_goals {
+        integer id PK
+        integer user_id FK
+        integer habit_id FK
+        integer target_days
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    user_profiles {
+        integer user_id PK,FK
+        character_varying_80_ display_name
+        date birth_date
+        character_varying_80_ grade
+        character_varying_50_ timezone
+        character_varying_20_ privacy_version
+        timestamp_without_time_zone privacy_accepted_at
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+        character_varying_20_ usage_mode
+        character_varying_160_ institution_name
+        character_varying_12_ reference_sex
+        character_varying_12_ movement_goal
+        character_varying_12_ movement_preference
+        timestamp_without_time_zone personalization_completed_at
+        timestamp_without_time_zone measurement_consent_at
+    }
+    users {
+        integer id PK
+        character_varying_254_ email
+        character_varying_255_ password_hash
+        character_varying_20_ role
+        character_varying_20_ status
+        timestamp_without_time_zone last_login_at
+        integer failed_login_count
+        timestamp_without_time_zone locked_until
+        timestamp_without_time_zone created_at
+        timestamp_without_time_zone updated_at
+    }
+    users ||--o{ announcements : "author_user_id"
+    users o|--o{ audit_events : "actor_user_id"
+    users ||--o{ daily_checkins : "user_id"
+    habits ||--o{ habit_entries : "habit_id"
+    users ||--o{ habit_entries : "user_id"
+    users ||--o{ health_measurements : "user_id"
+    users ||--o{ personal_routines : "user_id"
+    habits ||--o{ routine_completions : "habit_id"
+    users ||--o{ routine_completions : "user_id"
+    personal_routines ||--o{ routine_exercises : "routine_id"
+    users o|--o{ school_enrollment_requests : "reviewed_by_user_id"
+    users ||--o| school_enrollment_requests : "user_id"
+    schools ||--o{ school_groups : "school_id"
+    school_groups o|--o{ school_memberships : "group_id+school_id"
+    users o|--o{ school_memberships : "reviewed_by_user_id"
+    schools ||--o{ school_memberships : "school_id"
+    users ||--o| school_memberships : "user_id"
+    school_groups ||--o{ teacher_group_assignments : "group_id+school_id"
+    school_memberships ||--o{ teacher_group_assignments : "membership_id+school_id"
+    habits ||--o{ user_goals : "habit_id"
+    users ||--o{ user_goals : "user_id"
+    users ||--o| user_profiles : "user_id"
