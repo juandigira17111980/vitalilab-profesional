@@ -1,0 +1,46 @@
+/* One language, one owner: the existing VitaliLab design system, not a second UI. */
+.setup-steps { display: flex; gap: .75rem; padding: 0; margin: 0 0 1.5rem; list-style: none; flex-wrap: wrap; }
+.setup-steps li { display: flex; align-items: center; gap: .4rem; font-size: .8rem; color: #4b6157; }
+.setup-steps span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #e5ece4; font-weight: 700; flex-shrink: 0; }
+.setup-steps [aria-current] { color: var(--forest); font-weight: 700; }
+.setup-steps [aria-current] span { background: var(--forest); color: #fff; }
+.setup-callout { padding: 1.25rem; background: #f0f4e9; border-radius: 16px; margin-block: 1.5rem; }
+.setup-callout h3 { margin-top: 0; }
+.setup-exits { justify-content: space-between; margin-top: 1.5rem; }
+.library-views { display: flex; flex-wrap: wrap; gap: .5rem; border-bottom: 1px solid var(--line); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.library-views a { padding: .7rem 1rem; border-radius: 10px; color: var(--forest); font-weight: 700; min-height: 44px; text-decoration: none; }
+.library-views [aria-current] { background: var(--forest); color: #fff; }
+.routine-preview { display: block; width: 100%; height: auto; aspect-ratio: 2 / 1; object-fit: contain; border-radius: 14px; background: #f1f5e8; margin-bottom: 1.1rem; }
+.routine-card, .own-exercise, .exercise-editor { min-width: 0; overflow-wrap: anywhere; }
+.routine-card h2, .routine-card h3 { line-height: 1.25; }
+.my-routines-section { padding-top: 2.5rem; border-top: 1px solid var(--line); margin-top: 2.5rem; scroll-margin-top: 100px; }
+.exercise-editor { padding: 1.25rem; border: 1px solid #a3b5a9; border-radius: 16px; margin: 1.5rem 0; }
+.exercise-editor legend { padding-inline: .5rem; font-weight: 700; color: var(--forest); }
+.exercise-numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
+.exercise-numbers .field { min-width: 0; }
+.exercise-numbers label { min-height: 2.75em; display: block; }
+.exercise-numbers input { width: 100%; min-width: 0; }
+.exercise-remove { min-height: 44px; background: none; border: 0; cursor: pointer; font: inherit; text-decoration: underline; }
+.exercise-remove[hidden] { display: none; }
+.own-exercise-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+.exercise-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.exercise-stats div { border-left: 3px solid #b1c560; padding-left: .75rem; min-width: 0; }
+.exercise-stats dt { color: #4b6157; font-size: .8rem; }
+.exercise-stats dd { margin: .25rem 0 0; font-size: 1.65rem; font-weight: 700; line-height: 1.2; color: var(--forest); font-variant-numeric: tabular-nums; }
+.exercise-demo { max-width: 720px; margin: 1.5rem 0; }
+.exercise-demo img { display: block; width: 100%; height: auto; border-radius: 16px; background: #f1f5e8; }
+.exercise-demo figcaption { margin-top: .6rem; color: #4b6157; font-size: .8rem; line-height: 1.5; }
+.exercise-timer { padding-top: 1rem; border-top: 1px solid var(--line); }
+.exercise-timer .timer-digits { font-size: clamp(2rem, 8vw, 3rem); line-height: 1.2; display: block; margin: 1rem 0; }
+.archive-panel { margin-top: 2rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+.archive-panel summary { cursor: pointer; min-height: 44px; color: var(--forest); font-weight: 700; }
+.form-card dd { margin: .2rem 0 1rem; overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .own-exercise-grid { grid-template-columns: minmax(0, 1fr); }
+  .exercise-editor { padding: 1rem; }
+  .setup-steps { gap: .45rem; }
+  .setup-steps li { font-size: .72rem; }
+  .library-views a { padding: .65rem; }
+  .exercise-numbers { gap: 0 .75rem; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

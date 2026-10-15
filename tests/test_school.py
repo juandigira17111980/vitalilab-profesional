@@ -112,7 +112,7 @@ def test_cross_school_request_and_unknown_role_are_rejected(
     response = client.post(
         "/colegios/", data={"school_id": school.id, "group_id": 0, "requested_role": "admin"}
     )
-    assert "válidos" in response.text
+    assert "Revisa el colegio" in response.text
     assert membership_for(user) is None
     with pytest.raises(ValueError):
         request_membership(user, 9999, 0, "teacher")

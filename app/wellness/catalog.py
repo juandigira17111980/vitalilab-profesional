@@ -1,4 +1,4 @@
-"""General educational routines, not clinically validated prescriptions."""
+"""General, adaptable activities. Not clinically validated prescriptions."""
 
 ROUTINES = (
     {
@@ -153,4 +153,129 @@ ROUTINES = (
             "Relaciona esa pausa con un momento habitual de tu día para recordarla.",
         ),
     },
+)
+
+ROUTINES += (
+    {
+        "slug": "postura-sentada",
+        "name": "Encuentra tu postura",
+        "category": "Movimiento",
+        "seconds": 90,
+        "icon": "focus",
+        "habit_code": "gentle-movement",
+        "description": "Una pausa sentada para reconocer el apoyo y alargar suavemente la espalda.",
+        "steps": (
+            "Elige una silla estable, sin ruedas, con los pies apoyados.",
+            "Relaja los hombros y alarga la espalda sin arquearla ni contener el aire.",
+            "Vuelve a una posición cómoda. Repite solo si te resulta agradable "
+            "y descansa cuando quieras.",
+        ),
+    },
+    {
+        "slug": "hombros-libres",
+        "name": "Dale espacio a tus hombros",
+        "category": "Movimiento",
+        "seconds": 120,
+        "icon": "move",
+        "habit_code": "gentle-movement",
+        "description": "Explora movimientos pequeños de hombros, sentado o de pie con apoyo.",
+        "steps": (
+            "Busca una posición estable y deja los brazos relajados.",
+            "Eleva un poco los hombros y vuelve a soltarlos, sin acercarte al dolor.",
+            "Haz pausas y reduce el recorrido si lo necesitas. No fuerces el cuello.",
+        ),
+    },
+    {
+        "slug": "brazos-en-movimiento",
+        "name": "Activa tus brazos",
+        "category": "Movimiento",
+        "seconds": 120,
+        "icon": "sun",
+        "habit_code": "gentle-movement",
+        "description": "Alterna movimientos de brazos a un ritmo cómodo; puedes hacerlo sentado.",
+        "steps": (
+            "Elige una postura sentada o de pie que puedas mantener con estabilidad.",
+            "Mueve un brazo hacia delante y vuelve; alterna con el otro sin impulsos.",
+            "Mantén una respiración natural y descansa antes de cansarte. El ritmo lo eliges tú.",
+        ),
+    },
+    {
+        "slug": "pasos-a-tu-ritmo",
+        "name": "Unos pasos para volver",
+        "category": "Movimiento",
+        "seconds": 180,
+        "icon": "move",
+        "habit_code": "gentle-movement",
+        "description": "Interrumpe un rato sentado con una caminata corta en un espacio despejado.",
+        "steps": (
+            "Comprueba que el suelo esté libre de obstáculos. Usa apoyo si lo necesitas.",
+            "Camina despacio dentro de tu espacio, sin perseguir una distancia ni un ritmo.",
+            "Para y descansa cuando quieras. Si caminar no te resulta adecuado, "
+            "elige Activa tus brazos.",
+        ),
+    },
+    {
+        "slug": "fuerza-con-palmas",
+        "name": "Fuerza suave con tus manos",
+        "category": "Movimiento",
+        "seconds": 90,
+        "icon": "focus",
+        "habit_code": "gentle-movement",
+        "description": "Una activación suave con las palmas juntas, sin cargas externas.",
+        "steps": (
+            "Siéntate con apoyo y mantén los hombros relajados.",
+            "Junta las palmas y presiónalas suavemente mientras respiras con normalidad.",
+            "Suelta la presión y descansa. No mantengas el esfuerzo si te incomoda.",
+        ),
+    },
+    {
+        "slug": "apoyo-en-pared",
+        "name": "Explora el apoyo en pared",
+        "category": "Movimiento",
+        "seconds": 120,
+        "icon": "move",
+        "habit_code": "gentle-movement",
+        "description": "Una alternativa con apoyo estable y un esfuerzo que puedas controlar.",
+        "steps": (
+            "Solo si puedes estar de pie con estabilidad: apoya ambas manos "
+            "en una pared firme a una altura cómoda.",
+            "Con los pies cerca de la pared, flexiona un poco los codos y vuelve suavemente; "
+            "no bloquees la respiración.",
+            "Descansa sin forzar. Si no te resulta adecuado, elige Fuerza suave con tus manos. "
+            "En menores, consulta al adulto responsable.",
+        ),
+    },
+)
+
+VISUALS = {
+    "posture": "Postura sentada: pies apoyados, espalda alargada y hombros relajados.",
+    "march": "Brazos alternos: una posición de reposo y otra con un brazo hacia delante.",
+    "palms": "Manos separadas y palmas juntas frente al pecho, sin elevar los hombros.",
+    "shoulders": "Hombros relajados y elevación pequeña, sin forzar el cuello.",
+    "wall": "Apoyo de manos en pared y pequeña flexión de codos con los pies estables.",
+    "walk": "Pasos suaves: alterna las piernas al caminar en un espacio despejado.",
+    "breathing": "Pausa sentada: observa la respiración manteniendo una postura cómoda.",
+    "custom": "Rutina propia: revisa las instrucciones que guardaste para cada ejercicio.",
+}
+_DETAILS = {
+    "fortalece-tu-centro": ("center", "posture", ("seated", "supported", "standing")),
+    "despierta-tu-energia": ("energy", "march", ("seated", "supported", "standing")),
+    "construye-tu-fuerza": ("strength", "palms", ("seated", "supported", "standing")),
+    "postura-sentada": ("center", "posture", ("seated", "supported")),
+    "hombros-libres": ("center", "shoulders", ("seated", "supported", "standing")),
+    "brazos-en-movimiento": ("energy", "march", ("seated", "supported", "standing")),
+    "pasos-a-tu-ritmo": ("energy", "walk", ("standing",)),
+    "fuerza-con-palmas": ("strength", "palms", ("seated", "supported", "standing")),
+    "apoyo-en-pared": ("strength", "wall", ("supported", "standing")),
+}
+ROUTINES = tuple(
+    {
+        **routine,
+        "goal": _DETAILS.get(routine["slug"], (None,))[0],
+        "visual": _DETAILS.get(routine["slug"], (None, "breathing"))[1],
+        "preferences": _DETAILS.get(
+            routine["slug"], (None, None, ("seated", "supported", "standing"))
+        )[2],
+    }
+    for routine in ROUTINES
 )

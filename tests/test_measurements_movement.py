@@ -51,8 +51,11 @@ def test_extreme_value_is_not_extrapolated():
     )
 
 
-def test_child_measurements_are_neutral_and_saved_with_reference(client, user_factory, login):
+def test_child_measurements_are_neutral_and_saved_with_reference(
+    client, user_factory, login, student_authorization
+):
     user = user_factory()
+    student_authorization(user)
     login()
     response = client.post(
         "/perfil/",
@@ -64,6 +67,7 @@ def test_child_measurements_are_neutral_and_saved_with_reference(client, user_fa
             "weight_kg": "30",
             "height_cm": "140",
             "usage_mode": "personal",
+            "measurement_consent": "y",
         },
         follow_redirects=True,
     )
@@ -74,7 +78,7 @@ def test_child_measurements_are_neutral_and_saved_with_reference(client, user_fa
     assert "Percentil de referencia OMS" in reference_note(row)
     for forbidden in ("Sobrepeso", "Obesidad", "Bajo peso", "bajar de peso", "Dentro del rango"):
         assert forbidden not in response.text
-    assert "Fortalece tu centro" in response.text
+    assert "Preparar mi espacio" in response.text
     assert suggested_routine(user)["slug"] == "fortalece-tu-centro"
 
 
@@ -104,7 +108,12 @@ def test_smaller_child_values_and_unknown_age_do_not_use_adult_thresholds(
     login()
     response = client.post(
         "/perfil/",
-        data={"display_name": "Ejemplo", "weight_kg": "14", "height_cm": "100"},
+        data={
+            "display_name": "Ejemplo",
+            "weight_kg": "14",
+            "height_cm": "100",
+            "measurement_consent": "y",
+        },
         follow_redirects=True,
     )
     assert "Perfil actualizado" in response.text

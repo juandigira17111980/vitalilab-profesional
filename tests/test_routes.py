@@ -54,11 +54,20 @@ def test_footer_cleanup_preserves_privacy_and_content_routes(client):
         assert client.get(path).status_code == 200
 
 
-def test_staging_banner_identifies_fictional_lab_data(client, app):
-    app.config["APP_ENV"] = "staging"
-    assert "Laboratorio académico" in client.get("/").text
-    app.config["APP_ENV"] = "production"
-    assert "Laboratorio académico" not in client.get("/").text
+@pytest.mark.parametrize("environment", ["development", "staging", "production"])
+def test_professional_presentation_has_no_academic_demo_banners(client, app, environment):
+    app.config["APP_ENV"] = environment
+    for path in ("/", "/privacidad", "/rutinas/", "/acceso/registro"):
+        page = client.get(path).text.lower()
+        for text in (
+            "laboratorio académico",
+            "datos ficticios",
+            "piloto académico",
+            "versión académica",
+            "no es el sitio de producción",
+            "antes de producción",
+        ):
+            assert text not in page
 
 
 def test_profile_stores_optional_measurement(client, user_factory, login):
@@ -71,6 +80,7 @@ def test_profile_stores_optional_measurement(client, user_factory, login):
             "grade": "10 A",
             "weight_kg": "70",
             "height_cm": "175",
+            "measurement_consent": "y",
         },
         follow_redirects=True,
     )
@@ -119,6 +129,7 @@ def test_profile_validation_and_measurement_deduplication(client, user_factory, 
         "grade": "10 A",
         "weight_kg": "70",
         "height_cm": "175",
+        "measurement_consent": "y",
     }
     client.post("/perfil/", data=payload)
     client.post("/perfil/", data=payload)

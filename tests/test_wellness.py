@@ -18,7 +18,7 @@ def test_new_private_pages_require_login(client, path):
 
 
 def test_library_is_public_searchable_and_escapes_queries(client):
-    assert "9 rutinas disponibles" in client.get("/rutinas/").text
+    assert "15 rutinas disponibles" in client.get("/rutinas/").text
     assert "1 rutina disponible" in client.get("/rutinas/?categoria=Descanso").text
     assert "2 rutinas disponibles" in client.get("/rutinas/?q=pantalla").text
     assert "No encontramos" in client.get("/rutinas/?q=noexiste").text

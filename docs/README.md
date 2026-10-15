@@ -2,7 +2,11 @@
 
 Fuente de verdad técnica y académica del proyecto. Los documentos separan cuatro estados: implementado localmente, verificado por pruebas, validado en Staging y promovido a Production.
 
-Fecha de actualización documental: **14 de octubre de 2026**. Las pruebas y auditorías históricas conservan su fecha de ejecución.
+Fecha de actualización documental: **15 de octubre de 2026**. Las pruebas y auditorías históricas conservan su fecha de ejecución.
+
+## Edición actual
+
+Empieza por el [manual integral del sistema](26_MANUAL_INTEGRAL_DEL_SISTEMA.md): explicación progresiva de todo el proyecto, modelo de diecisiete entidades, backend, frontend, seguridad, Git, DNS, infraestructura y prácticas de sustentación. La [especificación de personalización y rutinas propias](25_PERSONALIZACION_Y_RUTINAS.md) relaciona los cambios con sus criterios de aceptación. Las guías anteriores siguen siendo útiles, pero describen los cortes históricos identificados en cada una.
 
 ## Empieza aquí si eres estudiante
 

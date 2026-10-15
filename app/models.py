@@ -127,6 +127,10 @@ class UserProfile(TimestampMixin, db.Model):
         CheckConstraint(
             "movement_goal IN ('center', 'energy', 'strength')", name="valid_movement_goal"
         ),
+        CheckConstraint(
+            "movement_preference IN ('adaptable', 'seated', 'supported', 'standing')",
+            name="valid_movement_preference",
+        ),
     )
 
     user_id: Mapped[int] = mapped_column(
@@ -144,9 +148,14 @@ class UserProfile(TimestampMixin, db.Model):
     movement_goal: Mapped[str] = mapped_column(
         String(12), default="energy", server_default="energy", nullable=False
     )
+    movement_preference: Mapped[str] = mapped_column(
+        String(12), default="adaptable", server_default="adaptable", nullable=False
+    )
+    personalization_completed_at: Mapped[datetime | None] = mapped_column(DateTime)
+    measurement_consent_at: Mapped[datetime | None] = mapped_column(DateTime)
     grade: Mapped[str | None] = mapped_column(String(80))
     timezone: Mapped[str] = mapped_column(String(50), default="America/Bogota", nullable=False)
-    privacy_version: Mapped[str] = mapped_column(String(20), default="2026-10-14", nullable=False)
+    privacy_version: Mapped[str] = mapped_column(String(20), default="2026-10-15", nullable=False)
     privacy_accepted_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, nullable=False)
 
     user: Mapped[User] = relationship(back_populates="profile")
@@ -398,6 +407,93 @@ class RoutineCompletion(db.Model):
     )
     completed_on: Mapped[date] = mapped_column(Date, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, nullable=False)
+
+
+class SchoolEnrollmentRequest(TimestampMixin, db.Model):
+    """Untrusted free text. Only a reviewed membership can grant school access."""
+
+    __tablename__ = "school_enrollment_requests"
+    __table_args__ = (
+        CheckConstraint("requested_role IN ('student', 'teacher')", name="valid_requested_role"),
+        CheckConstraint(
+            "status IN ('pending', 'resolved', 'rejected', 'cancelled')",
+            name="valid_enrollment_status",
+        ),
+        db.Index("ix_enrollment_status_created", "status", "created_at"),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
+    school_name: Mapped[str] = mapped_column(String(160), nullable=False)
+    group_name: Mapped[str] = mapped_column(String(80), nullable=False)
+    requested_role: Mapped[str] = mapped_column(String(12), nullable=False)
+    status: Mapped[str] = mapped_column(String(12), default="pending", nullable=False)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime)
+    reviewed_by_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), index=True
+    )
+    user: Mapped[User] = relationship(foreign_keys=[user_id])
+
+
+class PersonalRoutine(TimestampMixin, db.Model):
+    __tablename__ = "personal_routines"
+    __table_args__ = (
+        CheckConstraint("goal IN ('center', 'energy', 'strength')", name="valid_routine_goal"),
+        CheckConstraint("revision >= 1", name="valid_routine_revision"),
+        db.Index("ix_personal_routines_user_active", "user_id", "active"),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    name: Mapped[str] = mapped_column(String(80), nullable=False)
+    description: Mapped[str] = mapped_column(String(500), default="", nullable=False)
+    goal: Mapped[str] = mapped_column(String(12), nullable=False)
+    active: Mapped[bool] = mapped_column(default=True, nullable=False)
+    revision: Mapped[int] = mapped_column(default=1, nullable=False)
+    exercises: Mapped[list[RoutineExercise]] = relationship(
+        cascade="all, delete-orphan", order_by="RoutineExercise.position", lazy="selectin"
+    )
+
+    @property
+    def slug(self):
+        return f"personal-{self.id}"
+
+
+class RoutineExercise(db.Model):
+    __tablename__ = "routine_exercises"
+    __table_args__ = (
+        db.UniqueConstraint("routine_id", "position", name="uq_routine_exercise_position"),
+        CheckConstraint("position BETWEEN 0 AND 11", name="valid_exercise_position"),
+        CheckConstraint("sets BETWEEN 1 AND 20", name="valid_exercise_sets"),
+        CheckConstraint(
+            "repetitions IS NULL OR repetitions BETWEEN 1 AND 200", name="valid_exercise_reps"
+        ),
+        CheckConstraint(
+            "duration_seconds IS NULL OR duration_seconds BETWEEN 5 AND 3600",
+            name="valid_exercise_duration",
+        ),
+        CheckConstraint(
+            "repetitions IS NOT NULL OR duration_seconds IS NOT NULL", name="exercise_has_dose"
+        ),
+        CheckConstraint("rest_seconds BETWEEN 0 AND 600", name="valid_exercise_rest"),
+        CheckConstraint(
+            "visual IN ('posture', 'march', 'palms', 'shoulders', "
+            "'wall', 'walk', 'breathing', 'custom')",
+            name="valid_exercise_visual",
+        ),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    routine_id: Mapped[int] = mapped_column(
+        ForeignKey("personal_routines.id", ondelete="CASCADE"), nullable=False
+    )
+    position: Mapped[int] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(String(80), nullable=False)
+    sets: Mapped[int] = mapped_column(nullable=False)
+    repetitions: Mapped[int | None] = mapped_column()
+    duration_seconds: Mapped[int | None] = mapped_column()
+    rest_seconds: Mapped[int] = mapped_column(nullable=False)
+    instructions: Mapped[str] = mapped_column(String(280), default="", nullable=False)
+    visual: Mapped[str] = mapped_column(String(12), default="custom", nullable=False)
 
 
 @login_manager.user_loader

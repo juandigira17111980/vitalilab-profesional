@@ -11,6 +11,7 @@ from app.models import (
     HabitEntry,
     HealthMeasurement,
     School,
+    SchoolEnrollmentRequest,
     SchoolGroup,
     SchoolMembership,
     TeacherGroupAssignment,
@@ -86,6 +87,14 @@ def configure_join_form(form):
 
 
 def request_membership(user, school_id, group_id, requested_role):
+    db.session.scalar(db.select(User.id).where(User.id == user.id).with_for_update())
+    if db.session.scalar(
+        db.select(SchoolEnrollmentRequest.id).where(
+            SchoolEnrollmentRequest.user_id == user.id,
+            SchoolEnrollmentRequest.status == "pending",
+        )
+    ):
+        raise ValueError("Ya tienes una solicitud en trámite. Retírala antes de enviar otra.")
     school = db.session.get(School, school_id)
     group = db.session.get(SchoolGroup, group_id) if group_id else None
     if not school or not school.active or requested_role not in {"student", "teacher"}:

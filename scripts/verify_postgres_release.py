@@ -12,8 +12,11 @@ from app.models import (
     DailyCheckIn,
     Habit,
     HealthMeasurement,
+    PersonalRoutine,
     RoutineCompletion,
+    RoutineExercise,
     School,
+    SchoolEnrollmentRequest,
     SchoolGroup,
     SchoolMembership,
     TeacherGroupAssignment,
@@ -33,7 +36,16 @@ def verify():
         if db.engine.dialect.name != "postgresql" or db.engine.url.database != "vitalilab_test":
             raise RuntimeError("Refusing writes outside the disposable PostgreSQL CI database")
         tables = inspect(db.engine).get_table_names()
-        assert len(tables) == 15  # Fourteen business tables plus Alembic metadata.
+        assert len(tables) == 18  # Seventeen business tables plus Alembic metadata.
+        legacy = db.session.scalar(
+            db.select(User).where(User.email == "ci-before-migration@example.com")
+        )
+        assert legacy is not None and legacy.profile.grade == "Nota previa"
+        assert legacy.profile.movement_goal == "center"
+        assert legacy.profile.movement_preference == "adaptable"
+        assert legacy.profile.measurement_consent_at is None
+        assert legacy.profile.personalization_completed_at is None
+        assert legacy.measurements[0].bmi_snapshot == Decimal("22.86")
         user = User(email="ci-release@example.com")
         user.set_password("CiFixtureOnly2026!")
         user.profile = UserProfile(display_name="Fixture CI")
@@ -102,6 +114,48 @@ def verify():
         assert sum(result["points"] for result in results) == 15
         db.session.expire_all()
         assert db.session.scalar(db.select(db.func.count(RoutineCompletion.id))) == 1
+        custom_user = User(email="ci-custom@example.com")
+        custom_user.set_password("CiFixtureOnly2026!")
+        custom_user.profile = UserProfile(display_name="Rutina privada CI")
+        db.session.add(custom_user)
+        db.session.flush()
+        custom_user_id = custom_user.id
+        personal = PersonalRoutine(user_id=custom_user.id, name="Mi rutina CI", goal="strength")
+        db.session.add(personal)
+        db.session.flush()
+        exercise = RoutineExercise(
+            routine_id=personal.id,
+            position=0,
+            name="Palmas",
+            sets=2,
+            duration_seconds=10,
+            rest_seconds=30,
+            instructions="A mi ritmo",
+            visual="palms",
+        )
+        db.session.add(exercise)
+        db.session.add(
+            SchoolEnrollmentRequest(
+                user_id=custom_user.id,
+                school_name="Escrito CI",
+                group_name="Grupo CI",
+                requested_role="student",
+            )
+        )
+        db.session.commit()
+        slug = personal.slug
+
+        def concurrent_personal(_):
+            with application.app_context():
+                return register_routine(db.session.get(User, custom_user_id), slug)
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(concurrent_personal, range(2)))
+        assert sum(result["created"] for result in results) == 1
+        assert sum(result["points"] for result in results) == 15
+        db.session.expire_all()
+        exercise.duration_seconds = None
+        _expect_constraint_error()
         assert user.profile.usage_mode == "institutional"
         habit = db.session.scalar(db.select(Habit).order_by(Habit.id))
         assert save_goal(user, habit, 3)
@@ -113,8 +167,9 @@ def verify():
         db.session.add(DailyCheckIn(user_id=user.id, checked_on=local_day(user), energy=9, focus=2))
         _expect_constraint_error()
         print(
-            "PostgreSQL: fourteen entities, tenant FKs, growth snapshots, concurrent routine "
-            "idempotence, profile modes, reflection and goal verified."
+            "PostgreSQL: seventeen entities, previous data preserved, tenant FKs, "
+            "growth snapshots, "
+            "concurrent guided/private routine idempotence, dose constraints and goals verified."
         )
 
 

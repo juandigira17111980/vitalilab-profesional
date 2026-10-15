@@ -4,6 +4,12 @@ from flask_login import current_user, login_required
 from app.extensions import db, limiter
 from app.forms import CheckInForm, EmptyForm, GoalForm
 from app.models import DailyCheckIn, Habit, UserGoal
+from app.services.personal_routines import (
+    archive_personal_routine,
+    owned_routine,
+    personal_routines_for,
+    save_personal_routine,
+)
 from app.services.progress import progress_for
 from app.services.wellness import (
     goals_for,
@@ -13,7 +19,8 @@ from app.services.wellness import (
     save_checkin,
     save_goal,
 )
-from app.wellness.catalog import ROUTINES
+from app.wellness.catalog import ROUTINES, VISUALS
+from app.wellness.forms import GOAL_CHOICES, PersonalRoutineForm
 
 bp = Blueprint("wellness", __name__)
 
@@ -99,10 +106,25 @@ def progress():
 def library():
     query = request.args.get("q", "")[:80].strip()
     category = request.args.get("categoria", "")
+    personal_view = request.args.get("para") == "mi"
+    goal = request.args.get("objetivo", "")
+    preference = "adaptable"
+    if personal_view:
+        category = ""
+        if not current_user.is_authenticated:
+            return redirect(url_for("auth.login", next=url_for("wellness.library", para="mi")))
+        if not current_user.profile.personalization_completed_at:
+            return redirect(url_for("profile.setup_measurement"))
+        goal = current_user.profile.movement_goal
+        preference = current_user.profile.movement_preference
+    if goal not in dict(GOAL_CHOICES):
+        goal = ""
     routines = [
         routine
         for routine in ROUTINES
         if (not category or routine["category"] == category)
+        and (not goal or routine["goal"] == goal)
+        and (preference == "adaptable" or preference in routine["preferences"])
         and query.casefold() in (routine["name"] + " " + routine["description"]).casefold()
     ]
     return render_template(
@@ -111,6 +133,11 @@ def library():
         query=query,
         category=category,
         categories=("Calma", "Movimiento", "Descanso", "Enfoque"),
+        personal_view=personal_view,
+        goal=goal,
+        goals=GOAL_CHOICES,
+        visuals=VISUALS,
+        own_routines=personal_routines_for(current_user) if current_user.is_authenticated else [],
     )
 
 
@@ -129,6 +156,7 @@ def routine(slug):
         routine=selected,
         habit=habit,
         completed=current_user.is_authenticated and routine_done_today(current_user, slug),
+        visuals=VISUALS,
     )
 
 
@@ -140,6 +168,8 @@ def complete_routine(slug):
 
     if not EmptyForm().validate_on_submit():
         abort(400)
+    if not any(item["slug"] == slug for item in ROUTINES):
+        abort(404)
     result = register_routine(current_user, slug)
     if result is None:
         abort(404)
@@ -154,3 +184,81 @@ def complete_routine(slug):
         if request.form.get("origin") == "profile"
         else url_for("wellness.routine", slug=slug)
     )
+
+
+@bp.route("/mis-rutinas/nueva", methods=["GET", "POST"])
+@bp.route("/mis-rutinas/<int:routine_id>/editar", methods=["GET", "POST"])
+@login_required
+@limiter.limit("40 per hour", methods=["POST"])
+def edit_personal_routine(routine_id=None):
+    routine = owned_routine(current_user, routine_id) if routine_id is not None else None
+    if routine_id is not None and routine is None:
+        abort(404)
+    form = PersonalRoutineForm(obj=routine)
+    if request.method == "POST" and request.form.get("intent") == "add-exercise":
+        if len(form.exercises) < 12:
+            form.exercises.append_entry()
+        else:
+            flash("Puedes guardar hasta 12 ejercicios por rutina.", "info")
+    elif form.validate_on_submit():
+        try:
+            saved = save_personal_routine(current_user, form.data, routine_id)
+        except LookupError:
+            abort(404)
+        except ValueError as error:
+            db.session.rollback()
+            flash(str(error), "error")
+            return render_template("wellness/personal_edit.html", form=form, routine=routine), 409
+        flash("Tu rutina está guardada. Solo tú puedes verla y editarla.", "success")
+        return redirect(url_for("wellness.personal_routine", routine_id=saved.id))
+    elif form.is_submitted():
+        flash("Revisa los campos marcados. No se ha guardado la rutina.", "error")
+    return render_template("wellness/personal_edit.html", form=form, routine=routine)
+
+
+@bp.get("/mis-rutinas/<int:routine_id>/")
+@login_required
+def personal_routine(routine_id):
+    from app.services.movement import routine_done_today
+
+    routine = owned_routine(current_user, routine_id)
+    if routine is None:
+        abort(404)
+    return render_template(
+        "wellness/personal_detail.html",
+        routine=routine,
+        visuals=VISUALS,
+        completed=routine_done_today(current_user, routine.slug),
+    )
+
+
+@bp.post("/mis-rutinas/<int:routine_id>/archivar")
+@login_required
+@limiter.limit("30 per minute")
+def archive_routine(routine_id):
+    if not EmptyForm().validate_on_submit():
+        abort(400)
+    if not archive_personal_routine(current_user, routine_id):
+        abort(404)
+    flash("Rutina archivada. Tus actividades registradas y puntos se conservan.", "info")
+    return redirect(url_for("wellness.library"))
+
+
+@bp.post("/mis-rutinas/<int:routine_id>/registrar")
+@login_required
+@limiter.limit("30 per minute")
+def complete_personal_routine(routine_id):
+    from app.services.movement import register_routine
+
+    if not EmptyForm().validate_on_submit():
+        abort(400)
+    result = register_routine(current_user, f"personal-{routine_id}")
+    if result is None:
+        abort(404)
+    message = (
+        f"Rutina registrada. +{result['points']} XP por tu constancia."
+        if result["points"]
+        else "Actividad registrada sin duplicar los puntos de movimiento de hoy."
+    )
+    flash(message, "success" if result["created"] else "info")
+    return redirect(url_for("wellness.personal_routine", routine_id=routine_id))

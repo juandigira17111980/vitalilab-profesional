@@ -1,5 +1,16 @@
 # Changelog
 
+## Personalización y rutinas propias — 2026-10-15
+
+- Recorrido de medición, resultado, objetivo y biblioteca personalizada, completado una sola vez.
+- Confirmación para guardar mediciones y verificación previa de vinculaciones escolares; sin prescripción por IMC.
+- Colegio y grupo escritos manualmente, con revisión independiente de los permisos institucionales.
+- Rutinas privadas con ejercicios ordenados, edición con control de revisión, archivo e idempotencia diaria de XP.
+- Quince rutinas guiadas y demostraciones vectoriales propias, con diseño responsive y alternativas de texto.
+- Retirada de avisos académicos de la interfaz, conservando privacidad, autorizaciones y contexto de salud.
+- Migración aditiva a diecisiete entidades; CI con conservación de datos previos y pruebas de concurrencia PostgreSQL.
+- Manual integral del sistema para estudio, operación y sustentación.
+
 Los cambios relevantes de VitaliLab se documentan siguiendo una adaptación de Keep a Changelog.
 
 ## [Unreleased]
