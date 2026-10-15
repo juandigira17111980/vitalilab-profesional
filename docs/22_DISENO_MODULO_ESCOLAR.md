@@ -1,6 +1,6 @@
 # Diseño de la experiencia personal y escolar
 
-Fecha del diseño: 14 de octubre de 2026 (Colombia). Estado inicial: implementación en rama, no publicado todavía.
+Fecha del diseño: 14 de octubre de 2026 (Colombia). Diseño implementado y validado localmente y en CI del PR #10; la publicación se verifica por el commit servido en `/health` y la evidencia de entrega. Ver [guía y validación](23_GUIA_ESCOLAR_Y_VALIDACION.md).
 
 ## Objetivo y hechos
 
