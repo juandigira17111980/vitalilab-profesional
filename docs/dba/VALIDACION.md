@@ -8,6 +8,7 @@ Fecha: 15 de octubre de 2026. Responsable de autorización: propietario del proy
 - Inventario: 17 entidades de negocio, 148 columnas, 22 restricciones FK; `alembic_version` se documenta aparte como tabla técnica.
 - Modelo completo generado desde catálogos; diccionario de tipos físicos, nulabilidad, defaults, restricciones e índices. Las pruebas comparan columnas y FK con los modelos Python versionados.
 - Diez pruebas específicas del paquete: integridad documental, reproducibilidad, relaciones reales, exportación sin datos, destino de estudio, permisos/configuración y comparación estricta de catálogos.
+- Suite local completa: **164 pruebas aprobadas**, cobertura de aplicación **94,90 %**, Ruff/formato y Bandit sin hallazgos de los niveles evaluados; revisión de dependencias sin vulnerabilidades conocidas. Se conservan cinco avisos de deprecación de dependencias existentes, sin modificar la aplicación en este corte.
 
 ## Instancia ejecutada y comprobada en NexoStack
 

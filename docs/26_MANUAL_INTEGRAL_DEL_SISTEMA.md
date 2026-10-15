@@ -436,6 +436,8 @@ El corte técnico no elimina pendientes operativos: correo de recuperación, rec
 
 ## Prácticas para aprender sin riesgo
 
+Para demostrar acceso y conocimiento directo de PostgreSQL, el [suplemento DBA de estudio y sustentación](dba/README.md) documenta la copia sintética separada, la activación individual por llave pública, DBeaver y el esquema físico completo: 17 entidades, 148 campos y 22 FK, más la tabla técnica Alembic. Incluye diccionario, modelo editable, DDL sin filas del sitio, consultas y prácticas con ROLLBACK. Se entrega también como guía PDF independiente y diagrama PDF amplio, para complementar este manual sin exponer secretos ni datos de la página. La [validación](dba/VALIDACION.md) separa la copia ya comprobada del acceso personal todavía pendiente de llave.
+
 Práctica de hábitos: utiliza dos cuentas locales. Registra el mismo hábito dos veces con una cuenta y comprueba que la otra conserva cero registros. Explica por qué un campo oculto con el identificador de otra persona no debe cambiar el propietario.
 
 Práctica de personalización: intenta abrir el paso de objetivo antes de guardar la medición. Comprueba que el servidor vuelve al paso anterior. Completa el recorrido y vuelve a ingresar; verifica que no se crea otra medición por iniciar sesión. Prueba una entrada sin altura, otra sin consentimiento y una combinación de unidades errónea.
