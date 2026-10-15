@@ -44,3 +44,5 @@ Textos: sustituir avisos técnicos por orientación concreta; CTA «Calcular y c
 ## Control de publicación
 
 La auditoría debe separar la verificación técnica de los requisitos operativos para tratar datos reales de menores: responsable de datos, autorizaciones institucionales y del representante, revisión profesional de actividades, retención, recuperación y alertas. No se declarará «100/100» ni certificación legal o clínica sin evidencia. El detalle y el veredicto se registrarán tras las pruebas.
+
+El 15 de octubre el propietario confirmó mantener el repositorio público (opción 2). Esta decisión no permite publicar credenciales, exportaciones de base de datos ni información de usuarios. La revisión de código y los manuales públicos no contienen esos valores.

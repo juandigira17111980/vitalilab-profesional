@@ -146,3 +146,27 @@ def test_new_admin_review_and_manual_enrollment_enforce_csrf(
     login(email=admin.email)
     app.config["WTF_CSRF_ENABLED"] = True
     assert client.post("/admin/colegios/altas/1").status_code == 400
+
+
+def test_legacy_form_cannot_bypass_pending_manual_request(
+    client, user_factory, login, review_world
+):
+    _, schools, groups = review_world
+    user_factory()
+    login()
+    client.post("/colegios/", data=request_data())
+    response = client.post(
+        "/colegios/",
+        data={"school_id": schools[0].id, "group_id": groups[0].id, "requested_role": "teacher"},
+    )
+    assert "Ya tienes una solicitud" in response.text
+    assert db.session.scalar(db.select(db.func.count(SchoolMembership.id))) == 0
+
+
+def test_repeated_admin_actions_have_unique_dom_ids(client, login, review_world):
+    import re
+
+    admin, _, _ = review_world
+    login(email=admin.email)
+    identifiers = re.findall(r'\bid="([^"]+)"', client.get("/admin/colegios/").text)
+    assert len(identifiers) == len(set(identifiers))

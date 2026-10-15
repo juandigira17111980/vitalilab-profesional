@@ -201,3 +201,15 @@ def test_active_routine_quota_is_enforced(client, user_factory, login, monkeypat
     response = client.post("/mis-rutinas/nueva", data=routine_payload())
     assert response.status_code == 409
     assert len(personal_routines_for(user)) == 1
+
+
+def test_oversized_identifiers_fail_closed_and_slug_is_canonical(client, user_factory, login):
+    user = user_factory()
+    login()
+    assert client.get("/mis-rutinas/999999999999999999999/").status_code == 404
+    client.post("/mis-rutinas/nueva", data=routine_payload())
+    routine = db.session.scalar(db.select(PersonalRoutine))
+    assert register_routine(user, f"personal-0{routine.id}")["created"]
+    assert not register_routine(user, routine.slug)["created"]
+    assert db.session.scalar(db.select(db.func.count(RoutineCompletion.id))) == 1
+    assert client.post(f"/rutinas/{routine.slug}/registrar").status_code == 404

@@ -278,9 +278,13 @@ Solo el administrador de infraestructura autorizado realiza este procedimiento. 
 
 El script fija rutas y proyecto Compose. Construye la imagen de VitaliLab, crea un respaldo y ejecuta la migración con la cuenta propietaria. Concede los permisos necesarios a la cuenta de aplicación y sustituye únicamente la web. La base existente y los servicios ajenos no deben recrearse por un cambio de pantalla.
 
+`deploy/nexostack/deploy.sh` comprueba que PostgreSQL pertenece al proyecto previsto, está sano y usa la imagen esperada. Si ya existe, no ejecuta una recreación de la base. Esto evita que la ruta del archivo de inicialización, distinta en cada release, provoque un reinicio innecesario. Un cambio de configuración de PostgreSQL requiere una operación planificada aparte. Si HTTPS del dominio principal ya está activo y falla la comprobación DNS, el script se detiene: no retira silenciosamente el certificado configurado.
+
 Después se comprueban `/health`, `/ready`, versión, HTTPS, acceso, permisos y una actividad con cuenta de verificación. Se comparan los contenedores ajenos con el registro previo. La evidencia debe indicar qué se probó, con qué cuenta de prueba y sin incluir datos personales ni credenciales.
 
 Si falla una comprobación, no se sigue promoviendo a ciegas. Se revisa el error y se vuelve al código compatible anterior si corresponde, conservando la base y el respaldo. Nunca se ejecuta `docker compose down -v`, una limpieza global de Docker, un reinicio del proxy compartido o una migración de otro proyecto para arreglar VitaliLab.
+
+Para esta migración aditiva, `deploy/nexostack/rollback-web.sh` recibe el SHA completo de una imagen anterior ya construida. Tras verificar compatibilidad y generar un respaldo, cambia solo la web, sin ejecutar migraciones ni recrear PostgreSQL. Se ejecuta el ayudante nuevo con el SHA anterior; no el antiguo script de despliegue, que desconoce la sexta revisión de esquema. Las carpetas e imágenes necesarias para la reversión se conservan. Este mecanismo no autoriza volver a cualquier versión arbitraria.
 
 ## Operación y accesos individuales
 

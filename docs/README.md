@@ -8,6 +8,8 @@ Fecha de actualización documental: **15 de octubre de 2026**. Las pruebas y aud
 
 Empieza por el [manual integral del sistema](26_MANUAL_INTEGRAL_DEL_SISTEMA.md): explicación progresiva de todo el proyecto, modelo de diecisiete entidades, backend, frontend, seguridad, Git, DNS, infraestructura y prácticas de sustentación. La [especificación de personalización y rutinas propias](25_PERSONALIZACION_Y_RUTINAS.md) relaciona los cambios con sus criterios de aceptación. Las guías anteriores siguen siendo útiles, pero describen los cortes históricos identificados en cada una.
 
+El [diccionario completo y mapa de rutas](27_DICCIONARIO_Y_RUTAS_GENERADAS.md) se genera desde los modelos y direcciones reales; no consulta ni exporta datos del servidor.
+
 ## Empieza aquí si eres estudiante
 
 Lee [VitaliLab explicado desde cero](15_MANUAL_DE_APRENDIZAJE_Y_SUSTENTACION.md) antes de los documentos por especialidad. Está escrito para primeros fundamentos de programación: cada concepto se relaciona con un archivo, una práctica y una explicación de sustentación.

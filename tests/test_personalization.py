@@ -195,3 +195,24 @@ def test_personal_library_cannot_skip_setup_and_csrf_is_enforced(client, app, us
     app.config["WTF_CSRF_ENABLED"] = True
     assert client.post("/perfil/inicio/medicion", data=measurement_data()).status_code == 400
     assert client.post("/perfil/inicio/objetivo").status_code == 400
+
+
+def test_authorized_student_must_provide_age_context_but_can_use_habits(
+    client, user_factory, login, student_authorization
+):
+    user = user_factory()
+    user.profile.usage_mode = "institutional"
+    student_authorization(user)
+    login()
+    for path in ("/perfil/inicio/medicion", "/perfil/"):
+        response = client.post(
+            path,
+            data={
+                **measurement_data(birth_date=""),
+                "display_name": "Estudiante",
+                "usage_mode": "institutional",
+            },
+        )
+        assert "Completa tu fecha de nacimiento" in response.text
+    assert db.session.scalar(db.select(db.func.count(HealthMeasurement.id))) == 0
+    assert client.get("/habitos/").status_code == 200
