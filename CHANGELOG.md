@@ -1,5 +1,14 @@
 # Changelog
 
+## Uso personal sin bloqueos por mediciones — 2026-10-16
+
+- Objetivo y preferencia de movimiento suficientes para preparar las rutinas personales, sin exigir IMC, fecha, peso, altura o vinculación escolar.
+- Consulta opcional de IMC en el navegador, sin peticiones, almacenamiento ni clasificación corporal; los valores se limpian al abandonar la página.
+- Entradas antiguas de personalización conducen al objetivo; el historial guardado conserva sus controles y sus datos.
+- El modo institucional mantiene medición y autorización; completar antes un plan personal no habilita permisos escolares.
+- Perfil más limpio: historial opcional desplegable y sin tarjeta vacía para el uso personal.
+- Guía didáctica y límites en `docs/31_USO_PERSONAL_SIMPLE.md`. No hay migración ni cambios de roles, cuentas o estadísticas.
+
 ## Guardado de mediciones y autorización — 2026-10-16
 
 - La pantalla utiliza la fecha enviada al resolver el permiso, no solo la fecha previamente guardada.

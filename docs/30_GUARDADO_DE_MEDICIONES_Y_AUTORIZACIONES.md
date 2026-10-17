@@ -1,5 +1,7 @@
 # Guardado de mediciones: qué significa la autorización pendiente
 
+**Actualización posterior del mismo día:** la [experiencia personal simplificada](31_USO_PERSONAL_SIMPLE.md) ya no exige guardar mediciones para acceder a objetivos y rutinas. El IMC se puede consultar localmente sin historial. Los requisitos de almacenamiento descritos aquí siguen vigentes; el aviso grande ya no bloquea el recorrido personal.
+
 Fecha: 16 de octubre de 2026. Alcance: corrección puntual del formulario de perfil y del inicio de personalización. No modifica tablas, historial, permisos institucionales ni fórmulas.
 
 ## Explicación sencilla

@@ -10,6 +10,7 @@ from app.services.personal_routines import (
     personal_routines_for,
     save_personal_routine,
 )
+from app.services.personalization import personalization_ready
 from app.services.progress import progress_for
 from app.services.wellness import (
     goals_for,
@@ -113,8 +114,14 @@ def library():
         category = ""
         if not current_user.is_authenticated:
             return redirect(url_for("auth.login", next=url_for("wellness.library", para="mi")))
-        if not current_user.profile.personalization_completed_at:
-            return redirect(url_for("profile.setup_measurement"))
+        if not personalization_ready(current_user):
+            return redirect(
+                url_for(
+                    "profile.setup_goal"
+                    if current_user.profile.usage_mode == "personal"
+                    else "profile.setup_measurement"
+                )
+            )
         goal = current_user.profile.movement_goal
         preference = current_user.profile.movement_preference
     if goal not in dict(GOAL_CHOICES):

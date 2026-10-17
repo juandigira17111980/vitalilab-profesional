@@ -1,7 +1,16 @@
 {% extends 'base.html' %}{% from 'macros/icons.html' import icon %}
 {% block title %}Rutinas guiadas · VitaliLab{% endblock %}
 {% block content %}
-<section class="page-hero page-hero--compact"><div class="shell"><p class="eyebrow">{{ 'Tu propósito en movimiento' if personal_view else 'Una pausa, una posibilidad' }}</p><h1>{{ 'Tu siguiente paso, a tu manera.' if personal_view else 'Encuentra tu próxima rutina.' }}</h1><p>{% if personal_view %}Opciones para {{ dict(goals)[goal]|lower }} según tu preferencia de movimiento. Puedes adaptarlas, cambiar de objetivo o crear tu propia rutina.{% else %}Explora opciones breves por objetivo o crea una rutina con tus propios ejercicios y tiempos.{% endif %}</p><div class="button-row">{% if current_user.is_authenticated %}<a class="button button--primary" href="{{ url_for('wellness.edit_personal_routine') }}">Crear mi rutina</a><a class="button button--ghost" href="{{ url_for('profile.setup_goal') if current_user.profile.personalization_completed_at else url_for('profile.setup_measurement') }}">{{ 'Cambiar mi objetivo' if current_user.profile.personalization_completed_at else 'Personalizar mi espacio' }}</a>{% else %}<a class="button button--primary" href="{{ url_for('auth.register') }}">Crear mi espacio</a>{% endif %}</div></div></section>
+<section class="page-hero page-hero--compact"><div class="shell">
+  <p class="eyebrow">{{ 'Tu propósito en movimiento' if personal_view else 'Una pausa, una posibilidad' }}</p>
+  <h1>{{ 'Tu siguiente paso, a tu manera.' if personal_view else 'Encuentra tu próxima rutina.' }}</h1>
+  <p>{% if personal_view %}Opciones para {{ dict(goals)[goal]|lower }} según tu preferencia de movimiento. Puedes adaptarlas, cambiar de objetivo o crear tu propia rutina.{% else %}Explora opciones breves por objetivo o crea una rutina con tus propios ejercicios y tiempos.{% endif %}</p>
+  <div class="button-row">{% if current_user.is_authenticated %}
+    <a class="button button--primary" href="{{ url_for('wellness.edit_personal_routine') }}">Crear mi rutina</a>
+    <a class="button button--ghost" href="{{ url_for('profile.setup_goal') if current_user.profile.personalization_completed_at or current_user.profile.usage_mode == 'personal' else url_for('profile.setup_measurement') }}">{{ 'Cambiar mi objetivo' if current_user.profile.personalization_completed_at else 'Personalizar mi espacio' }}</a>
+    {% else %}<a class="button button--primary" href="{{ url_for('auth.register') }}">Crear mi espacio</a>{% endif %}
+  </div>
+</div></section>
 <section class="section shell workspace-section">
   {% if current_user.is_authenticated %}<nav class="library-views" aria-label="Vista de rutinas"><a href="{{ url_for('wellness.library', para='mi') }}"{% if personal_view %} aria-current="page"{% endif %}>Para mi objetivo</a><a href="{{ url_for('wellness.library') }}"{% if not personal_view %} aria-current="page"{% endif %}>Explorar todas</a><a href="#mis-rutinas">Mis rutinas</a></nav>{% endif %}
   {% if not personal_view %}<nav class="filter-tabs" aria-label="Objetivos de movimiento"><a href="{{ url_for('wellness.library') }}"{% if not goal %} aria-current="page"{% endif %}>Todos los objetivos</a>{% for value,label in goals %}<a href="{{ url_for('wellness.library', objetivo=value) }}"{% if goal == value %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}</nav>{% endif %}

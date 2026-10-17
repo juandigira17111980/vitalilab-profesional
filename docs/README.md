@@ -6,6 +6,8 @@ Fecha de actualización documental: **16 de octubre de 2026**. Las pruebas y aud
 
 ## Edición actual
 
+La [guía del uso personal sencillo](31_USO_PERSONAL_SIMPLE.md) explica el recorrido actual: objetivo → rutinas, sin exigir guardar mediciones. Incluye IMC opcional calculado localmente y conserva los controles del historial y del modo escolar. Este ajuste sucede al aviso de autorización descrito a continuación.
+
 La [guía del guardado de mediciones y autorizaciones](30_GUARDADO_DE_MEDICIONES_Y_AUTORIZACIONES.md) explica el bloqueo reportado, su corrección de interfaz, los pasos para revisión administrativa y la limitación del uso personal de menores. No elimina verificaciones ni convierte los ejemplos en autorizaciones reales.
 
 Para estudiar específicamente PostgreSQL, consultar la [guía DBA y de sustentación](dba/README.md), el [diccionario físico de 148 campos](dba/diccionario_postgresql.md), el [modelo completo](dba/modelo_completo.svg) y su [evidencia de validación](dba/VALIDACION.md). El paquete incluye SQL de estructura, datos inventados y ejercicios; no comparte la base publicada. El acceso individual se activa tras recibir la llave pública del compañero.

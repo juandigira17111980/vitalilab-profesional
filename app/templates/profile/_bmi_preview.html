@@ -1,0 +1,12 @@
+<details class="form-card" data-bmi-preview>
+  <summary>Consultar mi IMC (opcional)</summary>
+  <p>Una consulta rápida, sin guardar tus medidas ni enviarlas al servidor.</p>
+  <div class="field-row">
+    <div class="field"><label for="bmi-preview-weight">Peso (kg)</label><input id="bmi-preview-weight" type="text" inputmode="decimal" autocomplete="off" maxlength="8" placeholder="Ej. 58" data-bmi-weight></div>
+    <div class="field"><label for="bmi-preview-height">Altura (cm)</label><input id="bmi-preview-height" type="text" inputmode="decimal" autocomplete="off" maxlength="8" placeholder="Ej. 174" data-bmi-height></div>
+  </div>
+  <button type="button" class="button button--ghost button--full" data-bmi-calculate>Calcular IMC</button>
+  <p role="status" aria-live="polite" data-bmi-result hidden></p>
+  <p class="field-hint">Es una referencia numérica: no es un diagnóstico ni determina qué ejercicio realizar. No clasifica rangos por edad.</p>
+  <noscript><p>Activa JavaScript para esta consulta opcional. Puedes elegir tu objetivo y continuar sin calcularla.</p></noscript>
+</details>

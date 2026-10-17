@@ -35,6 +35,8 @@
 .archive-panel { margin-top: 2rem; border-top: 1px solid var(--line); padding-top: 1rem; }
 .archive-panel summary { cursor: pointer; min-height: 44px; color: var(--forest); font-weight: 700; }
 .form-card dd { margin: .2rem 0 1rem; overflow-wrap: anywhere; }
+[data-bmi-preview] > summary, .measurement-history > summary { min-height: 44px; padding-block: .6rem; cursor: pointer; }
+[data-bmi-preview] [data-bmi-result] { overflow-wrap: anywhere; }
 @media (max-width: 700px) {
   .own-exercise-grid { grid-template-columns: minmax(0, 1fr); }
   .exercise-editor { padding: 1rem; }

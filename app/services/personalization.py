@@ -30,7 +30,7 @@ def student_setup_required(user):
     is_student = (
         member and member.requested_role == "student" and member.status in {"pending", "approved"}
     ) or (requested and requested.requested_role == "student" and requested.status == "pending")
-    return bool(is_student and not user.profile.personalization_completed_at)
+    return bool(is_student and not personalization_ready(user))
 
 
 def is_school_student(user):
@@ -71,6 +71,19 @@ def measurement_permission(user, birth_date=None):
         and member.reviewed_by_user_id
         and member.school.active
         and (member.requested_role != "student" or (member.group and member.group.active))
+    )
+
+
+def personalization_ready(user):
+    """Personal goals do not require health data; school setup keeps its controls."""
+    if not user.profile.personalization_completed_at:
+        return False
+    if user.profile.usage_mode == "personal":
+        return True
+    return bool(
+        user.profile.measurement_consent_at
+        and latest_measurement(user)
+        and measurement_permission(user)
     )
 
 

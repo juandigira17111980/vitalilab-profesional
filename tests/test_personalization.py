@@ -51,16 +51,12 @@ def test_setup_needs_login_and_never_caches(client, path):
 def test_setup_sequence_result_goal_filters_and_no_repeat_on_login(client, user_factory, login):
     user = user_factory()
     login()
-    assert client.get("/perfil/inicio/objetivo").location.endswith("/perfil/inicio/medicion")
-    assert (
-        client.post("/perfil/inicio/objetivo", data={"movement_goal": "strength"}).status_code
-        == 302
-    )
+    assert client.get("/perfil/inicio/objetivo").status_code == 200
     assert user.profile.personalization_completed_at is None
     response = client.post(
         "/perfil/inicio/medicion", data=measurement_data(), follow_redirects=True
     )
-    assert "22.86" in response.text and "Ahora, dale un propósito" in response.text
+    assert "22.86" in response.text and "Tu objetivo, tu ritmo" in response.text
     assert user.profile.measurement_consent_at is not None
     assert user.profile.personalization_completed_at is None
     # Same day, same input does not append a second snapshot.
@@ -166,8 +162,12 @@ def test_pending_school_and_known_minor_cannot_store_measurements_even_with_dire
     assert not measurement_permission(user)
 
 
-def test_goal_cannot_be_spoofed_or_completed_without_consent(client, user_factory, login):
+def test_school_goal_cannot_be_spoofed_or_completed_without_consent(
+    client, user_factory, login, student_authorization
+):
     user = user_factory()
+    user.profile.usage_mode = "institutional"
+    student_authorization(user)
     login()
     client.post("/perfil/inicio/medicion", data=measurement_data())
     for data in (
@@ -191,7 +191,7 @@ def test_personal_library_cannot_skip_setup_and_csrf_is_enforced(client, app, us
     assert client.get("/rutinas/?para=mi").status_code == 302
     user_factory()
     login()
-    assert client.get("/rutinas/?para=mi").location.endswith("/perfil/inicio/medicion")
+    assert client.get("/rutinas/?para=mi").location.endswith("/perfil/inicio/objetivo")
     app.config["WTF_CSRF_ENABLED"] = True
     assert client.post("/perfil/inicio/medicion", data=measurement_data()).status_code == 400
     assert client.post("/perfil/inicio/objetivo").status_code == 400
