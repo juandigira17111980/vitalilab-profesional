@@ -11,6 +11,7 @@ from app.services.movement import routine_done_today, suggested_routine
 from app.services.personalization import (
     is_school_student,
     latest_measurement,
+    measurement_access,
     measurement_permission,
     save_measurement,
     student_setup_required,
@@ -28,6 +29,9 @@ def edit():
     latest = latest_measurement(current_user)
     form = ProfileForm(obj=profile)
     valid = form.validate_on_submit()
+    birth = form.birth_date.data if form.is_submitted() and not form.birth_date.errors else None
+    access = measurement_access(current_user, birth)
+    measurement_blocked = bool(valid and form.weight_kg.data and not access.allowed)
     if (
         valid
         and form.weight_kg.data
@@ -38,14 +42,7 @@ def edit():
             "Completa tu fecha de nacimiento para contextualizar la medición."
         )
         valid = False
-    if (
-        valid
-        and form.weight_kg.data
-        and not measurement_permission(current_user, form.birth_date.data)
-    ):
-        form.weight_kg.errors.append(
-            "Necesitas una vinculación verificada y autorizada antes de guardar mediciones."
-        )
+    if measurement_blocked:
         valid = False
     if (
         valid
@@ -80,7 +77,10 @@ def edit():
         flash("Perfil actualizado.", "success")
         return redirect(url_for("profile.edit"))
     elif form.is_submitted():
-        flash("Revisa los campos marcados.", "error")
+        if measurement_blocked:
+            flash("La medición no se guardó. Consulta el paso pendiente en tu perfil.", "info")
+        else:
+            flash("Revisa los campos marcados.", "error")
     elif latest:
         form.weight_kg.data = latest.weight_kg
         form.height_cm.data = latest.height_cm
@@ -93,7 +93,9 @@ def edit():
         member=membership_for(current_user),
         suggested=routine,
         routine_completed=routine_done_today(current_user, routine["slug"]),
-        can_measure=measurement_permission(current_user),
+        can_measure=access.allowed,
+        measurement_access=access,
+        measurement_blocked=measurement_blocked,
         needs_setup=student_setup_required(current_user),
     )
 
@@ -116,37 +118,37 @@ def tracking():
 def setup_measurement():
     latest = latest_measurement(current_user)
     form = MeasurementSetupForm(obj=current_user.profile)
-    allowed = measurement_permission(current_user)
     valid = form.validate_on_submit()
+    birth = form.birth_date.data if form.is_submitted() and not form.birth_date.errors else None
+    access = measurement_access(current_user, birth)
     if valid and is_school_student(current_user) and not form.birth_date.data:
         form.birth_date.errors.append(
             "Completa tu fecha de nacimiento para contextualizar la medición."
         )
         valid = False
-    if valid:
-        if not measurement_permission(current_user, form.birth_date.data):
-            form.weight_kg.errors.append(
-                "Tu institución debe verificar el vínculo y las autorizaciones "
-                "antes de guardar mediciones."
-            )
-        else:
-            profile = current_user.profile
-            profile.birth_date = form.birth_date.data
-            profile.reference_sex = form.reference_sex.data
-            profile.measurement_consent_at = profile.measurement_consent_at or utcnow()
-            save_measurement(current_user, form.weight_kg.data, form.height_cm.data)
-            record_event(
-                "personalization.measurement_saved",
-                "user_profile",
-                profile.user_id,
-                current_user.id,
-            )
-            db.session.commit()
-            return redirect(url_for("profile.setup_goal"))
+    if valid and access.allowed:
+        profile = current_user.profile
+        profile.birth_date = form.birth_date.data
+        profile.reference_sex = form.reference_sex.data
+        profile.measurement_consent_at = profile.measurement_consent_at or utcnow()
+        save_measurement(current_user, form.weight_kg.data, form.height_cm.data)
+        record_event(
+            "personalization.measurement_saved",
+            "user_profile",
+            profile.user_id,
+            current_user.id,
+        )
+        db.session.commit()
+        return redirect(url_for("profile.setup_goal"))
     elif not form.is_submitted() and latest:
         form.weight_kg.data, form.height_cm.data = latest.weight_kg, latest.height_cm
     return render_template(
-        "profile/setup_measurement.html", form=form, allowed=allowed, latest=latest
+        "profile/setup_measurement.html",
+        form=form,
+        allowed=access.allowed,
+        latest=latest,
+        measurement_access=access,
+        measurement_blocked=form.is_submitted() and not access.allowed,
     )
 
 

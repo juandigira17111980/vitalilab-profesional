@@ -45,7 +45,7 @@
         {{ field(form.height_cm, autocomplete="off", placeholder="Ej. 168") }}
       </div>
       {% if not current_user.profile.measurement_consent_at %}<label class="check-row">{{ form.measurement_consent() }}<span>{{ form.measurement_consent.label.text }}</span></label>{% for error in form.measurement_consent.errors %}<p class="field-error">{{ error }}</p>{% endfor %}{% endif %}
-      {% else %}<p class="context-note">Para guardar mediciones escolares, primero debe verificarse tu vinculación y las autorizaciones. Mientras tanto puedes usar hábitos y rutinas generales.</p><a class="text-link" href="{{ url_for('school.account') }}">Gestionar mi vinculación →</a>{% endif %}
+      {% else %}{% include 'profile/_measurement_access.html' %}{% endif %}
       {{ submit_button(form.submit) }}
     </form>
   </div>

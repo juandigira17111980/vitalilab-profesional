@@ -1,5 +1,14 @@
 # Changelog
 
+## Guardado de mediciones y autorización — 2026-10-16
+
+- La pantalla utiliza la fecha enviada al resolver el permiso, no solo la fecha previamente guardada.
+- El bloqueo de autorización ya no se presenta como un error del peso; explica el paso pendiente y enlaza a su gestión.
+- Se distinguen uso personal de menores, vinculación pendiente, revisión incompleta, colegio inactivo y grupo no disponible.
+- Se conservan temporalmente los datos enviados para corregir una fecha equivocada, sin guardarlos ni activar consentimientos.
+- La política de permisos permanece intacta: no se aprueban cuentas, no se cambia la base y no se habilitan estadísticas automáticamente.
+- Diagnóstico, pasos administrativos y alcance en `docs/30_GUARDADO_DE_MEDICIONES_Y_AUTORIZACIONES.md`.
+
 ## Paquete DBA de estudio y sustentación — 2026-10-15
 
 - Inventario físico PostgreSQL 18.6: 17 entidades, 148 campos y 22 FK, sin exportar filas del sitio.

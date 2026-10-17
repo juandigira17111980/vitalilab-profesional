@@ -1,5 +1,6 @@
 """Explicit, one-time setup. BMI is descriptive and never chooses exercise loads."""
 
+from dataclasses import dataclass
 from decimal import Decimal
 
 from app.extensions import db
@@ -70,6 +71,81 @@ def measurement_permission(user, birth_date=None):
         and member.reviewed_by_user_id
         and member.school.active
         and (member.requested_role != "student" or (member.group and member.group.active))
+    )
+
+
+@dataclass(frozen=True)
+class MeasurementAccess:
+    allowed: bool
+    code: str = "allowed"
+    title: str = ""
+    message: str = ""
+    action: str = "school"
+
+
+def measurement_access(user, birth_date=None):
+    """Explain the existing permission decision; never grant or fabricate approval."""
+    if measurement_permission(user, birth_date):
+        return MeasurementAccess(allowed=True)
+    member = membership_for(user)
+    if not member:
+        if user.profile.usage_mode == "personal":
+            return MeasurementAccess(
+                False,
+                "minor-authorization",
+                "Antes de guardar, necesitamos una autorización",
+                "La fecha de nacimiento indica que eres menor de edad. "
+                "El guardado de mediciones para menores en uso personal aún no está "
+                "habilitado: marcar la casilla no activa esa autorización. "
+                "Si la fecha está equivocada, puedes corregirla. "
+                "Si es correcta, puedes seguir usando hábitos y rutinas generales. "
+                "No necesitas vincularte a un colegio si tu uso es personal.",
+                "birth-date",
+            )
+        return MeasurementAccess(
+            False,
+            "school-verification",
+            "Tu espacio escolar necesita una verificación",
+            "Consulta tu vinculación: la administración debe verificar el colegio, "
+            "el grupo y las autorizaciones antes de habilitar el guardado. "
+            "Escribir el nombre del colegio no activa esta autorización.",
+        )
+    if member.status != "approved":
+        status = {
+            "pending": "Tu solicitud está pendiente de revisión.",
+            "rejected": "Tu vinculación no está aprobada.",
+            "revoked": "Tu vinculación está retirada.",
+        }.get(member.status, "Tu vinculación necesita una revisión.")
+        return MeasurementAccess(
+            False,
+            "membership-review",
+            "Tu espacio escolar necesita una verificación",
+            status + " La administración debe comprobar la pertenencia y las autorizaciones. "
+            "Abre tu vinculación para consultar el estado; no hace falta repetir las medidas.",
+        )
+    if not member.school.active:
+        return MeasurementAccess(
+            False,
+            "school-inactive",
+            "Tu colegio está temporalmente inactivo",
+            "La administración debe revisar el estado del colegio antes de habilitar "
+            "el guardado de nuevas mediciones. Tu historial se conserva.",
+        )
+    if not (member.authorization_confirmed and member.reviewed_at and member.reviewed_by_user_id):
+        return MeasurementAccess(
+            False,
+            "authorization-review",
+            "Falta confirmar la revisión de tus autorizaciones",
+            "La vinculación figura aprobada, pero falta registrar una revisión completa "
+            "de las autorizaciones. Contacta con la administración para que revise "
+            "el registro; no se soluciona cambiando tu peso ni tu altura.",
+        )
+    return MeasurementAccess(
+        False,
+        "group-unavailable",
+        "Falta un grupo activo en tu vinculación",
+        "La administración debe asignarte un grupo activo de tu colegio "
+        "antes de habilitar el guardado de mediciones. Tu historial se conserva.",
     )
 
 

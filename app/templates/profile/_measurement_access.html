@@ -1,0 +1,11 @@
+<aside class="notice" role="status" aria-live="polite" data-measurement-access="{{ measurement_access.code }}">
+  <h3>{{ measurement_access.title }}</h3>
+  <p>{{ measurement_access.message }}</p>
+  {% if measurement_blocked %}<p><strong>No se guardaron estas mediciones ni se activó tu autorización.</strong></p>{% endif %}
+  {% if measurement_access.action == 'birth-date' %}
+  <a class="text-link" href="{{ url_for('profile.edit') }}#birth_date">Revisar mi fecha de nacimiento →</a>
+  {% else %}
+  <a class="text-link" href="{{ url_for('school.account') }}">Ver mi vinculación y su estado →</a>
+  {% endif %}
+  <p>Puedes continuar con tus hábitos y las rutinas generales mientras se resuelve este paso.</p>
+</aside>
