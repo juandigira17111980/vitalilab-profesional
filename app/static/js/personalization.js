@@ -45,3 +45,40 @@ document.querySelectorAll('[data-confirm-archive]').forEach((form) => {
     if (!window.confirm('¿Archivar esta rutina? Tu historial y puntos se conservan.')) event.preventDefault();
   });
 });
+
+// This optional calculator has no named fields, requests, cookies or persistence.
+document.querySelectorAll('[data-bmi-preview]').forEach((preview) => {
+  const weightInput = preview.querySelector('[data-bmi-weight]');
+  const heightInput = preview.querySelector('[data-bmi-height]');
+  const result = preview.querySelector('[data-bmi-result]');
+  const readNumber = (input) => {
+    const value = input.value.trim();
+    return /^\d+(?:[.,]\d+)?$/.test(value) ? Number(value.replace(',', '.')) : NaN;
+  };
+  const calculate = () => {
+    const weight = readNumber(weightInput);
+    const height = readNumber(heightInput);
+    const bmi = weight / ((height / 100) ** 2);
+    result.hidden = false;
+    if (!Number.isFinite(weight) || weight < 10 || weight > 500
+      || !Number.isFinite(height) || height < 50 || height > 250
+      || !Number.isFinite(bmi) || bmi < 5 || bmi > 100) {
+      result.textContent = 'Revisa el peso en kilogramos y la altura en centímetros.';
+      return;
+    }
+    result.textContent = `Tu IMC es ${bmi.toLocaleString('es-CO', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2,
+    })}. Esta consulta no se guarda en tu historial.`;
+  };
+  preview.querySelector('[data-bmi-calculate]').addEventListener('click', calculate);
+  [weightInput, heightInput].forEach((input) => {
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') { event.preventDefault(); calculate(); }
+    });
+    input.addEventListener('input', () => { result.hidden = true; result.textContent = ''; });
+  });
+  window.addEventListener('pagehide', () => {
+    weightInput.value = ''; heightInput.value = '';
+    result.hidden = true; result.textContent = '';
+  });
+});

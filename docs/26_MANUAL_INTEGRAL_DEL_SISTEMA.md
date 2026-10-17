@@ -1,5 +1,7 @@
 # Manual integral de VitaliLab
 
+**Actualización del 16 de octubre:** el uso personal continúa directamente a objetivo y rutinas, con [IMC opcional calculado en el navegador](31_USO_PERSONAL_SIMPLE.md). Las secciones de mediciones de este manual describen el historial guardado y el recorrido escolar; ya no son un requisito del plan personal.
+
 ## Propósito de este manual
 
 Este documento explica cómo funciona VitaliLab y cómo mantenerlo sin poner en riesgo sus datos ni otros servicios del servidor. Está dirigido a estudiantes que están aprendiendo programación y a las personas que administran el proyecto. Puedes leerlo de principio a fin para estudiar, o consultar un capítulo durante una práctica.

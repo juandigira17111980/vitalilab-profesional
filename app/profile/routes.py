@@ -13,6 +13,7 @@ from app.services.personalization import (
     latest_measurement,
     measurement_access,
     measurement_permission,
+    personalization_ready,
     save_measurement,
     student_setup_required,
 )
@@ -78,7 +79,12 @@ def edit():
         return redirect(url_for("profile.edit"))
     elif form.is_submitted():
         if measurement_blocked:
-            flash("La medición no se guardó. Consulta el paso pendiente en tu perfil.", "info")
+            flash(
+                "No guardamos la medición. Puedes continuar con tu objetivo."
+                if profile.usage_mode == "personal"
+                else "La medición no se guardó. Consulta el paso pendiente en tu perfil.",
+                "info",
+            )
         else:
             flash("Revisa los campos marcados.", "error")
     elif latest:
@@ -97,6 +103,8 @@ def edit():
         measurement_access=access,
         measurement_blocked=measurement_blocked,
         needs_setup=student_setup_required(current_user),
+        plan_ready=personalization_ready(current_user),
+        personal_mode=profile.usage_mode == "personal",
     )
 
 
@@ -116,11 +124,18 @@ def tracking():
 @login_required
 @limiter.limit("20 per hour", methods=["POST"])
 def setup_measurement():
+    personal_mode = current_user.profile.usage_mode == "personal"
+    if personal_mode and request.method == "GET" and request.args.get("guardar") != "1":
+        return redirect(url_for("profile.setup_goal"))
     latest = latest_measurement(current_user)
     form = MeasurementSetupForm(obj=current_user.profile)
     valid = form.validate_on_submit()
     birth = form.birth_date.data if form.is_submitted() and not form.birth_date.errors else None
     access = measurement_access(current_user, birth)
+    if personal_mode and not access.allowed:
+        if form.is_submitted():
+            flash("Puedes preparar tus rutinas sin guardar mediciones.", "info")
+        return redirect(url_for("profile.setup_goal"))
     if valid and is_school_student(current_user) and not form.birth_date.data:
         form.birth_date.errors.append(
             "Completa tu fecha de nacimiento para contextualizar la medición."
@@ -156,10 +171,14 @@ def setup_measurement():
 @login_required
 @limiter.limit("20 per hour", methods=["POST"])
 def setup_goal():
+    personal_mode = current_user.profile.usage_mode == "personal"
     latest = latest_measurement(current_user)
-    if not latest or not current_user.profile.measurement_consent_at:
-        return redirect(url_for("profile.setup_measurement"))
-    if not measurement_permission(current_user):
+    has_measurement = bool(
+        latest
+        and current_user.profile.measurement_consent_at
+        and measurement_permission(current_user)
+    )
+    if not personal_mode and not has_measurement:
         return redirect(url_for("profile.setup_measurement"))
     form = MovementGoalForm(obj=current_user.profile)
     if form.validate_on_submit():
@@ -171,5 +190,9 @@ def setup_goal():
         flash("Tu espacio está listo. Elige una rutina o crea la tuya.", "success")
         return redirect(url_for("wellness.library", para="mi"))
     return render_template(
-        "profile/setup_goal.html", form=form, latest=latest, bmi_status=reference_note(latest)
+        "profile/setup_goal.html",
+        form=form,
+        latest=latest if has_measurement else None,
+        bmi_status=reference_note(latest) if has_measurement else None,
+        personal_mode=personal_mode,
     )

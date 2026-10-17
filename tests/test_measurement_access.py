@@ -29,11 +29,14 @@ def test_first_minor_birth_date_has_actionable_notice_not_weight_error(
     response = client.post(
         path,
         data={**measurement_data(), "display_name": "Mi perfil", "usage_mode": "personal"},
+        follow_redirects=True,
     )
     assert response.status_code == 200
-    assert 'data-measurement-access="minor-authorization"' in response.text
-    assert "No se guardaron estas mediciones" in response.text
-    assert "No necesitas vincularte a un colegio si tu uso es personal" in response.text
+    if path == "/perfil/":
+        assert 'data-measurement-access="minor-authorization"' in response.text
+        assert "No se guardaron estas mediciones" in response.text
+    else:
+        assert "Tu objetivo, tu ritmo" in response.text
     assert "Tu institución debe verificar" not in response.text
     assert 'class="field-error"' not in response.text
     assert user.profile.birth_date is None
@@ -44,16 +47,15 @@ def test_first_minor_birth_date_has_actionable_notice_not_weight_error(
     assert "no-store" in response.headers["Cache-Control"]
 
 
-def test_setup_preserves_attempt_for_correction_and_corrected_adult_can_continue(
+def test_legacy_minor_attempt_continues_to_goals_and_adult_can_still_save_optional_measurement(
     client, user_factory, login
 ):
     user = user_factory()
     login()
     blocked = client.post("/perfil/inicio/medicion", data=measurement_data())
-    assert "Revisar los datos que ingresé" in blocked.text
-    assert 'value="2009-11-11"' in blocked.text
-    assert 'value="58"' in blocked.text
-    assert 'value="174"' in blocked.text
+    assert blocked.status_code == 302
+    assert blocked.location.endswith("/perfil/inicio/objetivo")
+    assert db.session.scalar(db.select(db.func.count(HealthMeasurement.id))) == 0
     saved = client.post("/perfil/inicio/medicion", data=measurement_data(birth_date="1990-11-11"))
     assert saved.status_code == 302 and saved.location.endswith("/perfil/inicio/objetivo")
     row = db.session.scalar(db.select(HealthMeasurement))
@@ -66,10 +68,10 @@ def test_known_minor_does_not_get_measurement_inputs_before_review(client, user_
     user.profile.birth_date = date(2014, 1, 1)
     db.session.commit()
     login()
-    response = client.get("/perfil/inicio/medicion")
-    assert 'data-measurement-access="minor-authorization"' in response.text
+    response = client.get("/perfil/inicio/medicion", follow_redirects=True)
+    assert "Tu objetivo, tu ritmo" in response.text
     assert 'name="weight_kg"' not in response.text
-    assert 'href="/perfil/#birth_date"' in response.text
+    assert "Guardar mi objetivo y ver rutinas" in response.text
     assert client.get("/habitos/").status_code == 200
 
 
