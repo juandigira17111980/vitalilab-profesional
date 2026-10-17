@@ -1,0 +1,12 @@
+{% from 'macros/forms.html' import field, submit_button %}
+<form method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <p class="field-hint">Si eres menor de edad o participas como estudiante, el guardado requiere una autorización verificada. La casilla de este formulario no sustituye esa revisión.</p>
+  {{ field(form.birth_date, autocomplete="bday", hint="En estudiantes se necesita para contextualizar el crecimiento. Sin edad no se interpreta el IMC con referencias infantiles.") }}
+  <div class="field-row">{{ field(form.weight_kg, inputmode="decimal", placeholder="Kilogramos") }}{{ field(form.height_cm, inputmode="decimal", placeholder="Centímetros") }}</div>
+  {{ field(form.reference_sex, hint="Opcional. Solo se usa, si procede, para la referencia de crecimiento por edad; no representa identidad de género.") }}
+  <label class="check-row">{{ form.measurement_consent() }}<span>{{ form.measurement_consent.label.text }}</span></label>
+  {% for error in form.measurement_consent.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  <p class="field-hint">Estas mediciones son privadas. No habilitan el aporte a estadísticas del colegio. Consulta la <a href="{{ url_for('main.privacy') }}">política de privacidad</a>.</p>
+  {{ submit_button(form.submit) }}
+</form>

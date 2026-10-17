@@ -2,9 +2,11 @@
 
 Fuente de verdad técnica y académica del proyecto. Los documentos separan cuatro estados: implementado localmente, verificado por pruebas, validado en Staging y promovido a Production.
 
-Fecha de actualización documental: **15 de octubre de 2026**. Las pruebas y auditorías históricas conservan su fecha de ejecución.
+Fecha de actualización documental: **16 de octubre de 2026**. Las pruebas y auditorías históricas conservan su fecha de ejecución.
 
 ## Edición actual
+
+La [guía del guardado de mediciones y autorizaciones](30_GUARDADO_DE_MEDICIONES_Y_AUTORIZACIONES.md) explica el bloqueo reportado, su corrección de interfaz, los pasos para revisión administrativa y la limitación del uso personal de menores. No elimina verificaciones ni convierte los ejemplos en autorizaciones reales.
 
 Para estudiar específicamente PostgreSQL, consultar la [guía DBA y de sustentación](dba/README.md), el [diccionario físico de 148 campos](dba/diccionario_postgresql.md), el [modelo completo](dba/modelo_completo.svg) y su [evidencia de validación](dba/VALIDACION.md). El paquete incluye SQL de estructura, datos inventados y ejercicios; no comparte la base publicada. El acceso individual se activa tras recibir la llave pública del compañero.
 

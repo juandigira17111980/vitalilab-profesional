@@ -5,12 +5,11 @@
 <section class="section shell shell--narrow">
   <ol class="setup-steps" aria-label="Progreso de personalización"><li aria-current="step"><span>01</span> Mi medición</li><li><span>02</span> Mi objetivo</li><li><span>03</span> Mis rutinas</li></ol>
   {% if allowed %}<article class="form-card"><h2>Conoce tu medición</h2><p>El IMC relaciona peso y altura. Es una referencia, no una valoración de tu cuerpo ni una indicación de qué ejercicio hacer.</p>
-  <form method="post" novalidate>{{ form.hidden_tag() }}<div class="field-row">{{ field(form.weight_kg, inputmode="decimal", placeholder="Kilogramos") }}{{ field(form.height_cm, inputmode="decimal", placeholder="Centímetros") }}</div>
-  {{ field(form.birth_date, autocomplete="bday", hint="En estudiantes se necesita para contextualizar el crecimiento. Sin edad no se interpreta el IMC con referencias infantiles.") }}
-  {{ field(form.reference_sex, hint="Opcional. Solo se usa, si procede, para la referencia de crecimiento por edad; no representa identidad de género.") }}
-  <label class="check-row">{{ form.measurement_consent() }}<span>{{ form.measurement_consent.label.text }}</span></label>{% for error in form.measurement_consent.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-  <p class="field-hint">Estas mediciones son privadas. No habilitan el aporte a estadísticas del colegio. Consulta la <a href="{{ url_for('main.privacy') }}">política de privacidad</a>.</p>{{ submit_button(form.submit) }}</form></article>
-  {% else %}<article class="panel-card"><p class="eyebrow">Primero, tu autorización</p><h2>Tu espacio escolar necesita una verificación.</h2><p>La administración debe comprobar tu vinculación y las autorizaciones correspondientes antes de guardar mediciones. No necesitas introducirlas mientras esperas.</p><a class="button button--primary" href="{{ url_for('school.account') }}">Ver mi vinculación</a><p>Puedes seguir con tus hábitos y explorar la biblioteca general.</p></article>{% endif %}
+  {% include 'profile/_measurement_setup_form.html' %}</article>
+  {% else %}
+  {% include 'profile/_measurement_access.html' %}
+  {% if form.is_submitted() %}<details class="form-card"><summary>Revisar los datos que ingresé</summary><p>Si escribiste una fecha incorrecta, corrígela aquí. Reenviar las mismas medidas no activa una autorización pendiente.</p>{% include 'profile/_measurement_setup_form.html' %}</details>{% endif %}
+  {% endif %}
   <div class="button-row setup-exits"><a class="text-link" href="{{ url_for('main.dashboard') }}">Continuar con mis hábitos →</a><a class="text-link" href="{{ url_for('wellness.library') }}">Explorar rutinas generales →</a></div>
 </section>
 {% endblock %}
